@@ -41,6 +41,15 @@ python -m pytest tests -q
 
 Every model parameter is available as a `--flag` on every subcommand.
 
+The paper, with its derivations, diagrams and the design study, is
+`paper/The Flying Screen.pdf`. To rebuild it (needs a TeX distribution with
+pdflatex and bibtex):
+
+```
+python paper/build.py            # writes paper/The Flying Screen.pdf
+python paper/make_results.py     # first, only if the engine changed (~15 min)
+```
+
 ---
 
 ## The seven layers

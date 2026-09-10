@@ -204,9 +204,11 @@ would reduce available thrust at low state of charge is not modelled.
 
 \subsection{Numerics}
 
-The convergence check that matters for a sampled-data simulation, holding the
-controller rate fixed and refining the integration substeps, was not run
-(\cref{sec:numerics}). The differential evolution of \cref{eq:outerprog} is
+The integration is converged at the design step (\cref{tab:numerics}). The
+controller rate is a different matter: it defines the sampled-data loop, and
+doubling it moves the peak tracking error by \SI{\rCtlDTrack}{\milli\metre}, so
+the rate simulated must be the rate the real autopilot runs at. The
+differential evolution of \cref{eq:outerprog} is
 stochastic and offers no optimality certificate: the reported designs are the
 best found, not the best that exists, and the exterior penalty of
 \cref{eq:penalty} means a returned point may violate a constraint slightly,

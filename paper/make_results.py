@@ -612,7 +612,8 @@ def emit(R: Dict[str, Any]) -> None:
         h2 = Nu["half_dt"]
         mac("CtlDP", f(100 * abs(h2["P_mean"] / coarse["P_mean"] - 1.0), 2))
         mac("CtlDTrack", f(abs(1000 * (h2["track"] - coarse["track"])), 1))
-        mac("CtlDClear", f(abs(1000 * (h2["clear"] - coarse["clear"])), 1))
+        mac("CtlDClear", f(abs(1000 * (h2["clear"] - coarse["clear"])), 2))
+        mac("CtlTrackHalf", f(1000 * h2["track"], 0)); mac("CtlTrackBase", f(1000 * coarse["track"], 0))
 
     Nf = R.get("nearfield")
     if Nf:

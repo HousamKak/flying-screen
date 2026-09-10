@@ -51,6 +51,20 @@ upright while the airframe tilts.}
 \label{fig:cascade}
 \end{figure}
 
+\begin{figure}[htbp]
+\centering
+\input{figures/sec12_bandwidth}
+\caption{The frequency ladder of the design's cascade on a logarithmic axis,
+with the gains of \cref{mod:gains}. Each loop is at least a factor of three
+slower than the one it relies on: position at $\sqrt{K_p}$, attitude at
+$\sqrt{K_R}$, the motors at $1/\tau_m$. The governor's filter at $\sqrt{k_p}$
+shapes the reference and closes no loop on the vehicle. The first bending mode
+of the arms and the sampling rate of the controller lie one and two orders of
+magnitude above the fastest loop, which is the condition under which the
+airframe may be treated as rigid and the sampled controller as continuous.}
+\label{fig:bandwidth}
+\end{figure}
+
 \begin{remark}[Flatness]
 The quadrotor with these dynamics is differentially flat with flat outputs
 $(x,y,z,\psi)$~\cite{mellinger2011}: every state and input is an algebraic
@@ -324,21 +338,8 @@ and the actuator dynamics, and \cref{sec:results} verifies by simulation that
 the resulting loop stays out of saturation on the missions flown. For the
 design the two bounds are \SI{\rKRauth}{\per\second\squared} and
 \SI{\rKRlag}{\per\second\squared}, the lag bound binds, and the value used is
-$K_R=\SI{\rKR}{\per\second\squared}$, $K_\omega=\SI{\rKw}{\per\second}$.
-
-\begin{figure}[htbp]
-\centering
-\input{figures/sec12_bandwidth}
-\caption{The frequency ladder of the design's cascade on a logarithmic axis.
-Each loop is at least a factor of three slower than the one it relies on:
-position at $\sqrt{K_p}$, attitude at $\sqrt{K_R}$, the motors at $1/\tau_m$.
-The governor's filter at $\sqrt{k_p}$ shapes the reference and closes no loop
-on the vehicle. The first bending mode of the arms and the sampling rate of
-the controller lie one and two orders of magnitude above the fastest loop,
-which is the condition under which the airframe may be treated as rigid and
-the sampled controller as continuous.}
-\label{fig:bandwidth}
-\end{figure}
+$K_R=\SI{\rKR}{\per\second\squared}$, $K_\omega=\SI{\rKw}{\per\second}$;
+\cref{fig:bandwidth} places these values on one frequency axis.
 
 \begin{remark}[Yaw is the weak axis]
 By \cref{eq:alloc} the yaw column involves $k_Q$ rather than $k_T L$, and
@@ -354,6 +355,7 @@ authority; the architectural response, a yaw axis on the gimbal where a
 \SI{30}{\gram} motor solves what the airframe cannot, is not modelled.
 \end{remark}
 
+\FloatBarrier
 \subsection{Control allocation under saturation}
 
 Given a desired wrench $\vect\chi_d = (T_c,\vect\tau)$ the allocation problem is

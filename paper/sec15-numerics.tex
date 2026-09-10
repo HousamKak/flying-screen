@@ -179,9 +179,41 @@ the plant under a piecewise-constant input at fourth order. The closed loop is
 therefore a sampled-data system at \SI{250}{\hertz}, which is what a digital
 autopilot is; the $O(h)$ difference between it and a continuous-feedback
 idealisation is a property of the system being simulated, not an integration
-error. A convergence check with the controller rate held fixed and the
-integration substeps refined was not run and is listed in
-\cref{sec:limitations}. \Cref{fig:sampled} shows the structure of one step.
+error. \Cref{fig:sampled} shows the structure of one step.
+
+\Cref{tab:numerics} separates the two. On the turnaround, the hardest
+mission, the controller is held at \SI{250}{\hertz} while the plant is
+integrated with one to eight RK4 substeps per control period under the same
+held commands. The mean power changes by a relative \num{\rSubDP}, and the
+peak tracking error and the minimum rotor clearance by less than
+\SI{\rSubDTrack}{\milli\metre} and \SI{\rSubDClear}{\milli\metre}: at the
+design step the integration is converged, and the figures of
+\cref{sec:results} are properties of the sampled-data loop, not of the
+integrator. Halving the controller period instead changes the loop being
+simulated, not the accuracy of simulating it. It moves the mean power by
+\SI{\rCtlDP}{\percent} and the rotor clearance by
+\SI{\rCtlDClear}{\milli\metre}, but raises the peak tracking error from
+\SI{\rCtlTrackBase}{\milli\metre} to \SI{\rCtlTrackHalf}{\milli\metre}, still
+inside the margin $\varepsilon$. The peak tracking error is therefore the one
+reported quantity that is sensitive to the controller rate, and its distance
+to $\varepsilon$ is the number to recheck for an autopilot running at a
+different rate.
+
+\begin{table}[tbp]
+\centering
+\caption{Integration convergence on the turnaround at a fixed controller rate
+of \SI{250}{\hertz}: the plant is integrated with one to eight RK4 substeps
+per control period under the same held commands. Every reported quantity is
+unchanged to the digits shown.}
+\label{tab:numerics}
+\small
+\begin{tabular}{@{}rrrrrr@{}}
+\toprule
+Substeps & RK4 step & Mean power & Peak $e_{\mathrm{track}}$ & $e_{\mathrm{lag}}$ rms & Rotor clearance\\
+\midrule
+\inputrows{results/tab_numerics_rows}
+\end{tabular}
+\end{table}
 
 \begin{figure}[tbp]
 \centering
