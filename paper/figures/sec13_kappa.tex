@@ -1,0 +1,44 @@
+% Lumped fixed-area closure of the design with the whole power multiplied by
+% kappa (gen_b.kappa): alpha m - kappa beta m^{3/2} against the load
+% m_fix + kappa P_aux t_f / e_b. (a) the fold falls as kappa^{-2}; (b) near the
+% light root, the root moves only slightly while the critical load collapses.
+\begin{tikzpicture}
+\begin{groupplot}[group style={group size=2 by 1, horizontal sep=1.6cm},
+  halfplot, height=6.0cm, width=0.46\linewidth]
+\nextgroupplot[xlabel={gross mass $m$ [\si{\kilo\gram}]},
+  ylabel={load [\si{\kilo\gram}]}, xmin=0, xmax=30, ymin=0, ymax=3.1,
+  title={(a) the fold moves in and down},
+  legend style={at={(0.5,-0.32)}, anchor=north, font=\scriptsize},
+  legend columns=3]
+  \addplot[cA] table[x=m, y=F0] {results/fig/b_kappa.dat};
+  \addlegendentry{$\varkappa=1$}
+  \addplot[cE] table[x=m, y=F1] {results/fig/b_kappa.dat};
+  \addlegendentry{$\varkappa=1.1$}
+  \addplot[cD] table[x=m, y=F2] {results/fig/b_kappa.dat};
+  \addlegendentry{$\varkappa=1.25$}
+  \addplot[cG, dashed, forget plot] table[x=m, y=M0] {results/fig/b_kappa.dat};
+  \addplot[only marks, mark=*, mark size=1.9pt, black, forget plot]
+    table[x=mstar, y=Mmax] {results/fig/b_kappa_pts.dat};
+  \node[lbl, anchor=south west] at (axis cs:18.5,2.55) {$\Mmax\propto\varkappa^{-2}$};
+  \node[lbl, cG, anchor=south west] at (axis cs:18,0.62) {$\Mzero(\varkappa)$};
+  \draw[cG] (axis cs:0.4,0.35) rectangle (axis cs:1.9,0.85);
+\nextgroupplot[xlabel={gross mass $m$ [\si{\kilo\gram}]},
+  ylabel={load [\si{\kilo\gram}]}, xmin=0.9, xmax=1.45, ymin=0.52, ymax=0.68,
+  title={(b) near the light root},
+  yticklabel style={/pgf/number format/fixed, /pgf/number format/precision=2}]
+  \addplot[cA, name path=f0] table[x=m, y=F0] {results/fig/b_kappa.dat};
+  \addplot[cE, name path=f1] table[x=m, y=F1] {results/fig/b_kappa.dat};
+  \addplot[cD, name path=f2] table[x=m, y=F2] {results/fig/b_kappa.dat};
+  \addplot[cA, dashed, name path=l0] table[x=m, y=M0] {results/fig/b_kappa.dat};
+  \addplot[cE, dashed, name path=l1] table[x=m, y=M1] {results/fig/b_kappa.dat};
+  \addplot[cD, dashed, name path=l2] table[x=m, y=M2] {results/fig/b_kappa.dat};
+  \path[name intersections={of=f0 and l0, name=a}];
+  \path[name intersections={of=f1 and l1, name=b}];
+  \path[name intersections={of=f2 and l2, name=c}];
+  \fill[cA] (a-1) circle (2pt);
+  \fill[cE] (b-1) circle (2pt);
+  \fill[cD] (c-1) circle (2pt);
+  \node[lbl, anchor=north west, align=left] at (axis cs:0.92,0.675)
+    {dashed: $\mfix+\varkappa\Paux t_f/\eb$\\dots: light root $m_-(\varkappa)$};
+\end{groupplot}
+\end{tikzpicture}

@@ -1,0 +1,26 @@
+\input{results/fig/c_geom}%
+% The three wall-thickness requirements of the arm against gross mass, for
+% the design's arm tube; the wall used is their maximum.
+\begin{tikzpicture}
+  \begin{loglogaxis}[paperplot, height=5.4cm,
+      xlabel={gross mass $m$ [\si{\kilo\gram}]},
+      ylabel={wall thickness [\si{\milli\metre}]},
+      xmin=0.3, xmax=8, ymin=0.01, ymax=3,
+      xtick={0.3,0.5,1,2,5,8}, xticklabels={0.3,0.5,1,2,5,8},
+      legend pos=south east]
+    \addplot[black!25, line width=4pt, forget plot]
+      table[x=m, y=t] {results/fig/c_wall.dat};
+    \addplot[cB] table[x=m, y=tsigma] {results/fig/c_wall.dat};
+    \addlegendentry{strength, $t_\sigma$}
+    \addplot[cA] table[x=m, y=tdelta] {results/fig/c_wall.dat};
+    \addlegendentry{stiffness, $t_\delta$}
+    \addplot[cG, dashed] table[x=m, y=tmin] {results/fig/c_wall.dat};
+    \addlegendentry{minimum gauge, $t_{\min}$}
+    \addlegendimage{black!25, line width=4pt}
+    \addlegendentry{wall used, $\max\{\cdot\}$}
+    \draw[construct] (axis cs:\cM,0.01) -- (axis cs:\cM,3);
+    \addplot[only marks, mark=*, mark size=2pt, cA] coordinates {(\cM,\cWallStiff)};
+    \node[lbl, anchor=west, align=left] at (axis cs:1.05*\cM,0.3)
+      {design, $m=\SI{\cM}{\kilo\gram}$:\\stiffness governs};
+  \end{loglogaxis}
+\end{tikzpicture}

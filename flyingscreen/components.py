@@ -437,7 +437,7 @@ def arm_structure(p: Dict[str, float], m: float,
 
 
 def optimal_tip_speed(p: Dict[str, float], T: float,
-                      lo: float = 30.0, hi: float = 260.0) -> Dict[str, float]:
+                      lo: float = 8.0, hi: float = 260.0) -> Dict[str, float]:
     """
     Tip speed that maximises the figure of merit at thrust T.
 

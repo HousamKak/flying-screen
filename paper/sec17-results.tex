@@ -90,6 +90,21 @@ Display & px/deg & Logical & Areal & Gross & Power & $L_p(\SI{1}{\metre})$ & At 
 \end{tabular}
 \end{table}
 
+\Cref{fig:displays} shows the same comparison graphically.
+
+\begin{figure}[tbp]
+\centering
+\input{figures/sec17_displays}
+\caption{The display candidates of \cref{tab:displays}, each with its aircraft
+re-optimised. Left: gross mass, against the \SI{\eOptMass}{\kilo\gram}
+limit. Right: free-field level at \SI{1}{\metre}, against the
+\SI{\eOptSpl}{dBA} limit. Every candidate that fails exceeds the noise limit,
+and only one of them exceeds the mass limit: a heavier display needs a more
+heavily loaded rotor, and by \cref{obs:sixthpower} that is paid for in
+decibels long before it is paid for in kilograms.}
+\label{fig:displays}
+\end{figure}
+
 \begin{finding}
 The full $1920\times1080$ panel is available, provided it is a laptop panel
 and not a monitor panel. Flying a whole laptop is not: the panel is a sixth
@@ -129,6 +144,22 @@ and $|\Delta z|=\SI{0.13}{\metre}$, \cref{eq:clearance} gives
 $\ell_0=\SI{0.148}{\metre}$ against a safe distance of \SI{0.45}{\metre}: a
 violation by a factor of three, invisible to any check evaluated at the
 vehicle centre.
+
+\Cref{fig:clearance} draws the two standoffs to scale.
+
+\begin{figure}[tbp]
+\centering
+\input{figures/sec17_clearance}
+\caption{\Cref{prop:clearance} in side view, to scale. The display is held at
+eye height at standoff $d$; with the screen above the rotors the rotor plane
+lies $|\Delta z|=\SI{\eDeltaZ}{\metre}$ below the eye; the nearest blade tip is
+the reach $\mathcal{R}=L+R$ back toward the user from the rotor centroid. At
+$d=\SI{0.70}{\metre}$ the tip is inside the sphere of radius $d_{\mathrm{safe}}$
+about the eye, although the display is well outside it; a check made at the
+vehicle centre would pass this design. At $d=\SI{1.20}{\metre}$ the tip is
+outside.}
+\label{fig:clearance}
+\end{figure}
 
 \Cref{tab:clearance} compares the two remedies, each option closed, its gains
 capped by \cref{mod:gains} for its own authority (attitude and position gains
@@ -200,6 +231,24 @@ workspace than the resolution suggests. The resolution is not the constraint;
 the angular size of a character is.
 \end{finding}
 
+\Cref{fig:readability} shows the whole trade over standoff.
+
+\begin{figure}[tbp]
+\centering
+\input{figures/sec17_readability}
+\caption{Readability against blade clearance, over the standoff $d$ from the
+eye to the display. Top: the logical desktop width once the interface is
+scaled to a \SI{16}{\arcminute} character height; it is the full \num{1920}
+pixels only within \SI{\eDtext}{\metre}, where unscaled text already meets the
+minimum, and it falls as $1/d$ beyond. A \num{1280}-pixel desktop needs
+$d\le\SI{\eDfull}{\metre}$ (green). Bottom: the nearest blade tip $\ell_0$ of
+\cref{eq:clearance}; it stays at $|\Delta z|$ while the rotors overhang the
+user and clears $d_{\mathrm{safe}}$ only for $d\ge\SI{\eDsafeCross}{\metre}$
+(green). The two green regions do not overlap, and at the first safe standoff
+the desktop is already down to \eLogicalAtCross\ pixels.}
+\label{fig:readability}
+\end{figure}
+
 \subsection{Screen above or below the rotors}
 
 Because the display is vertical and the rotor flow is vertical
@@ -214,12 +263,42 @@ air, because by the remark following \cref{eq:screenmoment} the drag moment
 becomes weathercock-stable, and marginally worse in a steady breeze for the
 same reason.
 
+\Cref{fig:placement} compares the two at the design standoff.
+
+\begin{figure}[tbp]
+\centering
+\input{figures/sec17_placement}
+\caption{The two placements of the display at the design standoff, to scale,
+with the display held at eye height in both. The nearest-tip clearance
+(green) is the same either way, because \cref{eq:clearance} depends on
+$\Delta z$ only through $\Delta z^2$. What differs is where the rotor plane
+sits relative to the head: with the screen below it is at the top of the head,
+with the screen above it drops below the chin, and the panel is then the
+object between the blades and the face. The heights marked are rotor plane
+heights above the floor.}
+\label{fig:placement}
+\end{figure}
+
 \subsection{The design}
 
 \Cref{tab:design} gives the resulting machine with a buildable payload: a bare
 laptop panel on a matched controller board, a Raspberry Pi running a remote
 desktop client, a separate flight controller, and an on-sensor inference
-camera.
+camera. \Cref{fig:design} draws it to scale.
+
+\begin{figure}[tbp]
+\centering
+\input{figures/sec17_design}
+\caption{DESK-1/W to scale. Top view: four rotors of diameter $D$ in the
+$\times$ layout, the arm length $L$ set by the tip gap rule of
+\cref{sec:components} so that adjacent guards (outer circles) nearly touch,
+the display edge on above the hub, and $\vect b_1$ pointing at the user. Side
+view: the display on its gimbal a height $r_{cp}$ above the rotor plane,
+which is what puts the panel, and not the blades, between the rotors and the
+user's face. The largest dimension, tip to tip across the diagonal, is the
+span $2(L+R)=\SI{\rSpan}{\metre}$.}
+\label{fig:design}
+\end{figure}
 
 \begin{table}[t]
 \centering
@@ -280,6 +359,35 @@ conservative quantity that \cref{prop:governor}(iv) bounds. The rotor
 clearance is the distance from the eye to the nearest oriented rotor disk,
 which is what a blade could actually touch.
 
+The six motions are not defined elsewhere, so they are stated here. Each is a
+smooth trajectory of the person's position and heading over the
+\SI{\rTwindow}{\second} window, and the ideal vehicle position follows from it
+by holding the display at the standoff in front of the eyes. Standing is
+postural sway of a few centimetres; pacing is walking back and forth along one
+line while facing the display; sit to stand lowers the eyes by
+\SI{0.45}{\metre}; walking a loop and jogging follow a circle of radius
+\SI{1.44}{\metre}, jogging adding a vertical bob at the stride frequency; and
+turning around reverses the heading at each end of a walk.
+\Cref{fig:missions} draws them, together with the acceleration each one asks
+of the display.
+
+\begin{figure}[tbp]
+\centering
+\input{figures/sec17_missions}
+\caption{The six motions flown in \cref{tab:flight}, over one window. Grey is
+the person, blue the ideal vehicle position $\vect r_{\mathrm{raw}}$ that holds
+the display at the standoff in front of their eyes, and dashed arrows join the
+two at intervals. Pacing is mirrored by the vehicle at a fixed offset; sit to
+stand is followed in height; on the loop the vehicle runs on an outer circle.
+Turning around is different in kind: at each reversal the display must swing
+through a half circle of radius $d$ about the person (\cref{prop:turn}). The
+last panel shows the price. The raw reference asks for an acceleration an
+order of magnitude above the governor's cap $a_{\max}$ (dashed) at every reversal,
+jogging's vertical bob alone exceeds it at the stride frequency, and ordinary
+walking stays below it.}
+\label{fig:missions}
+\end{figure}
+
 \begin{table}[t]
 \centering
 \caption{Missions flown on the hover-sized battery. $\varkappa$ is the mission
@@ -309,6 +417,23 @@ turnaround. Disturbance rejection is not what limits the machine indoors: a
 stronger than any room, produces \SI{\rBreezeLag}{\milli\metre} of lag and
 \ang{\rBreezeTilt} of screen tilt while the airframe leans
 \ang{\rBreezeLean}, which is the gimbal doing what it exists for.
+\Cref{fig:turn} shows the hardest mission, the turnaround, as time histories.
+
+\begin{figure}[htbp]
+\centering
+\input{figures/sec17_turn}
+\caption{The turnaround flown with the governor. (a) The tracking error
+against the governed reference stays below the margin $\varepsilon$, which is
+the hypothesis of \cref{prop:governor}(iv) checked on this run. (b) The lag
+behind the ideal display position grows to about \SI{2}{\metre} at each
+reversal: the governor lets the display fall behind rather than swing it round
+the head at the acceleration of \cref{fig:missions}. (c) The distance from the
+eye to the nearest rotor disk never approaches $d_{\mathrm{safe}}$. (d) The
+electrical power, whose window mean after the settling interval (grey) is the
+$\bar P$ of the energy integral; the brief spikes are the rotor speeds
+responding to the jerk of the reference at the start and end of each swing.}
+\label{fig:turn}
+\end{figure}
 
 What the table also shows is that a battery sized for hover is not sized for
 the mission: on every moving mission the pack lands below its reserve, at
@@ -349,7 +474,21 @@ hover sizing & \SI{\rGross}{\kilo\gram} & \SI{\rBattery}{\gram} & n/a & \SI{\rPo
 \end{tabular}
 \end{table}
 
-Three observations follow.
+\begin{figure}[tbp]
+\centering
+\input{figures/sec17_coupled}
+\caption{The coupled closure against the hover sizing. Left: the battery each
+motion needs when \cref{eq:residual} is solved around the flown mission; the
+dashed line is the \SI{\eHoverBat}{\gram} of the hover sizing. Right: the
+charge left at $t_f$ when that hover-sized pack is flown through each motion
+instead. Every moving mission lands below the \SI{\eReservePct}{\percent}
+reserve. The two panels are the same fact from either side: the right is the
+violation, the left is its cure.}
+\label{fig:coupled}
+\end{figure}
+
+\Cref{fig:coupled} shows the table's battery column against what the hover
+sizing would have done. Three observations follow.
 
 \emph{The standing row reproduces the hover sizing} to within
 \SI{\rCoupStandBat}{\gram} of battery. This is a consistency check, not a
@@ -410,6 +549,21 @@ $\delta$,
 with $A_c$ taken as the largest of the resistive requirement, the continuous
 current density limit $I/J_{\max}$ with $J_{\max}=\SI{\rTethJmax}{\ampere\per\milli\metre\squared}$,
 and a handling floor of \SI{\rTethAreaMin}{\milli\metre\squared}.
+\Cref{fig:tether} shows how the three requirements trade over power.
+
+\begin{figure}[tbp]
+\centering
+\input{figures/sec17_tether}
+\caption{Conductor area per leg for a \SI{\eTethL}{\metre} lead at
+\SI{\eTethV}{\volt}, against the power drawn at the source. Each requirement of
+\cref{eq:tether} is linear in $P$ or constant, and the conductor is sized by
+their maximum (grey band): the handling floor at low power, the current
+density limit above about \SI{60}{\watt}. At this length and voltage the
+voltage-drop requirement, the only one that grows with $L^2$, never binds.
+The design point lies on the ampacity line, so the carried conductor mass is
+proportional to power, which is the $m^{3/2}$ term that keeps the fold.}
+\label{fig:tether}
+\end{figure}
 
 \begin{observation}
 \Cref{eq:tether} contains no mission time, so endurance ceases to be a design

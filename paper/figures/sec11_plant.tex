@@ -1,0 +1,28 @@
+% Block diagram of the plant f(x,u,w;p) of eq:ode: motor lag, rotor wrench,
+% rigid body, aerodynamic feedback through the screen, gimbal, and battery.
+\begin{tikzpicture}[font=\small, >={Stealth[length=2mm]},
+    node distance=0.6cm and 0.75cm]
+  \node[block] (motor) {motor lag\\$\tau_m\dt\Omega_i=\Omega_i^{\mathrm{cmd}}-\Omega_i$};
+  \node[block, right=of motor] (wrench) {rotor wrench\\$(T,\vect\tau_{\mathrm{rot}})=\mat M\,\vect u$\\$u_i=\Omega_i^{2}$};
+  \node[sumnode, right=of wrench] (sum) {$\Sigma$};
+  \node[block, right=of sum, fill=cA!8] (body) {rigid body on $\SEthree$\\$m\dt{\vect v}=\vect F$\\$J\dt{\vect\omega}+\vect\omega\times J\vect\omega=\vect\tau$\\$\dt q=\tfrac12\Omega(\vect\omega)q$};
+  \node[block, below=1.0cm of sum] (aero) {screen and gimbal loads\\drag \cref{eq:screendrag}, frame drag,\\gimbal reaction torque};
+  \node[block, below=of motor] (batt) {battery\\$\dt E=-\tfrac1\eta\sum k_P\Omega_i^{3}-\Paux$};
+  \node[block, below=of aero] (gimbal) {gimbal\\$J_g\ddt\theta_g+b_g\dt\theta_g=\tau_g-\tau_{\mathrm{wind}}$};
+  % signals
+  \draw[flow] ($(motor.west)+(-1.0,0)$) -- node[above, pos=0.3] {$\Omega^{\mathrm{cmd}}$} (motor.west);
+  \draw[flow] (motor) -- node[above] {$\Omega$} (wrench);
+  \draw[flow] (wrench) -- node[above] {$T,\vect\tau$} (sum);
+  \draw[flow] (sum) -- node[above] {$\vect F,\vect\tau$} (body);
+  \coordinate (out) at ($(body.east)+(0.7,0)$);
+  \draw[flow] (body.east) -- (out) node[right, align=left] {$\vect r,\vect v,$\\$q,\vect\omega$};
+  \draw[flow] ($(body.east)+(0.35,0)$) |- ($(aero.east)+(0,0.15)$);
+  \draw[flow] (aero.north) -- node[right, align=left, font=\footnotesize] {$\vect F_{\mathrm{aero}},$\\$\vect\tau_{\mathrm{aero}}$} (sum.south);
+  \draw[flow] ($(motor.east)+(0.35,0)$) |- (batt.east);
+  \draw[flow] (batt.west) -- ++(-0.5,0) node[left] {$E$};
+  \draw[flow] ($(gimbal.west)+(-1.2,0)$) -- node[above, pos=0.35] {$\vect\tau_g$} (gimbal.west);
+  \draw[flow] (gimbal.north) -- node[left, font=\footnotesize] {$\vect\theta_g,\vect\tau_g$} (aero.south);
+  \draw[flow] (gimbal.east) -- ++(1.5,0) node[right, align=left] {$\theta_{\mathrm{read}}$};
+  \draw[flow, cG] ($(sum.north)+(0,0.8)$) node[above, font=\footnotesize] {$-mg\vect e_3,\ \vect F_{\mathrm{dist}}$} -- (sum.north);
+  \draw[flow, cG] ($(aero.east)+(1.3,-0.3)$) node[right, font=\footnotesize] {$\vect v_{\mathrm{air}}$} -- ($(aero.east)+(0,-0.3)$);
+\end{tikzpicture}

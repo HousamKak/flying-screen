@@ -1,0 +1,43 @@
+% The sampled-data structure of the simulation: the controller is evaluated
+% once per step at t_k and its output held; RK4 evaluates the plant four
+% times inside the step under that held input; telemetry compares the state
+% at t_k with the references at t_k.
+\begin{tikzpicture}[font=\footnotesize, x=1cm, y=1cm]
+  \def\tk{1.0}
+  \def\tkh{4.5}
+  \def\tkk{8.0}
+  \def\tkkk{11.5}
+  % time axis
+  \draw[flow] (0,0) -- (12.6,0) node[right] {$t$};
+  \foreach \x/\l in {\tk/{t_k}, \tkh/{t_k+\tfrac h2}, \tkk/{t_{k+1}}, \tkkk/{t_{k+2}}} {
+    \draw (\x,0.08) -- (\x,-0.08) node[below] {$\l$};
+  }
+  \draw[dim] (\tk,-0.75) -- (\tkk,-0.75) node[midway, below] {$h=\SI{4}{\milli\second}$};
+  % state and reference
+  \draw[cA, line width=1pt] plot[smooth] coordinates
+    {(0.2,2.25) (\tk,2.45) (2.5,2.75) (\tkh,2.95) (6.5,3.05) (\tkk,3.25) (10,3.55) (\tkkk,3.7) (12.3,3.75)};
+  \node[cA, anchor=west] at (12.35,3.75) {$x(t)$};
+  \draw[cG, dashed] plot[smooth] coordinates
+    {(0.2,2.55) (\tk,2.7) (\tkh,3.05) (\tkk,3.4) (\tkkk,3.7) (12.3,3.8)};
+  \node[cG, anchor=west] at (12.35,4.05) {reference};
+  % controller evaluations
+  \foreach \x/\y in {\tk/2.45, \tkk/3.25} {
+    \draw[construct] (\x,0) -- (\x,4.2);
+    \fill[cD] (\x,\y) circle (2.2pt);
+  }
+  \node[cD, anchor=south, align=center] at (\tk,4.2) {controller and telemetry\\ at $x(t_k)$, ref$(t_k)$};
+  \node[cD, anchor=south] at (\tkk,4.2) {next sample};
+  % RK4 stages
+  \fill[cE] (\tk,2.45) ++(0.18,0) circle (1.6pt);
+  \fill[cE] (\tkh,2.88) circle (1.6pt);
+  \fill[cE] (\tkh,3.04) circle (1.6pt);
+  \fill[cE] (\tkk,3.25) ++(-0.18,0) circle (1.6pt);
+  \node[cE, anchor=north] at (\tk+0.35,2.35) {$k_1$};
+  \node[cE, anchor=north west] at (\tkh,2.8) {$k_2,k_3$};
+  \node[cE, anchor=north] at (\tkk-0.35,3.15) {$k_4$};
+  % held input
+  \draw[cB, line width=1.1pt] (0.2,0.9) -- (\tk,0.9) -- (\tk,1.45) -- (\tkk,1.45)
+       -- (\tkk,1.2) -- (\tkkk,1.2) -- (\tkkk,1.6) -- (12.3,1.6);
+  \node[cB, anchor=west] at (12.35,1.6) {$u$ (held)};
+  \node[cB, anchor=south] at (\tkh,1.45) {$u_k = \kappa\big(x(t_k),\ \mathrm{ref}(t_k)\big)$};
+\end{tikzpicture}

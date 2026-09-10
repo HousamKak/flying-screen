@@ -1,0 +1,61 @@
+% Mass budget of the design, eq:budget, drawn to scale. The four groups
+% depend on m in four different ways, which is the structure of eq:closure.
+\begin{tikzpicture}[x=0.0079cm, y=1cm,
+  seg/.style={draw=white, line width=0.8pt},
+  inlab/.style={font=\scriptsize, align=center, inner sep=0pt},
+  brace/.style={decorate, decoration={brace, mirror, amplitude=5pt}, line width=0.6pt}]
+  \pgfmathsetmacro{\hub}{\rFrame-\rArms-\rGuards}
+  \pgfmathsetmacro{\esc}{\rProp-\rMotors-\rProps}
+  \pgfmathsetmacro{\xa}{\rPanel}
+  \pgfmathsetmacro{\xb}{\xa+\rElectronics}
+  \pgfmathsetmacro{\xc}{\xb+\rGimbal}
+  \pgfmathsetmacro{\xd}{\xc+\rArms}
+  \pgfmathsetmacro{\xe}{\xd+\rGuards}
+  \pgfmathsetmacro{\xf}{\xe+\hub}
+  \pgfmathsetmacro{\xg}{\xf+\rMotors}
+  \pgfmathsetmacro{\xh}{\xg+\rProps}
+  \pgfmathsetmacro{\xi}{\xh+\esc}
+  \pgfmathsetmacro{\xj}{\xi+\rBattery}
+  % fixed load
+  \fill[seg, fill=cG!45] (0,0) rectangle (\xa,1);
+  \fill[seg, fill=cG!32] (\xa,0) rectangle (\xb,1);
+  \fill[seg, fill=cG!20] (\xb,0) rectangle (\xc,1);
+  % structure
+  \fill[seg, fill=cE!45] (\xc,0) rectangle (\xd,1);
+  \fill[seg, fill=cE!30] (\xd,0) rectangle (\xe,1);
+  \fill[seg, fill=cE!18] (\xe,0) rectangle (\xf,1);
+  % propulsion
+  \fill[seg, fill=cB!55] (\xf,0) rectangle (\xg,1);
+  \fill[seg, fill=cB!35] (\xg,0) rectangle (\xh,1);
+  \fill[seg, fill=cB!18] (\xh,0) rectangle (\xi,1);
+  % battery
+  \fill[seg, fill=cA!55] (\xi,0) rectangle (\xj,1);
+  \draw[line width=0.6pt] (0,0) rectangle (\xj,1);
+  % labels inside the wide segments
+  \node[inlab] at ({\xa/2},0.5) {panel\\\rPanel};
+  \node[inlab] at ({(\xa+\xb)/2},0.5) {electr.\\\rElectronics};
+  \node[inlab] at ({(\xd+\xe)/2},0.5) {guards\\\rGuards};
+  \node[inlab] at ({(\xe+\xf)/2},0.5) {hub, fixed\\\pgfmathprintnumber[fixed,precision=0]{\hub}};
+  \node[inlab] at ({(\xf+\xg)/2},0.5) {motors\\\rMotors};
+  \node[inlab] at ({(\xg+\xh)/2},0.5) {props\\\rProps};
+  \node[inlab, white] at ({(\xi+\xj)/2},0.5) {\textbf{battery}\\\rBattery};
+  % labels above the narrow segments
+  \draw[cG, line width=0.4pt] ({(\xb+\xc)/2},1) -- ({(\xb+\xc)/2},1.3)
+      node[above, inlab] {gimbal \rGimbal};
+  \draw[cG, line width=0.4pt] ({(\xc+\xd)/2},1) -- ({(\xc+\xd)/2},1.62)
+      node[above, inlab] {arms \rArms};
+  \draw[cG, line width=0.4pt] ({(\xh+\xi)/2},1) -- ({(\xh+\xi)/2},1.3)
+      node[above, inlab] {ESCs \pgfmathprintnumber[fixed,precision=0]{\esc}};
+  % groups and how each depends on m
+  \draw[brace] (0,-0.1) -- node[below=6pt, inlab]
+      {$\mfix = \SI{\rFixed}{\gram}$\\independent of $m$} (\xc,-0.1);
+  \draw[brace] (\xc,-0.1) -- node[below=6pt, inlab]
+      {$\mstr = \SI{\rFrame}{\gram}$\\$\approx f_s\,m$} (\xf,-0.1);
+  \draw[brace] (\xf,-0.1) -- node[below=6pt, inlab]
+      {$\mprop = \SI{\rProp}{\gram}$\\$= \gamma_m m$, linear} (\xi,-0.1);
+  \draw[brace] (\xi,-0.1) -- node[below=6pt, inlab]
+      {$\mbat = \SI{\rBattery}{\gram}$\\$\propto P\,t_f \propto m^{3/2}$} (\xj,-0.1);
+  % total
+  \draw[dim] (0,2.25) -- node[above, inlab, fill=white, inner sep=1.5pt]
+      {$m = \SI{\rGrossG}{\gram}$} (\xj,2.25);
+\end{tikzpicture}

@@ -1,4 +1,4 @@
-# DESK-1: a flying screen that is actually buildable
+﻿# DESK-1: a flying screen that is actually buildable
 
 A design produced by running the engine in this repository against honest,
 component-level assumptions, and then flying the result.
@@ -42,7 +42,7 @@ manufacturers declare a sound *power* level, not a pressure at a distance;
 converting with `L_p = L_WA - 10 log10(2 pi r^2)` and running four DJI
 aircraft back through the broadband exponents gives an anchor of 82.9 dB,
 against the 68 that had been guessed. Four aircraft spanning 3.6x in mass
-agree to within 1.4 dB. Everything the engine said about noise before this
+agree to within 1.5 dB. Everything the engine said about noise before this
 was wrong by the width of the entire design space.
 
 **Motor torque density was too pessimistic and guard mass too heavy.**

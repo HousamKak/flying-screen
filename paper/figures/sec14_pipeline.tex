@@ -1,0 +1,57 @@
+% How the coupled problem is solved: a bounded root search sizes the hover
+% design, the battery loop wraps an inner algebraic fixed point and one
+% simulation per update, a verification flight closes it, and the results
+% flow into this paper.
+\begin{tikzpicture}[
+    font=\footnotesize,
+    box/.style={block, text width=2.8cm, minimum height=3.3em, inner sep=3pt},
+    stp/.style={box, fill=cA!7},
+    sim/.style={box, fill=cB!12},
+    res/.style={box, fill=cC!10},
+    lab/.style={font=\scriptsize},
+  ]
+  % top: hover sizing
+  \node[box] (p)    at (0,0)    {parameter set $p$,\\ \code{params.py}};
+  \node[stp] (root) at (3.9,0)  {component closure\\ $\mathcal{F}(m)=0$ by a\\ bounded root search};
+  \node[box] (hov)  at (7.8,0)  {hover design\\ $m,\ \mbat^{(0)}$};
+  \draw[flow] (p) -- (root);
+  \draw[flow] (root) -- (hov);
+
+  % middle: the battery loop
+  \node[stp] (inner) at (0,-2.6)   {inner map $\mathcal{G}(\mu)$:\\
+       $m=\mfix+S(m)+\mu$\\ by contraction};
+  \node[stp] (veh)   at (3.9,-2.6) {vehicle: $J$, $\mat M$,\\ $k_T,k_Q,k_P$, trim};
+  \node[sim] (fly)   at (7.8,-2.6) {simulate a window:\\ RK4, $h=\SI{4}{\milli\second}$,\\ controller, governor};
+  \node[stp] (req)   at (7.8,-5.1) {requirement\\ $\max\{E/\eb(1{-}\varsigma),$\\ $P_{\mathrm{peak}}/p_b\}$};
+  \node[stp] (sec)   at (3.9,-5.1) {secant step\\ on $\mathcal{R}_2$, guarded,\\ \labelcref{eq:secant}};
+  \node[box] (test)  at (0,-5.1)   {$|\mathcal{R}_2|<\mathrm{tol}$\,?};
+  \draw[flow] (hov.south) -- ++(0,-0.55)
+       -| node[lab, pos=0.3, below] {$\mu_0=\mbat^{(0)}$} (inner.north);
+  \draw[flow] (inner) -- node[lab, above] {$m$} (veh);
+  \draw[flow] (veh) -- (fly);
+  \draw[flow] (fly) -- node[lab, right] {$\bar P,\ P_{\mathrm{peak}}$} (req);
+  \draw[flow] (req) -- node[lab, above] {$\mathcal{H}(\mu)$} (sec);
+  \draw[flow] (sec) -- node[lab, above] {$\mathcal{R}_2$} (test);
+  \draw[flow] (test.north) -- node[lab, left] {no} (inner.south);
+
+  \begin{scope}[on background layer]
+    \node[draw=cA, dashed, rounded corners=3pt, inner sep=7pt,
+          fit=(inner)(veh)(fly)(req)(sec)(test)] (loop) {};
+  \end{scope}
+  \node[lab, cA, anchor=north east] at (loop.south east)
+       {battery loop, \code{closure.py}: one simulation per update};
+
+  % bottom: verification and output
+  \node[sim] (ver) at (0,-7.9)    {verification flight\\ at the rounded battery};
+  \node[res] (con) at (3.9,-7.9)  {margins and path\\ constraints \labelcref{eq:cd4}};
+  \node[res] (res) at (7.8,-7.9)  {\code{make\_results.py}:\\ results, macros,\\ tables, figure data};
+  \node[res] (pap) at (11.5,-7.9) {this paper};
+  \node[res] (api) at (11.5,-2.6) {API and\\ browser tool};
+  \draw[flow] (test.south) -- node[lab, left] {yes} (ver.north);
+  \draw[flow] (ver) -- (con);
+  \draw[flow] (con) -- (res);
+  \draw[flow] (res) -- (pap);
+  \draw[flow, cB] (p.north) -- ++(0,0.4) -| (api.north);
+  \draw[flow, cB, dashed] (ver.west) -- ++(-0.35,0) |- ($(ver.south)+(0,-0.45)$)
+       node[lab, pos=0.75, below] {round up, fly again} -- (ver.south);
+\end{tikzpicture}

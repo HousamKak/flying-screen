@@ -1,0 +1,27 @@
+% Lumped fixed-area closure of the design of sec17 (gen_b.wall_tf):
+% the critical load M0max(t_f) falls as t_f^{-2}; the load the mission demands,
+% M0(t_f) = m_fix + P_aux t_f / e_b, rises. They cross at the endurance wall.
+\begin{tikzpicture}
+\begin{axis}[paperplot, height=6.2cm, xmode=log, ymode=log,
+  xlabel={mission duration $t_f$ [\si{\minute}]},
+  ylabel={load [\si{\kilo\gram}]},
+  xmin=5, xmax=480, ymin=0.01, ymax=150, legend pos=north east,
+  xtick={5,10,20,30,60,120,240,480},
+  xticklabels={5,10,20,30,60,120,240,480}]
+  \addplot[cA, name path=wall] table[x=tmin, y=Mmax] {results/fig/b_walltf.dat};
+  \addlegendentry{critical load $\Mmax(t_f)\propto t_f^{-2}$}
+  \addplot[cB, name path=need] table[x=tmin, y=M0] {results/fig/b_walltf.dat};
+  \addlegendentry{required load $\Mzero(t_f)=\mfix+\Paux t_f/\eb$}
+  \path[name intersections={of=wall and need, name=w}];
+  \fill[black] (w-1) circle (2.2pt);
+  \draw[construct] (w-1) -- (w-1 |- {axis cs:5,0.01});
+  \node[lbl, anchor=south west, align=left] at (w-1) {endurance wall\\of the lumped\\fixed-area closure};
+  % slope triangle
+  \draw[cG] (axis cs:10,0.5) -- (axis cs:40,0.5) -- (axis cs:10,8) -- cycle;
+  \node[lbl, cG, anchor=north] at (axis cs:20,0.5) {$\times4$};
+  \node[lbl, cG, anchor=east] at (axis cs:10,2) {$\times16$};
+  \node[lbl, cG, anchor=west] at (axis cs:10.5,1.2) {slope $-2$};
+  \draw[cG, densely dotted, line width=0.7pt] (axis cs:30,0.01) -- (axis cs:30,150);
+  \node[lbl, cG, anchor=west] at (axis cs:30,0.02) {design $t_f$};
+\end{axis}
+\end{tikzpicture}

@@ -1,0 +1,25 @@
+% The outer map H(mu) sampled with the simulator (gen_b.fixed_point) for the
+% turnaround and standing missions, with the engine's battery iterates for the
+% turnaround: a plain step, a secant step, then two verification flights.
+\begin{tikzpicture}
+\begin{axis}[paperplot, height=6.4cm, width=0.78\linewidth,
+  xlabel={battery guess $\mu$ [\si{\kilo\gram}]},
+  ylabel={required battery $\mathcal H(\mu)$ [\si{\kilo\gram}]},
+  xmin=0.16, xmax=0.36, ymin=0.16, ymax=0.36, legend pos=south east,
+  legend style={font=\scriptsize}]
+  \addplot[cG, line width=0.6pt, domain=0.16:0.36] {x};
+  \addlegendentry{$\mathcal H(\mu)=\mu$}
+  \addplot[cA, mark=*, mark size=1.6pt] table[x=mu, y=H] {results/fig/b_H_turn.dat};
+  \addlegendentry{$\mathcal H$, turning around}
+  \addplot[cB, mark=square*, mark size=1.4pt] table[x=mu, y=H] {results/fig/b_H_stand.dat};
+  \addlegendentry{$\mathcal H$, standing}
+  \addplot[cD, line width=0.8pt, -{Stealth[length=2mm]}] table[x=x, y=y]
+    {results/fig/b_trace_path_turn.dat};
+  \addlegendentry{engine iterates, turning around}
+  \node[lbl, anchor=north west] at (axis cs:0.188,0.24) {$\mu_0$};
+  \addplot[only marks, mark=*, mark size=2pt, black, forget plot]
+    coordinates {(0.31024,0.31024)};
+  \draw[cG, line width=0.4pt] (axis cs:0.31024,0.31024) -- (axis cs:0.326,0.272)
+    node[anchor=north, lbl, black] {$\mu^\star=\mathcal H(\mu^\star)$};
+\end{axis}
+\end{tikzpicture}

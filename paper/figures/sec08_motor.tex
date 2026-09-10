@@ -1,0 +1,24 @@
+\input{results/fig/c_geom}%
+% Motor mass against peak torque: the scale law of the motor model against
+% constant torque density, both through the reference motor.
+\begin{tikzpicture}
+  \begin{loglogaxis}[paperplot, height=5.4cm,
+      xlabel={peak torque $Q$ [\si{\newton\metre}]},
+      ylabel={motor mass $m_{\mathrm{mot}}$ [\si{\gram}]},
+      xmin=0.02, xmax=5, ymin=3, ymax=1200,
+      legend pos=north west]
+    \addplot[cB, dashed] table[x=Q, y=mlin] {results/fig/c_motor.dat};
+    \addlegendentry{constant torque density, $e=0$ (slope $1$)}
+    \addplot[cA] table[x=Q, y=mmot] {results/fig/c_motor.dat};
+    \addlegendentry{model, $e=\cEmot$ (slope $1/(1+e)$)}
+    \pgfmathsetmacro{\Qref}{\cKtau*0.1}
+    \addplot[only marks, mark=o, mark size=2.2pt, black] coordinates {(\Qref,100)};
+    \node[lbl, anchor=north west] at (axis cs:\Qref,100) {$m_{\mathrm{ref}}$};
+    \addplot[only marks, mark=*, mark size=2.2pt, cA] coordinates {(\cQmax,\cMmot)};
+    \node[lbl, anchor=south east, cA] at (axis cs:\cQmax,\cMmot) {design motor};
+    % ten times the torque costs 10^(1/1.3) in mass
+    \draw[cG, line width=0.5pt] (axis cs:0.1,26.9) -- (axis cs:1,26.9) -- (axis cs:1,158.4);
+    \node[lbl, cG, anchor=north] at (axis cs:0.316,26.9) {$\times10$ torque};
+    \node[lbl, cG, anchor=west, align=left] at (axis cs:1.05,60) {$\times5.9$\\mass};
+  \end{loglogaxis}
+\end{tikzpicture}

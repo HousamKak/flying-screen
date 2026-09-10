@@ -1,0 +1,44 @@
+% Phase plane of the keep-out barrier h = ||r_g - c|| - rho. The admissible
+% set {h >= 0, hdot + gamma h >= 0} (shaded) is forward invariant under the
+% extremal dynamics hddot = -2 gamma hdot - gamma^2 h that the constraint
+% allows; a start with hdot + gamma h < 0 is not protected.
+% Closed form with psi0 = hdot0 + gamma h0:
+%   h(t)    = (h0 + psi0 t) exp(-gamma t)
+%   hdot(t) = (hdot0 - gamma psi0 t) exp(-gamma t)
+\begin{tikzpicture}
+  \pgfmathsetmacro{\gam}{4}
+  \begin{axis}[paperplot, height=6.0cm,
+      xmin=-0.15, xmax=1.0, ymin=-3.4, ymax=0.9,
+      xlabel={$h = \|\vect r_g-\vect c\|-\varrho$ [\si{\metre}]},
+      ylabel={$\dt h$ [\si{\metre\per\second}]},
+      legend pos=south east]
+    % admissible set
+    \fill[cC!12] (axis cs:0,0) -- (axis cs:0,0.9) -- (axis cs:1.0,0.9)
+                 -- (axis cs:1.0,-4.0) -- cycle;
+    \draw[cC!70!black, line width=0.9pt] (axis cs:0,0.9) -- (axis cs:0,0)
+         -- (axis cs:0.85,-3.4);
+    \node[lbl, cC!60!black, anchor=north east] at (axis cs:0.64,-2.62)
+         {$\dt h+\gamma h=0$};
+    \node[lbl, cC!60!black, align=center] at (axis cs:0.62,0.45)
+         {admissible set\\ $\{h\ge0,\ \dt h+\gamma h\ge0\}$};
+    \fill[cD!10] (axis cs:-0.15,-3.4) rectangle (axis cs:0,0.9);
+    \node[lbl, cD, rotate=90] at (axis cs:-0.075,-1.25) {inside the keep-out sphere};
+    % extremal trajectories from admissible starts
+    \foreach \hz/\hd in {0.5/-1.5, 0.8/-3.0, 0.2/-0.6, 0.9/0.5} {
+      \addplot[cA, domain=0:2.5, samples=90, variable=\t,
+               postaction={decorate}, decoration={markings,
+               mark=at position 0.25 with {\arrow{Stealth[length=2mm]}}}]
+        ({(\hz + (\hd+\gam*\hz)*\t)*exp(-\gam*\t)},
+         {(\hd - \gam*(\hd+\gam*\hz)*\t)*exp(-\gam*\t)});
+      \addplot[only marks, mark=*, mark size=1.6pt, cA] coordinates {(\hz,\hd)};
+    }
+    % an inadmissible start: closing too fast for the distance left
+    \addplot[cD, dashed, domain=0:1.2, samples=80, variable=\t,
+             postaction={decorate}, decoration={markings,
+             mark=at position 0.3 with {\arrow{Stealth[length=2mm]}}}]
+      ({(0.3 + (-2.5+\gam*0.3)*\t)*exp(-\gam*\t)},
+       {(-2.5 - \gam*(-2.5+\gam*0.3)*\t)*exp(-\gam*\t)});
+    \fill[cD] (axis cs:0.3,-2.5) circle (1.6pt);
+    \node[lbl, cD, anchor=west] at (axis cs:0.31,-2.62) {$\dt h_0+\gamma h_0<0$};
+  \end{axis}
+\end{tikzpicture}

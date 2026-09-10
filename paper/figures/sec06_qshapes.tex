@@ -1,0 +1,34 @@
+% F(m) = alpha m - beta m^q with alpha = 1 for three exponents:
+% q = 3/2, beta = 0.3: maximum 1.646 at m* = 4.938 (fold);
+% q = 1,   beta = 0.6: the line 0.4 m;
+% q = 3/4, beta = 1.2: minimum -0.219 at 0.656, zero at 2.074, then unbounded.
+\begin{tikzpicture}
+\begin{axis}[paperplot, height=6.0cm,
+  xlabel={gross mass $m$ [\si{\kilo\gram}]},
+  ylabel={$F(m)=\alpha m-\beta m^{q}$ [\si{\kilo\gram}]},
+  xmin=0, xmax=12, ymin=-0.55, ymax=2.3, domain=0:12, samples=240,
+  legend style={at={(0.5,1.03)}, anchor=south, font=\scriptsize},
+  legend columns=2]
+  \addplot[cA, name path=qa] {x - 0.3*x^1.5};
+  \addlegendentry{$q=\tfrac32$ ($p=0$): fold, two roots or none}
+  \addplot[cE, name path=qb] {0.4*x};
+  \addlegendentry{$q=1$ ($p=1$): linear, one root iff $\alpha>\beta$}
+  \addplot[cB, name path=qc] {x - 1.2*x^0.75};
+  \addlegendentry{$q=\tfrac34$ ($p=\tfrac32$): one root for every $\Mzero$}
+  \addplot[cD, dashed, name path=L] {1.0};
+  \addlegendentry{a fixed load $\Mzero$}
+  \path[name intersections={of=qa and L, name=ia}];
+  \path[name intersections={of=qb and L, name=ib}];
+  \path[name intersections={of=qc and L, name=ic}];
+  \fill[cA] (ia-1) circle (2pt);
+  \fill[cA] (ia-2) circle (2pt);
+  \fill[cE] (ib-1) circle (2pt);
+  \fill[cB] (ic-1) circle (2pt);
+  \addplot[only marks, mark=x, mark size=2.6pt, cA, forget plot]
+    coordinates {(4.938,1.646)};
+  \node[lbl, anchor=west] at (axis cs:5.15,1.76) {$\Mmax$};
+  \addplot[only marks, mark=x, mark size=2.6pt, cB, forget plot]
+    coordinates {(0.656,-0.219)};
+  \node[lbl, anchor=north west] at (axis cs:0.7,-0.22) {$m_{\min}$};
+\end{axis}
+\end{tikzpicture}

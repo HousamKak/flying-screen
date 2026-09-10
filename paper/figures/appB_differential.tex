@@ -1,0 +1,56 @@
+% The balanced differential that attains the roll authority of the x
+% quadrotor. Rotor i sits at psi_i = pi/4 + i pi/2, i = 0..3 (numbered 1..4),
+% so the roll row y_i k_T has signs (+,+,-,-). Squared speeds normalised by
+% Omega_h^2; Omega_max^2 = lambda Omega_h^2, Delta = min(1, lambda - 1).
+\begin{tikzpicture}[font=\small]
+  % --- the quadrotor, top view, body x to the right, y up ------------------
+  \begin{scope}[shift={(0,0)}, scale=0.82]
+    \draw[line width=0.8pt, cG] (-1.1,-1.1) -- (1.1,1.1);
+    \draw[line width=0.8pt, cG] (-1.1,1.1) -- (1.1,-1.1);
+    \foreach \ang/\n/\s/\c in {45/1/+/cA, 135/2/+/cA, 225/3/-/cD, 315/4/-/cD}{
+      \draw[\c, line width=0.9pt, fill=\c!12] (\ang:1.556) circle (0.52);
+      \node[font=\footnotesize] at (\ang:1.556) {$\n$};
+      \node[\c, font=\normalsize] at (\ang:2.42) {$\s$};
+    }
+    \draw[vec] (0,0) -- (0.85,0) node[right, lbl] {$\vect b_1$};
+    \draw[vec] (0,0) -- (0,0.85) node[above, lbl] {$\vect b_2$};
+  \end{scope}
+  \node[lbl, align=center] at (0,2.45)
+    {$s_i=\operatorname{sign}\mat M_{2,i}=(+,+,-,-)$\\$\vect s\perp$ thrust, pitch, yaw rows};
+  \node[lbl, align=center, cA] at (0,-2.3)
+    {$y_i>0$ pair up, $y_i<0$ pair down:\\$\tau_1=\sum_i y_iT_i>0$};
+  % --- bars: lambda = 1.8 --------------------------------------------------
+  \begin{scope}[shift={(3.0,-1.7)}, yscale=1.35, xscale=0.8]
+    \draw[->] (-0.3,0) -- (4.3,0);
+    \draw[->] (-0.3,0) -- (-0.3,2.85) node[above, lbl] {$u_i/\Omega_h^2$};
+    \foreach \y in {0,1,2}{\draw (-0.35,\y) -- (-0.25,\y) node[left=2pt, lbl] {$\y$};}
+    \draw[cD, dashed] (-0.3,1.8) -- (4.3,1.8) node[right, lbl, cD] {$\Omega_{\max}^2$};
+    \draw[cG, densely dotted] (-0.3,1) -- (4.3,1) node[right, lbl, cG] {$\Omega_h^2$};
+    \foreach \x/\h/\c in {0.5/1.8/cA, 1.5/1.8/cA, 2.5/0.2/cD, 3.5/0.2/cD}{
+      \fill[\c!55] (\x-0.3,0) rectangle (\x+0.3,\h);
+      \draw[\c] (\x-0.3,0) rectangle (\x+0.3,\h);
+    }
+    \foreach \x/\n in {0.5/1,1.5/2,2.5/3,3.5/4}{\node[below, lbl] at (\x,0) {$\n$};}
+    \draw[dim] (1.95,1) -- (1.95,1.8) node[midway, right, lbl, black] {$\Delta$};
+    \draw[dim] (3.95,0.2) -- (3.95,1) node[midway, right, lbl, black] {$\Delta$};
+    \node[lbl, align=center] at (2,-0.72)
+      {$\lambda=1.8$: $\Delta=\Omega_{\max}^2-\Omega_h^2$,\\increments reach the limit};
+  \end{scope}
+  % --- bars: lambda = 2.5 --------------------------------------------------
+  \begin{scope}[shift={(8.6,-1.7)}, yscale=1.35, xscale=0.8]
+    \draw[->] (-0.3,0) -- (4.3,0);
+    \draw[->] (-0.3,0) -- (-0.3,2.85) node[above, lbl] {$u_i/\Omega_h^2$};
+    \foreach \y in {0,1,2}{\draw (-0.35,\y) -- (-0.25,\y) node[left=2pt, lbl] {$\y$};}
+    \draw[cD, dashed] (-0.3,2.5) -- (4.3,2.5) node[right, lbl, cD] {$\Omega_{\max}^2$};
+    \draw[cG, densely dotted] (-0.3,1) -- (4.3,1) node[right, lbl, cG] {$\Omega_h^2$};
+    \foreach \x/\h/\c in {0.5/2/cA, 1.5/2/cA}{
+      \fill[\c!55] (\x-0.3,0) rectangle (\x+0.3,\h);
+      \draw[\c] (\x-0.3,0) rectangle (\x+0.3,\h);
+    }
+    \foreach \x in {2.5,3.5}{\draw[cD, line width=1.4pt] (\x-0.3,0) -- (\x+0.3,0);}
+    \foreach \x/\n in {0.5/1,1.5/2,2.5/3,3.5/4}{\node[below, lbl] at (\x,0) {$\n$};}
+    \draw[dim] (1.95,1) -- (1.95,2) node[midway, right, lbl, black] {$\Delta$};
+    \node[lbl, align=center] at (2,-0.72)
+      {$\lambda=2.5$: $\Delta=\Omega_h^2$,\\decrements reach zero};
+  \end{scope}
+\end{tikzpicture}

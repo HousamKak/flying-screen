@@ -677,6 +677,21 @@ def test_states_and_references_are_compared_at_the_same_instant():
     assert r.telemetry["e_track"][0] == pytest.approx(0.0, abs=1e-12)
 
 
+def test_integration_substeps_converge_at_fixed_controller_rate():
+    # RK4 at the design step is already converged: halving the integration
+    # step under the same held commands changes the mission power by far
+    # less than any figure the paper reports.
+    p = base()
+    p["m_screen"] = 0.25
+    p["tip_speed"] = 75.0
+    a = simulate_flight(p, 1.9, mission_kind="walk_loop", t_window=3.0, settle=1.0)
+    b = simulate_flight(p, 1.9, mission_kind="walk_loop", t_window=3.0, settle=1.0,
+                        substeps=2)
+    assert b.config["substeps"] == 2
+    assert b.P_mean == pytest.approx(a.P_mean, rel=1e-5)
+    assert b.e_track_max_all == pytest.approx(a.e_track_max_all, abs=1e-5)
+
+
 def test_governor_keeps_out_of_a_head_that_walks_toward_it():
     # The keep-out boundary moves with the person. Testing n . v_g instead of
     # n . (v_g - c_dot) lets a stationary reference be walked into.
@@ -742,6 +757,19 @@ def test_moving_a_panel_away_sharpens_pixels_but_shrinks_text():
     assert far["pixels_per_degree"] > near["pixels_per_degree"]
     assert far["cap_arcmin_at_100"] == pytest.approx(0.5 * near["cap_arcmin_at_100"], rel=1e-3)
     assert far["logical_w"] < near["logical_w"]
+
+
+def test_endurance_wall_is_finite_and_continuous_as_p_approaches_one():
+    # The fold mass (alpha/(q beta))^(1/(q-1)) overflows as q -> 1+; the wall
+    # itself tends to the finite supremum alpha e_b / c_P of prop:twall.
+    p = base()
+    anchor = sizing.coefficients(p, area_p=0.0).anchor_mass
+    walls = [sweep.endurance_wall(p, area_p=pp, anchor=anchor)
+             for pp in (0.99, 0.999, 1.0)]
+    assert all(w is not None and math.isfinite(w) for w in walls)
+    assert walls[0] < walls[1] <= walls[2] * (1 + 1e-6)
+    c = sizing.coefficients(p, area_p=1.0, anchor_mass=anchor)
+    assert walls[2] == pytest.approx(c.alpha * c.e_b / c.c_P, rel=1e-6)
 
 
 def test_inner_map_slope_is_below_one_for_the_shipped_submodels():

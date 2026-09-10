@@ -1,0 +1,30 @@
+% Endurance wall against the disk-area exponent (gen_b.pwall), same
+% parameters and anchor as the table. (a) t_max / t_f: the curve is the
+% direct maximisation of Theta_p, the crosses the bisection of
+% sweep.endurance_wall; the open circle at p = 1 is the unattained
+% supremum 3/2. (b) the wall mass relative to the anchor; the wall rises
+% with p exactly where this exceeds one.
+\begin{tikzpicture}
+\begin{groupplot}[group style={group size=2 by 1, horizontal sep=1.6cm},
+  halfplot, height=5.8cm, width=0.46\linewidth,
+  xlabel={disk-area exponent $p$}, xmin=-0.25, xmax=1.5]
+\nextgroupplot[ylabel={$t_f^{\max}/t_f$}, ymin=0.8, ymax=1.75,
+  title={(a) the endurance wall}, unbounded coords=discard]
+  \fill[cD!8] (axis cs:1,0.8) rectangle (axis cs:1.5,1.75);
+  \node[lbl, cD, align=center] at (axis cs:1.25,1.25) {no wall:\\$\Theta_p\to\infty$};
+  \addplot[cA] table[x=p, y=tdirect] {results/fig/b_pwall.dat};
+  \addplot[only marks, mark=x, mark size=2.2pt, cB] table[x=p, y=t]
+    {results/fig/b_pwall.dat};
+  \addplot[only marks, mark=o, mark size=2.6pt, cA, line width=1pt] table[x=p, y=t]
+    {results/fig/b_pwall_lim.dat};
+  \draw[cB, dashed] (axis cs:0.55,1.5) -- (axis cs:1,1.5);
+  \node[lbl, anchor=south east] at (axis cs:0.98,1.52) {$t_{\lim}=\tfrac32t_f$};
+\nextgroupplot[ylabel={$\hat m/m_0$}, ymode=log, ymin=0.5, ymax=2000,
+  title={(b) the mass at the wall}, xmax=1.0]
+  \addplot[cA] table[x=p, y=x] {results/fig/b_pwall.dat};
+  \draw[cD, dashed] (axis cs:-0.25,1) -- (axis cs:1,1);
+  \node[lbl, cD, anchor=south east] at (axis cs:0.95,1.05) {$\hat m=m_0$};
+  \node[lbl, anchor=north west, align=left] at (axis cs:-0.2,900)
+    {wall rises with $p$\\where $\hat m>m_0$};
+\end{groupplot}
+\end{tikzpicture}

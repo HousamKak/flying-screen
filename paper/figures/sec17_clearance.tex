@@ -1,0 +1,46 @@
+\input{results/fig/e_macros}%
+\begin{tikzpicture}[x=3.3cm, y=3.3cm]
+\foreach \dd/\sx/\col/\ellv/\ttl in {
+    0.70/0.00/cD/0.148/{$d=\SI{0.70}{\metre}$, no boom: violated},
+    1.20/2.05/cC/0.586/{$d=\SI{1.20}{\metre}$, no boom: the design}} {
+  \begin{scope}[shift={(\sx,0)}]
+    \pgfmathsetmacro\tip{\dd-\eReach}
+    \pgfmathsetmacro\zlo{\eEye-\eScreenH/2}
+    \pgfmathsetmacro\zhi{\eEye+\eScreenH/2}
+    % the safe sphere about the eye
+    \fill[cD!6] (0,\eEye) circle (\eDsafe);
+    \draw[cD, dashed, line width=0.6pt] (0,\eEye) circle (\eDsafe);
+    \node[lbl, text=cD, anchor=north] at (0,\eEye-\eDsafe-0.01) {$d_{\mathrm{safe}}$ about the eye};
+    % the user
+    \draw[line width=0.8pt, fill=white] (-0.10,\eEye+0.02) circle (0.10);
+    \draw[line width=0.8pt] (-0.10,\eEye-0.08) -- (-0.10,1.12);
+    \fill (0,\eEye) circle (0.9pt);
+    \node[lbl, anchor=south] at (-0.10,\eEye+0.12) {eye};
+    % rotor plane seen from the side: arms, two disks edge on, hubs
+    \draw[line width=1.0pt] (\dd-\eArmL,\eZrotor) -- (\dd+\eArmL,\eZrotor);
+    \draw[cB, line width=2.6pt] (\dd-\eArmL-\eRotorR,\eZrotor) -- (\dd-\eArmL+\eRotorR,\eZrotor);
+    \draw[cB, line width=2.6pt] (\dd+\eArmL-\eRotorR,\eZrotor) -- (\dd+\eArmL+\eRotorR,\eZrotor);
+    \fill (\dd-\eArmL,\eZrotor) circle (0.7pt) (\dd+\eArmL,\eZrotor) circle (0.7pt);
+    % mast and display, screen above the rotors
+    \draw[cG, line width=1.0pt] (\dd,\eZrotor) -- (\dd,\zlo);
+    \draw[cA, line width=2.4pt] (\dd,\zlo) -- (\dd,\zhi);
+    \node[lbl, text=cA, anchor=west] at (\dd+0.03,\zhi-0.02) {display};
+    % the nearest tip and the clearance
+    \draw[\col, line width=1.1pt] (0,\eEye) -- (\tip,\eZrotor);
+    \fill[\col] (\tip,\eZrotor) circle (1.2pt);
+    \node[lbl, text=\col!80!black, anchor=south west, inner sep=1pt]
+      at (\tip+0.04,\eZrotor+0.035) {$\ell_0=\SI{\ellv}{\metre}$};
+    % dimensions
+    \draw[dim] (0,1.86) -- (\dd,1.86) node[midway, above, lbl] {$d$};
+    \draw[construct] (\dd,\zhi) -- (\dd,1.89);
+    \draw[construct] (0,\eEye) -- (0,1.89);
+    \draw[dim] (\tip,1.24) -- (\dd,1.24) node[midway, below, lbl] {$\mathcal{R}=L+R$};
+    \draw[construct] (\tip,\eZrotor) -- (\tip,1.21);
+    \draw[construct] (\dd,\eZrotor) -- (\dd,1.21);
+    \draw[dim] (-0.33,\eZrotor) -- (-0.33,\eEye) node[midway, left, lbl] {$\Delta z$};
+    \draw[construct] (-0.36,\eZrotor) -- (\tip,\eZrotor);
+    \draw[construct] (-0.36,\eEye) -- (-0.21,\eEye);
+    \node[font=\small, anchor=south] at (\dd/2+0.25,2.00) {\ttl};
+  \end{scope}
+}
+\end{tikzpicture}

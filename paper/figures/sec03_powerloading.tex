@@ -1,0 +1,35 @@
+% Power loading against disk loading, T/P = FM sqrt(2 rho / DL), eq:dl.
+\input{results/fig/a_macros}
+\begin{tikzpicture}
+\begin{axis}[paperplot, xmode=log, ymode=log, xmin=5, xmax=2000,
+    ymin=0.02, ymax=1.3, samples=40, domain=5:2000,
+    xlabel={disk loading $\mathrm{DL} = T/A$ [\si{\pascal}]},
+    ylabel={power loading $T/P$ [\si{\newton\per\watt}]},
+    legend pos=south west]
+  % wake faster than 5 m/s: loose paper moves, requirement (R3)
+  \pgfmathsetmacro{\DLfive}{2*\aRho*2.5*2.5}
+  \fill[cD!7] (axis cs:\DLfive,0.02) rectangle (axis cs:2000,1.3);
+  \draw[cD, dashed, line width=0.6pt] (axis cs:\DLfive,0.02) -- (axis cs:\DLfive,1.3);
+  \node[lbl, cD, anchor=north west] at (axis cs:\DLfive*1.05,1.25)
+      {wake $w = 2\vind > \SI{5}{\metre\per\second}$};
+  \addplot[cA] {sqrt(2*\aRho/x)};
+  \addlegendentry{$\FM = 1$, ideal disk}
+  \addplot[cA!70, dashed] {0.75*sqrt(2*\aRho/x)};
+  \addlegendentry{$\FM = 0.75$}
+  \addplot[cA!45, dotted, line width=1.2pt] {0.5*sqrt(2*\aRho/x)};
+  \addlegendentry{$\FM = 0.5$}
+  % the design
+  \pgfmathsetmacro{\TPd}{\rFM*sqrt(2*\aRho/\aDL)}
+  \addplot[only marks, mark=*, mark size=2.2pt, cA, forget plot]
+      coordinates {(\aDL,\TPd)};
+  \node[lbl, anchor=north west, align=left, fill=white, inner sep=1.5pt]
+      (dl) at (axis cs:40,0.62)
+      {design: $\mathrm{DL}=\SI{\aDL}{\pascal}$,\\
+       $\FM=\rFM$, $w=\SI{\aWake}{\metre\per\second}$};
+  \draw[cG, line width=0.4pt] (dl.south west) -- (axis cs:\aDL*1.06,\TPd*1.04);
+  % slope triangle, -1/2
+  \draw[cG, line width=0.5pt] (axis cs:400,0.16) -- (axis cs:1600,0.16)
+      -- (axis cs:400,0.32) -- cycle;
+  \node[lbl, cG, anchor=north] at (axis cs:800,0.155) {slope $-\tfrac12$};
+\end{axis}
+\end{tikzpicture}

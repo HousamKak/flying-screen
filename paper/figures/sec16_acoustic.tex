@@ -1,0 +1,25 @@
+% Calibration of the acoustic anchor C: each aircraft's declared sound power
+% inverted through eq. (splmodel), against the value first assigned.
+\begin{tikzpicture}
+  \begin{axis}[paperplot, height=5.4cm,
+      xmin=0.15, xmax=1.0, ymin=64, ymax=88,
+      xlabel={aircraft mass [\si{\kilo\gram}]},
+      ylabel={anchor $C$ [\si{\decibel}]},
+      legend style={at={(0.98,0.36)}, anchor=east}]
+    \fill[cA!10] (axis cs:0.15,82.3) rectangle (axis cs:1.0,83.8);
+    \addplot[only marks, mark=*, mark size=2.6pt, cA] coordinates
+      {(0.249,82.8) (0.595,83.8) (0.895,82.3) (0.907,82.6)};
+    \addlegendentry{calibrated from $L_{WA}$}
+    \addplot[cA, dashed, domain=0.15:1.0] {82.9};
+    \addlegendentry{mean, $C=82.9$}
+    \addplot[cD, line width=1.1pt, domain=0.15:1.0] {68};
+    \addlegendentry{initial judgement, $C=68$}
+    \node[lbl, anchor=south] at (axis cs:0.249,83.0) {Mini 3};
+    \node[lbl, anchor=south] at (axis cs:0.595,84.0) {Air 2S};
+    \node[lbl, anchor=north east] at (axis cs:0.88,82.1) {Mavic 3};
+    \node[lbl, anchor=south west] at (axis cs:0.91,82.8) {Mavic 2};
+    \draw[dim, cD] (axis cs:0.42,68) -- (axis cs:0.42,82.9)
+      node[midway, right, font=\footnotesize, cD, align=left]
+      {the anchor was\\ this far optimistic};
+  \end{axis}
+\end{tikzpicture}

@@ -14,7 +14,25 @@ inertial coordinates: a vector with body coordinates $\vect{u}$ has inertial
 coordinates $R\vect{u}$. Position and velocity of the centre of mass in
 $\mathcal{I}$ are $\vect{r},\vect{v}\in\R^3$, and the angular velocity of
 $\mathcal{B}$ relative to $\mathcal{I}$, expressed in $\mathcal{B}$, is
-$\vect{\omega}\in\R^3$.
+$\vect{\omega}\in\R^3$. \Cref{fig:frames} fixes the geometry that the rest of
+the paper uses.
+
+\begin{figure}[tbp]
+\centering
+\input{figures/sec02_frames}
+\caption{Frames and layout, to scale for the design of \cref{sec:results}
+except for the user. $\mathcal I$ is inertial with $\vect e_3$ up;
+$\mathcal B$ is attached at the centre of mass with $\vect b_1$ along the screen
+normal toward the user, $\vect b_3$ along the nominal thrust and
+$\vect b_2 = \vect b_3\times\vect b_1$. The four rotors sit on arms at
+$\psi_i = \pi/4 + (i-1)\pi/2$ from $\vect b_1$ (the $\times$ layout) with
+alternating spin senses, marked by the arrows: rotors 1 and 3 turn
+anticlockwise seen from above, 2 and 4 clockwise. The display stands above the
+rotor plane, normal to $\vect b_1$, on a two-axis gimbal hinged at its lower
+edge. $\vect r$ locates the centre of mass in $\mathcal I$, and $d$ is the
+standoff to the user's eye.}
+\label{fig:frames}
+\end{figure}
 
 \subsection{Algebraic preliminaries}
 

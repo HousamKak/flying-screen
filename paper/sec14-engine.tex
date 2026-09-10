@@ -55,6 +55,40 @@ Module & Sections & Responsibility \\
 \end{tabular}
 \end{table}
 
+\Cref{fig:modules} shows how the modules depend on one another, and
+\cref{fig:pipeline} traces one evaluation of the coupled problem through them:
+the order of operations that the rest of this paper derives piece by piece.
+
+\begin{figure}[tbp]
+\centering
+\input{figures/sec14_modules}
+\caption{Import graph of the engine: an arrow from A to B means that module A
+imports B. Every module also imports \code{params.py}, drawn as the base. The
+layers read from the bottom up as the layers of the paper: the algebraic and
+component models, the dynamics and control, the simulation, and the two
+modules that close the coupled problem, \code{closure.py} and
+\code{optimize.py}. \code{acoustics.py} and \code{payloads.py} import nothing
+but the parameters. The three interfaces at the top call across the whole
+engine and their individual edges are omitted.}
+\label{fig:modules}
+\end{figure}
+
+\begin{figure}[tbp]
+\centering
+\input{figures/sec14_pipeline}
+\caption{One evaluation of the coupled problem as the engine carries it out.
+A bounded root search on the component residual \cref{eq:fpclosure} gives the
+hover design, which seeds the battery loop. Each update of the loop solves the
+inner mass map by contraction (\cref{prop:inner}), rebuilds the vehicle, flies
+one simulation window and turns its mean and peak power into a battery
+requirement by \cref{eq:batreq}; a guarded secant step then moves the battery.
+When the residual is within tolerance the battery is rounded up and flown
+again, and the loop ends only on a verification flight that needs no more
+battery than it carries. The results pass through \code{make\_results.py} into
+this paper, and the same engine serves the API and the browser tool.}
+\label{fig:pipeline}
+\end{figure}
+
 \subsection{Interfaces}
 
 Three front ends share the engine: a command line for scripted studies, an HTTP

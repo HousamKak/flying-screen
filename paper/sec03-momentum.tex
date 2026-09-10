@@ -24,6 +24,22 @@ Leishman~\cite[Ch.~2]{leishman2006} and Johnson~\cite[Ch.~2]{johnson1980}.
 Let $\vind$ denote the axial velocity induced \emph{at the disk} and $w$ the
 axial velocity in the far wake, both measured relative to the undisturbed
 fluid. Let $A_\infty$ be the cross-sectional area of the far wake.
+\Cref{fig:streamtube} shows the control volume and the four stations used
+below.
+
+\begin{figure}[tbp]
+\centering
+\input{figures/sec03_streamtube}
+\caption{The actuator disk in hover. Air at rest far upstream (station 0) is
+drawn into a contracting streamtube, crosses the disk (stations 1 and 2) at the
+induced velocity $\vind$ with a jump $\Delta p$ in static pressure, and leaves
+in a wake of speed $w$ and area $A_\infty$ at ambient pressure (station 3). The
+momentum theorem is applied to the dashed control volume. The tube is drawn
+from continuity, $r^2u = R^2\vind$, with the axial velocity $u$ of the
+vortex-cylinder solution on the axis; it contracts to $A_\infty = A/2$, as
+\cref{thm:momentum} requires.}
+\label{fig:streamtube}
+\end{figure}
 
 \subsection{The three conservation laws}
 
@@ -120,8 +136,23 @@ velocity of the disk relative to the fluid it acts on. Substituting
 The factor of two in \cref{eq:froude} is the reason the disk sees only half the
 dynamic pressure of the wake, and is the origin of the $3/2$ exponent that
 drives the entire feasibility analysis. Half the velocity increment happens
-upstream of the disk and half downstream.
+upstream of the disk and half downstream; \cref{fig:axisprofile} shows both
+halves.
 \end{remark}
+
+\begin{figure}[tbp]
+\centering
+\input{figures/sec03_axis}
+\caption{Axial velocity and static pressure along the rotor axis, from
+Bernoulli's equation applied separately on each side of the disk with the
+vortex-cylinder velocity $u/\vind = 1 + \xi/\sqrt{1+\xi^2}$, $\xi = x/R$. The
+velocity is continuous through the disk and rises from $0$ to $\vind$
+upstream and from $\vind$ to $w = 2\vind$ downstream, the two halves of
+\cref{eq:froude}. The pressure falls ahead of the disk, jumps by
+$\Delta p = \tfrac12\rho w^2$ across it, \cref{eq:pressurejump}, and recovers
+to $p_\infty$ in the wake.}
+\label{fig:axisprofile}
+\end{figure}
 
 \begin{corollary}[Hover]
 \label{cor:hover}
@@ -160,6 +191,22 @@ powerful motors; it is asking for low disk loading. The quantity
 $T/\Pideal = \sqrt{2\rho/\mathrm{DL}}$, the power loading, is the correct
 figure of merit for a hovering vehicle and improves as disk loading falls.
 \end{observation}
+
+\Cref{fig:powerloading} places the design of \cref{sec:results} on this law.
+
+\begin{figure}[tbp]
+\centering
+\input{figures/sec03_powerloading}
+\caption{Power loading against disk loading, $T/P = \FM\sqrt{2\rho/\mathrm{DL}}$,
+from \cref{eq:dl} and the definition of $\FM$ in \cref{sec:blade}. On
+logarithmic axes every figure of merit gives a line of slope $-\tfrac12$:
+halving the disk loading buys a factor $\sqrt2$ in thrust per watt, whatever
+the rotor. The shaded region is where the wake exceeds
+\SI{5}{\metre\per\second}, the speed at which loose paper begins to move
+(requirement (R3) of \cref{sec:results}); the design sits just inside it, at
+$\mathrm{DL} = \SI{\aDL}{\pascal}$ and $w = \SI{\rWake}{\metre\per\second}$.}
+\label{fig:powerloading}
+\end{figure}
 
 This single observation determines the shape of every machine in
 \cref{sec:results}: large, slowly turning rotors, because

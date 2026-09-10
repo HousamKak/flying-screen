@@ -1,0 +1,46 @@
+\input{results/fig/c_geom}%
+% Image-rotor construction for ground and ceiling proximity, drawn to scale
+% for the design's rotor in the reference room. The mirrored wake makes the
+% floor a plane of symmetry, across which no air passes.
+\begin{tikzpicture}[scale=1.5, >={Stealth[length=1.6mm]}, font=\footnotesize]
+  \pgfmathsetmacro{\zr}{\cZrotor}
+  \pgfmathsetmacro{\H}{\cCeiling}
+  \pgfmathsetmacro{\rr}{\cR}
+  \pgfmathsetmacro{\zi}{2*\H-\zr}
+  % floor and ceiling
+  \fill[pattern=north east lines, pattern color=cG] (-1.6,-0.1) rectangle (1.6,0);
+  \draw[line width=0.8pt] (-1.6,0) -- (1.6,0);
+  \node[anchor=south west] at (-1.6,0.02) {floor};
+  \fill[pattern=north east lines, pattern color=cG] (-1.6,\H) rectangle (1.6,\H+0.1);
+  \draw[line width=0.8pt] (-1.6,\H) -- (1.6,\H);
+  \node[anchor=north west] at (-1.6,\H-0.02) {ceiling};
+  % the rotor, its inflow and its wake turning along the floor
+  \draw[cA, line width=1.6pt] (-\rr,\zr) -- (\rr,\zr);
+  \foreach \s in {-1,1} {
+    \draw[cA, line width=0.6pt, ->]
+      (\s*\rr,\zr) .. controls (\s*0.8*\rr,\zr-0.35) .. (\s*0.72*\rr,0.9)
+      .. controls (\s*0.7*\rr,0.25) and (\s*0.6,0.07) .. (\s*1.25,0.05);
+    \draw[cA, line width=0.6pt, <-]
+      (\s*1.25*\rr,\zr+0.02) .. controls (\s*1.35*\rr,\zr+0.4) .. (\s*2.0*\rr,\zr+0.72);
+    % the ground image and its mirrored wake
+    \draw[cA!45, dashed, line width=0.6pt, ->]
+      (\s*\rr,-\zr) .. controls (\s*0.8*\rr,-\zr+0.35) .. (\s*0.72*\rr,-0.9)
+      .. controls (\s*0.7*\rr,-0.25) and (\s*0.6,-0.07) .. (\s*1.25,-0.05);
+    % the ceiling image and its mirrored inflow
+    \draw[cE!55, dashed, line width=0.6pt, <-]
+      (\s*1.25*\rr,\zi-0.02) .. controls (\s*1.35*\rr,\zi-0.4) .. (\s*2.0*\rr,\zi-0.72);
+  }
+  \draw[cA!45, dashed, line width=1.6pt] (-\rr,-\zr) -- (\rr,-\zr);
+  \draw[cE!55, dashed, line width=1.6pt] (-\rr,\zi) -- (\rr,\zi);
+  \node[cA, anchor=east] at (-\rr-0.06,\zr) {rotor, radius $R$};
+  \node[cA!70, anchor=east] at (-\rr-0.06,-\zr) {ground image};
+  \node[cE!80, anchor=east] at (-\rr-0.06,\zi) {ceiling image};
+  % dimensions on the right
+  \draw[construct] (\rr+0.05,\zr) -- (1.8,\zr);
+  \draw[construct] (\rr+0.05,-\zr) -- (2.1,-\zr);
+  \draw[dim, black] (1.55,0) -- (1.55,\zr) node[midway, right] {$z$};
+  \draw[dim, black] (1.55,\zr) -- (1.55,\H) node[midway, right] {$z_c$};
+  \draw[dim, cG] (2.0,-\zr) -- (2.0,\zr) node[midway, right] {$2z$};
+  \node[align=right, anchor=north east] at (-1.68,\H-0.3)
+    {$z/R=\cZoverR$\\ $z_c/R=\cZcOverR$};
+\end{tikzpicture}

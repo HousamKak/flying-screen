@@ -243,7 +243,8 @@ def sec_hex(R: Dict[str, Any]) -> None:
         q = dict(base_params(), N_rotors=N)
         o = optimised(q)
         r = o["closure"]
-        row = dict(ok=o["ok"], violations=o["violations"], feasible=r["feasible"])
+        row = dict(ok=o["ok"], violations=o["violations"], feasible=r["feasible"],
+                   N=N, x={v: o["params"][v] for v in OPT["variables"]})
         if r["feasible"]:
             veh = build_vehicle(o["params"], r["m"], r["m_bat"])
             auth = control_authority(veh)
@@ -296,6 +297,31 @@ def sec_pwall(R: Dict[str, Any]) -> None:
     R["pwall"] = dict(rows=rows, anchor=anchor, params="DEFAULTS")
 
 
+def sec_numerics(R: Dict[str, Any]) -> None:
+    """
+    Integration convergence of the sampled-data simulation: the controller
+    rate held at 1/dt while the RK4 substeps are refined, on the hardest
+    mission. Separately, the controller rate itself doubled, which changes
+    the closed loop being simulated rather than the accuracy of simulating it.
+    """
+    p = base_params()
+    r = C.close_first_principles(p)
+    rows = []
+    for sub in (1, 2, 4, 8):
+        t0 = time.time()
+        s = simulate_flight(p, r["m"], m_bat=r["m_bat"], mission_kind="turnaround",
+                            governor=GOV, substeps=sub, **SIM)
+        rows.append(dict(substeps=sub, P_mean=s.P_mean, track=s.e_track_max_all,
+                         clear=s.rotor_clearance_min, lag=s.e_lag_rms,
+                         soc=s.soc_end, seconds=time.time() - t0))
+        print("  substeps %d %.0fs" % (sub, time.time() - t0), flush=True)
+    s2 = simulate_flight(p, r["m"], m_bat=r["m_bat"], mission_kind="turnaround",
+                         governor=GOV, **dict(SIM, dt=SIM["dt"] / 2.0))
+    R["numerics"] = dict(rows=rows, half_dt=dict(
+        dt=SIM["dt"] / 2.0, P_mean=s2.P_mean, track=s2.e_track_max_all,
+        clear=s2.rotor_clearance_min, lag=s2.e_lag_rms))
+
+
 def sec_nearfield(R: Dict[str, Any]) -> None:
     p = base_params()
     rows = {}
@@ -308,8 +334,34 @@ def sec_nearfield(R: Dict[str, Any]) -> None:
     R["nearfield"] = dict(rows=rows)
 
 
+def sec_figures(R: Dict[str, Any]) -> None:
+    """
+    Data for the figures. Every paper/figures/gen_*.py exposes
+    generate(out_dir) and writes whitespace-separated tables with a header
+    row into paper/results/fig/, which the pgfplots figures read.
+    """
+    import glob
+    import importlib.util
+    out = os.path.join(OUT, "fig")
+    os.makedirs(out, exist_ok=True)
+    fig_dir = os.path.join(HERE, "figures")
+    if fig_dir not in sys.path:
+        sys.path.insert(0, fig_dir)          # so generators can import _common
+    done = []
+    for path in sorted(glob.glob(os.path.join(fig_dir, "gen_*.py"))):
+        name = os.path.splitext(os.path.basename(path))[0]
+        spec = importlib.util.spec_from_file_location(name, path)
+        mod = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(mod)
+        t0 = time.time()
+        mod.generate(out)
+        done.append(name)
+        print("  %s %.0fs" % (name, time.time() - t0), flush=True)
+    R["figures"] = dict(generators=done)
+
+
 SECTIONS = dict(design=sec_design, flights=sec_flights, coupled=sec_coupled,
-                nearfield=sec_nearfield,
+                nearfield=sec_nearfield, figures=sec_figures, numerics=sec_numerics,
                 clearance=sec_clearance, displays=sec_displays, hex=sec_hex,
                 tether=sec_tether, pwall=sec_pwall)
 
@@ -541,6 +593,26 @@ def emit(R: Dict[str, Any]) -> None:
         mac("TethAreaMin", f(1e6 * tether.A_MIN_CONDUCTOR, 2))
         lc = Tt.get("lumped") or {}
         mac("TethGaugeLimited", "yes" if lc.get("gauge_limited") else "no")
+
+    Nu = R.get("numerics")
+    if Nu:
+        rows = Nu["rows"]
+        ref = rows[-1]                     # finest integration, the reference
+        T = []
+        for s in rows:
+            T.append("%d & \\SI{%s}{\\milli\\second} & \\SI{%s}{\\watt} & \\SI{%s}{\\milli\\metre} & \\SI{%s}{\\milli\\metre} & \\SI{%s}{\\milli\\metre}\\\\"
+                     % (s["substeps"], f(1000 * SIM["dt"] / s["substeps"], 2),
+                        f(s["P_mean"], 5), f(1000 * s["track"], 3),
+                        f(1000 * s["lag"], 3), f(1000 * s["clear"], 3)))
+        write("tab_numerics_rows.tex", T)
+        coarse = rows[0]
+        mac("SubDP", "%.1e" % abs(coarse["P_mean"] / ref["P_mean"] - 1.0))
+        mac("SubDTrack", "%.1e" % abs(1000 * (coarse["track"] - ref["track"])))
+        mac("SubDClear", "%.1e" % abs(1000 * (coarse["clear"] - ref["clear"])))
+        h2 = Nu["half_dt"]
+        mac("CtlDP", f(100 * abs(h2["P_mean"] / coarse["P_mean"] - 1.0), 2))
+        mac("CtlDTrack", f(abs(1000 * (h2["track"] - coarse["track"])), 1))
+        mac("CtlDClear", f(abs(1000 * (h2["clear"] - coarse["clear"])), 1))
 
     Nf = R.get("nearfield")
     if Nf:

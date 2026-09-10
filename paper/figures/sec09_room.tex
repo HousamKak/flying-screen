@@ -1,0 +1,29 @@
+\input{results/fig/c_geom}%
+% Eq:roomlevel for the design in the reference room: direct field, diffuse
+% reverberant field, their sum, the critical distance and the user's ear.
+\begin{tikzpicture}
+  \begin{semilogxaxis}[paperplot, height=5.8cm,
+      xlabel={distance from the machine $r$ [\si{\metre}]},
+      ylabel={$L_p$ [\si{\decibel A}]},
+      xmin=0.1, xmax=8, ymin=40, ymax=78,
+      xtick={0.1,0.2,0.5,1,2,5}, xticklabels={0.1,0.2,0.5,1,2,5},
+      legend pos=north east]
+    \addplot[cB, dashed] table[x=r, y=direct] {results/fig/c_room.dat};
+    \addlegendentry{direct, $L_W+10\log_{10}(Q/4\pi r^{2})$}
+    \addplot[cE, dashed] table[x=r, y=reverb] {results/fig/c_room.dat};
+    \addlegendentry{reverberant, $L_W+10\log_{10}(4/\mathcal{R}_{\mathrm{room}})$}
+    \addplot[cA, line width=1.4pt] table[x=r, y=total] {results/fig/c_room.dat};
+    \addlegendentry{total, \cref{eq:roomlevel}}
+    \draw[construct] (axis cs:\cRc,40) -- (axis cs:\cRc,78);
+    \node[lbl, cG, anchor=south east] at (axis cs:0.88,40.8) {$r_c=\SI{\cRc}{\metre}$};
+    \addplot[only marks, mark=*, mark size=2.3pt, cA] coordinates {(\cStandoff,\cSplEar)};
+    \node[lbl, cA, anchor=south west] at (axis cs:\cStandoff,\cSplEar+0.4)
+      {user's ear, \SI{\cSplEar}{\decibel A}};
+    \addplot[only marks, mark=o, mark size=2.3pt, cB] coordinates {(1,\cSplOne)};
+    \draw[cB, line width=0.4pt] (axis cs:0.98,\cSplOne-0.3) -- (axis cs:0.82,51.2);
+    \node[lbl, cB, anchor=north east] at (axis cs:0.84,51.4)
+      {free field at \SI{1}{\metre}: \SI{\cSplOne}{\decibel A}};
+    \node[lbl, cE, anchor=south, align=center] at (axis cs:4.2,54.9)
+      {rest of the room};
+  \end{semilogxaxis}
+\end{tikzpicture}

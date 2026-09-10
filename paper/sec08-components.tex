@@ -1,5 +1,6 @@
 ﻿\section{First-principles component models}
 \label{sec:components}
+\input{results/fig/c_geom}
 
 \Cref{mod:sm,mod:fs} introduced two constants, $S_m$ and $f_s$, that carry a
 great deal of weight and are not laws. This section replaces both with models
@@ -32,7 +33,22 @@ nearest blade tip, is
   \label{eq:reach}
 \end{equation}
 \Cref{eq:reach} is trivial and turns out to be one of the most consequential
-quantities in the paper; see \cref{sec:results}.
+quantities in the paper; see \cref{sec:results}. \Cref{fig:geometry} draws the
+design to scale.
+
+\begin{figure}[tbp]
+\centering
+\input{figures/sec08_geometry}
+\caption{The design of \cref{sec:results} drawn to scale. Top view: the hubs lie
+on a circle of radius $L$ fixed by \cref{eq:armlength}, so that adjacent disks,
+whose centres are $2L\sin(\pi/N)$ apart, clear each other by the tip gap
+$s=2L\sin(\pi/N)-2R$. The dashed circle of radius $\mathcal{R}=L+R$ is the
+envelope swept by the blades; its radius is the reach \cref{eq:reach}. Side
+view: the display is carried a distance $r_{cp}$ above the rotor plane, and
+raises the centre of mass only a little because it is light compared with the
+rest of the machine.}
+\label{fig:geometry}
+\end{figure}
 
 \paragraph{Section properties.} For a thin-walled tube the second moment of
 area about a diameter is
@@ -58,6 +74,21 @@ gives
   t \ge t_{\delta} = \frac{\Lambda F L^{2}}{3\pi E r^{3}} .
   \label{eq:tstiff}
 \end{equation}
+\Cref{fig:cantilever} collects the load case, the moment distribution and the
+section.
+
+\begin{figure}[tbp]
+\centering
+\input{figures/sec08_cantilever}
+\caption{The arm as a cantilevered thin-walled tube. The limit load $F$ at the
+tip produces a bending moment $M(x)=F(L-x)$ that grows linearly toward the
+root, where the extreme fibres of the section carry $\sigma=Mr/I$; that bounds
+the wall from below through \cref{eq:tstress}. The tip deflection, exaggerated
+here, bounds it through \cref{eq:tstiff}. For a thin wall both $I$ and the mass
+per unit length are linear in $t$, so every requirement on the arm is a lower
+bound on a single number.}
+\label{fig:cantilever}
+\end{figure}
 
 \paragraph{Dynamics.} The fundamental bending frequency of a uniform cantilever
 of mass per unit length $\mu$ is
@@ -76,12 +107,26 @@ $m_{\mathrm{tip}}$ (motor plus propeller). The wall thickness actually used is
 \end{equation}
 and the engine records which of the three governs, because the answer is
 informative: for the designs of \cref{sec:results} it is stiffness or minimum
-gauge, never strength, with a working stress of \SI{44}{\mega\pascal} against
-an allowable of \SI{350}{\mega\pascal}.
+gauge, never strength, with a working stress of \SI{\cSigmaWork}{\mega\pascal}
+against an allowable of \SI{\cSigmaAllow}{\mega\pascal}. \Cref{fig:wall} shows
+why.
+
+\begin{figure}[tbp]
+\centering
+\input{figures/sec08_wall}
+\caption{The three lower bounds of \cref{eq:wall} against gross mass for the
+design's arm tube, $r=\SI{\cArmr}{\milli\metre}$. Strength and stiffness are
+both linear in the limit load $F\propto m$, so on logarithmic axes they are
+parallel lines of slope one, and the stiffness bound lies a factor of about
+eight above the strength bound: an arm stiff enough is automatically strong
+enough. Below about \SI{1.6}{\kilo\gram} the minimum gauge governs; at the
+design, stiffness does.}
+\label{fig:wall}
+\end{figure}
 
 \begin{remark}[Consistency with \cref{as:rigid}]
 \Cref{eq:freq} is what makes the rigid-body assumption checkable. With
-$f_1\approx\SI{32}{\hertz}$ and an attitude loop at
+$f_1\approx\SI{\cFbend}{\hertz}$ and an attitude loop at
 $\sqrt{K_R}/2\pi\approx\SI{1.0}{\hertz}$ (\cref{sec:control}) the separation is
 a factor of $32$, comfortably in the regime where treating the airframe as rigid
 does not corrupt the control design.
@@ -131,7 +176,20 @@ calibrated in \cref{sec:verification}.
 Because the motor is sized by the burst condition $T_{\max}$, the peak rather
 than continuous torque is the right basis. \Cref{eq:motormass} is sublinear in
 $Q$, which matters: at $e=0.3$ a tenfold increase in torque costs a factor
-$10^{1/1.3}\approx5.9$ in mass, not ten.
+$10^{1/1.3}\approx5.9$ in mass, not ten (\cref{fig:motor}).
+
+\begin{figure}[tbp]
+\centering
+\input{figures/sec08_motor}
+\caption{Motor mass against the peak torque it must hold, \cref{eq:motormass}.
+Constant torque density, $e=0$, would make mass proportional to torque; the
+scale effect bends the line to slope $1/(1+e)$ on logarithmic axes, and the
+two agree at the reference motor. The step shows a tenfold torque costing
+$10^{1/1.3}\approx5.9$ times the mass. The filled point is the design's motor,
+sized by the torque at $T_{\max}$; the calibration of $k_\tau$ against
+catalogue motors is in \cref{sec:verification}.}
+\label{fig:motor}
+\end{figure}
 
 Speed controllers are sized by power, $m_{\mathrm{esc}} = \Pelec^{\max}/k_P$,
 and propellers by an empirical areal law $m_{\mathrm{prop}} = k_p D^{2.6}
@@ -166,7 +224,20 @@ Which term binds depends on the mission: for short sessions the power term
 dominates and endurance is effectively free, while for long sessions the energy
 term takes over. The engine reports which is active, because a design that is
 power-limited responds to entirely different levers than one that is
-energy-limited.
+energy-limited. \Cref{fig:batmax} traces both terms along the closed design.
+
+\begin{figure}[tbp]
+\centering
+\input{figures/sec08_battery}
+\caption{The two requirements of \cref{eq:batmax} along the closed design as
+the session length varies, every other parameter fixed. The power term follows
+the peak electrical power and barely moves. The energy term grows with $t_f$,
+and faster than linearly, because through the closure a heavier battery needs a
+heavier machine that needs more power. Below about \SI{\cTfCross}{\minute} the
+pack is sized by power, and endurance up to that point costs nothing: the gross
+mass is flat. The design session of \SI{\cTf}{\minute} is energy-limited.}
+\label{fig:batmax}
+\end{figure}
 
 High-energy lithium-ion cells are not high-power cells. Sizing against the
 burst condition $T_{\max}$ requires the burst rating; the continuous hover draw

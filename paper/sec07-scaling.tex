@@ -94,6 +94,22 @@ At fixed technology and geometry, $\Mmax \propto t_f^{-2}$. Multiplying the
 required endurance by $k$ divides the supportable fixed load by $k^2$.
 \end{corollary}
 
+\Cref{fig:walltf} shows the law for the lumped model of the design of
+\cref{sec:results}, and what it implies once the auxiliary load is counted.
+
+\begin{figure}[tbp]
+\centering
+\input{figures/sec07_walltf}
+\caption{The inverse-square law of \cref{cor:tsquared} for the lumped
+fixed-area model of the design of \cref{sec:results}. The critical load
+$\Mmax$ falls with slope $-2$ on logarithmic axes. The load the mission itself
+demands rises, because the battery that runs the auxiliary load,
+$\Paux t_f/\eb$, is part of $\Mzero$. The two cross at the endurance wall of
+this closure, \SI{66}{\minute}, against the design's \SI{30}{\minute} session;
+beyond the crossing no mass closes.}
+\label{fig:walltf}
+\end{figure}
+
 \begin{example}[Verification against the engine]
 For the parameter set of \cref{sec:results} the engine computes the
 sensitivities numerically by central differences in $\ln$-space and returns
@@ -127,6 +143,22 @@ sensitivity as long as $\alpha$ is comfortably positive, and become violent as
 $\alpha\to0$. They are not where the design is won or lost unless one has been
 careless.
 \end{remark}
+
+\Cref{fig:sensitivity} collects the sensitivities as the engine computes them.
+
+\begin{figure}[tbp]
+\centering
+\input{figures/sec07_sensitivity}
+\caption{Logarithmic sensitivities of $\Mmax$ at the engine's default
+parameters, computed by central differences in $\ln$-space. The top group are
+the squared levers of \cref{eq:sens1}; the middle group are disk area, entering
+as $D^2$ and $N$, and air density, \cref{eq:sens2}; the bottom group act
+through $\alpha$ and are \cref{eq:sens3}, here with $\gamma_m/\alpha=0.257$.
+Every bar agrees with \cref{thm:sensitivity} to three decimals. A bar of length
+two means a \SI{10}{\percent} change in the parameter moves the critical load
+by about \SI{20}{\percent}.}
+\label{fig:sensitivity}
+\end{figure}
 
 \subsection{The exponent, the constants, and where the wall sits}
 
@@ -226,9 +258,45 @@ then $\sqrt{m_0} = 2\alpha/(3\beta)$ and \cref{eq:tlim} gives exactly
 $t_{\lim} = \tfrac32 t_f$, independently of $\Paux$.
 \end{remark}
 
-\Cref{tab:pwall} records the computed values. The default parameters do not
-close at fixed area at the nominal hour, so the common anchor is the fold mass,
-and the $p=1$ entry is $\tfrac32 t_f$ as the remark predicts.
+\Cref{fig:theta} draws $\Theta_p$ for five exponents. The maxima of (i), the
+unattained ceiling of (ii) and the unbounded growth of (iii) are all visible,
+and the maxima lie to the right of the anchor, which by (iv) is why the wall
+rises with $p$ here.
+
+\begin{figure}[tbp]
+\centering
+\input{figures/sec07_theta}
+\caption{The longest mission a mass $m$ can close, $\Theta_p(m)$ of
+\cref{eq:theta}, relative to the nominal $t_f$, at the engine's default
+parameters with the anchor $m_0$ at the fold mass of the fixed-area closure.
+For $p<1$ each curve has an interior maximum $(\hat m,t_f^{\max})$ (dots), and
+these lie to the right of the anchor. At $p=1$ the curve rises towards
+$\alpha\eb/c_P=\tfrac32t_f$ (dashed) without reaching it; at $p=1.25$ it grows
+without bound. No fold and no ceiling are different statements: $p=1$ has the
+first property and not the second.}
+\label{fig:theta}
+\end{figure}
+
+\Cref{tab:pwall} records the computed values and \cref{fig:pwall} draws them
+on a finer grid. The default parameters do not close at fixed area at the
+nominal hour, so the common anchor is the fold mass, and the $p=1$ entry is
+$\tfrac32 t_f$ as the remark predicts.
+
+\begin{figure}[tbp]
+\centering
+\input{figures/sec07_pwall}
+\caption{The endurance wall of \cref{prop:twall} on a fine grid of exponents,
+at the parameters and anchor of \cref{tab:pwall}. (a) $t_f^{\max}/t_f$ from
+direct maximisation of \cref{eq:theta} (line) and from the bisection of
+\code{sweep.endurance\_wall} (crosses), which agree wherever the bisection
+runs; within about $0.01$ of $p=1$ the bisection overflows in the fold mass
+$(\alpha/q\beta)^{1/(q-1)}$ and only the direct value is shown. The circle at
+$p=1$ is the unattained supremum $\tfrac32t_f$ of \cref{eq:tlim}; for $p>1$
+there is no wall. (b) The mass at the wall exceeds the anchor for every $p<1$
+and diverges as $p\uparrow1$, so by \cref{eq:wallslope} the wall rises
+monotonically on this family.}
+\label{fig:pwall}
+\end{figure}
 
 \begin{table}[t]
 \centering

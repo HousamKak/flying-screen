@@ -1,0 +1,17 @@
+% Battery-loop convergence on the pacing mission: plain fixed-point
+% iteration against the guarded secant step of the engine.
+\input{results/fig/d_macros}
+\begin{tikzpicture}
+  \begin{axis}[paperplot, height=5.4cm, ymode=log,
+      xmin=-0.3, xmax=8.3, ymin=1e-7, ymax=0.3,
+      xlabel={battery update $k$ (one simulation each)},
+      ylabel={$|\mathcal{R}_2(\mu_k)|=|\mathcal{H}(\mu_k)-\mu_k|$ [\si{\kilo\gram}]},
+      legend pos=south west, xtick={0,...,8}]
+    \addplot[cB, mark=square*, mark size=1.8pt] table[x=k, y=gap] {results/fig/d_conv_plain.dat};
+    \addlegendentry{plain iteration $\mu_{k+1}=\mathcal{H}(\mu_k)$}
+    \addplot[cA, mark=*, mark size=2.2pt] table[x=k, y=gap] {results/fig/d_conv_secant.dat};
+    \addlegendentry{secant step \cref{eq:secant}}
+    \addplot[cD, dashed, domain=-0.3:8.3] {2e-3};
+    \addlegendentry{tolerance}
+  \end{axis}
+\end{tikzpicture}

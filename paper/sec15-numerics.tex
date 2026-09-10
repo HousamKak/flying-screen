@@ -54,10 +54,27 @@ outcomes: a root, a near-tangent root resolved only to residual tolerance, a
 non-finite residual, or an exhausted search. The last is reported as a failure
 of a bounded search and is never described as infeasibility. The case that
 motivated the refinement is kept as a regression test: the design of
-\cref{sec:results} at $t_f=\SI{4280.0502}{\second}$ has a positive island of
-width \SI{5}{\percent} in mass, with roots at \SI{4.5678}{\kilo\gram} and
-\SI{4.6173}{\kilo\gram}, which the grid alone straddled and reported as no
-mass closing.
+\cref{sec:results} at $t_f=\SI{4280.0502}{\second}$ has a positive island
+about \SI{1}{\percent} wide in mass, with roots at \SI{4.5678}{\kilo\gram}
+and \SI{4.6173}{\kilo\gram}, against a grid spacing of \SI{35}{\percent}.
+The grid alone straddled it and reported that no mass closes;
+\cref{fig:rootsearch} shows the case.
+
+\begin{figure}[tbp]
+\centering
+\input{figures/sec15_rootsearch}
+\caption{The component residual $\mathcal{F}$ of \cref{eq:fpclosure} for the
+design of \cref{sec:results} at $t_f=\SI{4280.05}{\second}$, just short of
+the fold. (a) On the scale of the whole search $\mathcal{F}$ appears merely to
+touch zero; the geometric grid of ratio $1.35$ samples it at the dots, and the
+samples on either side of the positive stretch, at \SI{\fdGridLo}{\kilo\gram}
+and \SI{\fdGridHi}{\kilo\gram}, are both negative. (b) Magnified, the positive
+island is \SI{\fdIslandPct}{\percent} wide in mass and \SI{\fdPeakF}{\gram}
+high, bounded by the roots $m_\pm$. The engine finds it by refining every
+sampled local maximum with a bounded maximisation in $\ln m$; the grid alone
+reported that no mass closes.}
+\label{fig:rootsearch}
+\end{figure}
 
 \subsection{The battery loop with the simulator inside it}
 
@@ -100,11 +117,26 @@ battery is rounded up to the last requirement and the design is flown once
 more, and the loop reports convergence only if that flight requires no more
 battery than it carries. On every mission of \cref{sec:results} this took
 three updates and two verification flights, five simulations in all, against
-eight or more for plain iteration.
+eight or more for plain iteration. \Cref{fig:convergence} compares the two on
+one mission.
+
+\begin{figure}[tbp]
+\centering
+\input{figures/sec15_convergence}
+\caption{Convergence of the battery loop on the pacing mission, flown with an
+\SI{\fdConvWindow}{\second} window so that plain iteration can be run to eight
+updates at reasonable cost. Plain iteration $\mu_{k+1}=\mathcal{H}(\mu_k)$
+contracts linearly, the residual falling by a factor of about
+\fdPlainRate{} per update, which is $\mathcal{H}'$ of \cref{prop:contraction}
+at this design. The guarded secant step \cref{eq:secant} takes the same first
+step and is below the tolerance on the third update. Each point costs one full
+simulation.}
+\label{fig:convergence}
+\end{figure}
 
 \subsection{Trajectory integration}
 
-\Cref{eq:ode} is integrated with classical fourth-order Runge--Kutta at fixed
+\Cref{eq:ode} is integrated with classical fourth-order Runge-Kutta at fixed
 step. Fixed step rather than adaptive, because the cost must be predictable for
 an interactive tool and because the controller is evaluated once per step,
 making the scheme effectively a sampled-data system whose sample rate should
@@ -116,7 +148,22 @@ $K_R\approx\SI{41}{\per\second\squared}$ and hence
 $\omega_n=\sqrt{K_R}\approx\SI{6.4}{\radian\per\second}$, the fastest pole is
 the motor at $1/\tau_m\approx\SI{22}{\radian\per\second}$; at
 $h=\SI{4}{\milli\second}$ the product $h\lambda\approx0.09$ sits deep inside the
-RK4 stability region, whose real-axis extent is $|h\lambda|\le2.79$.
+RK4 stability region, whose real-axis extent is $|h\lambda|\le2.79$
+(\cref{fig:rk4}).
+
+\begin{figure}[tbp]
+\centering
+\input{figures/sec15_rk4}
+\caption{(a) The stability region of classical RK4,
+$\{z:|1+z+z^2/2+z^3/6+z^4/24|\le1\}$, which reaches $-2.79$ on the negative
+real axis. (b) The products $h\lambda$ for the poles of the design's loops at
+$h=\SI{4}{\milli\second}$: the motor lag, the attitude loop
+$s^2+K_\omega s+K_R$, the position loop $s^2+K_ds+K_p$ and the governor's
+filter. The fastest, the motor, sits at $h\lambda=\fdHlMotorRe$, about thirty
+times inside the boundary, so the step is set by accuracy and by the sampling
+of the controller, not by stability.}
+\label{fig:rk4}
+\end{figure}
 
 The quaternion is renormalised after each step, $q\leftarrow q/\|q\|$. This
 does not cost the order. The exact flow preserves $\|q\|=1$, so the RK4 step
@@ -134,7 +181,21 @@ autopilot is; the $O(h)$ difference between it and a continuous-feedback
 idealisation is a property of the system being simulated, not an integration
 error. A convergence check with the controller rate held fixed and the
 integration substeps refined was not run and is listed in
-\cref{sec:limitations}.
+\cref{sec:limitations}. \Cref{fig:sampled} shows the structure of one step.
+
+\begin{figure}[tbp]
+\centering
+\input{figures/sec15_sampled}
+\caption{The sampled-data structure of every simulation. At $t_k$ the
+controller reads the state and the references at $t_k$, and the telemetry
+records both at that instant; the controller's output $u_k$ is then held over
+the step while RK4 evaluates the plant four times, at $t_k$, twice at
+$t_k+h/2$ and at $t_{k+1}$. The integration error is $O(h^4)$ for the plant
+under the held input. The difference between this sampled loop and a
+continuous-feedback idealisation belongs to the controller, which is sampled
+at \SI{250}{\hertz} as a digital autopilot would be.}
+\label{fig:sampled}
+\end{figure}
 
 \begin{remark}[Windowed mission energy]
 Integrating a full \SI{1800}{\second} mission at $h=\SI{4}{\milli\second}$ would

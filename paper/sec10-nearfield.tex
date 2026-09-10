@@ -49,17 +49,44 @@ the same as \cref{eq:ige} with a separate coefficient,
   \label{eq:ice}
 \end{equation}
 with $z_c$ the distance to the ceiling and $k_c>1$ because at equal spacing
-ceiling effect is the stronger of the two.
+ceiling effect is the stronger of the two. \Cref{fig:image} shows the image
+construction for both surfaces.
+
+\begin{figure}[tbp]
+\centering
+\input{figures/sec10_image}
+\caption{The image construction behind \cref{eq:ige,eq:ice}, drawn to scale for
+the design's rotor in the reference room. A mirror rotor below the floor, with
+its wake mirrored, makes the floor a plane of symmetry across which no air
+passes, which is the boundary condition the floor imposes; a mirror above the
+ceiling does the same for the inflow. The images sit $2z$ and $2z_c$ away, many
+rotor radii, and the corrections fall as the square of $R/4z$, which is why both
+are small here.}
+\label{fig:image}
+\end{figure}
 
 \begin{remark}[Honesty about $k_c$]
 Published values for ceiling proximity scatter considerably across geometries
 and measurement techniques~\cite{sanchezcuevas2017,conyers2019}. $k_c$ is the
 least certain constant in this paper. It is exposed as a user parameter and
 the engine reports the resulting factor separately so that its influence can be
-bounded rather than believed. For the designs here it contributes $1.3\%$ at
-$k_c=2$, and the entire range $k_c\in[0.5,6]$ moves the design mass by less
-than $10$ grams.
+bounded rather than believed. For the design here it reduces induced power by
+\SI{\cCeilPct}{\percent} at $k_c=\cKc$, and the entire range $k_c\in[0.5,6]$
+moves the design mass by \SI{\cKcSpanG}{\gram} (\cref{fig:surface}).
 \end{remark}
+
+\begin{figure}[tbp]
+\centering
+\input{figures/sec10_factors}
+\caption{Fractional reduction of induced power from \cref{eq:ige,eq:ice},
+$1-1/k=k_s(R/4z)^2$ with $k_s=1$ for the floor and $k_s=k_c$ for the ceiling,
+against distance over rotor radius. On logarithmic axes both are lines of slope
+$-2$; the band spans the published range $k_c\in[0.5,6]$. At the design's two
+distances the floor is worth \SI{\cGroundPct}{\percent} and the ceiling
+\SI{\cCeilPct}{\percent}, and even the upper edge of the band stays below
+\SI{3}{\percent}.}
+\label{fig:surface}
+\end{figure}
 
 \subsection{Rotor-to-rotor interference}
 
@@ -87,7 +114,18 @@ with an induced-flow interaction that decays smoothly.
 
 For a quadrotor with $k_{\mathrm{gap}}=1.10$ in \cref{eq:armlength}, the
 adjacent hub spacing is $2L\sin(\pi/4)=2.2R$ and the tip-to-tip gap is
-$0.2R = 0.1D$, giving $\kappa_{\mathrm{int}} = 1.025$.
+$0.2R = 0.1D$, giving $\kappa_{\mathrm{int}} = 1.025$ (\cref{fig:interference}).
+
+\begin{figure}[tbp]
+\centering
+\input{figures/sec10_interference}
+\caption{The interference factor \cref{eq:interference} against tip gap over
+diameter, with the geometry that defines the gap. The penalty and its slope
+vanish together at $s/D=0.25$, so the model joins the isolated-rotor case
+smoothly. The design, with $k_{\mathrm{gap}}=\cKgap$ in \cref{eq:armlength},
+sits at $s/D=\cSoverD$ and pays $\kappa_{\mathrm{int}}=\cKint$.}
+\label{fig:interference}
+\end{figure}
 
 \subsection{Net effect and why it is worth stating}
 
@@ -149,6 +187,20 @@ $V_{\mathrm{room}}=\SI{48}{\metre\cubed}$ and
 $t_{\mathrm{ex}} = \SI{21}{\second}$. The mean return velocity distributed over
 the floor plan is $\dot V/(5\times4) = \SI{0.11}{\metre\per\second}$.
 \end{example}
+
+\Cref{fig:recirc} shows the circulation this sets up in the room.
+
+\begin{figure}[tbp]
+\centering
+\input{figures/sec10_recirc}
+\caption{Recirculation in the reference room, schematic. The wake strikes the
+floor, spreads, rises along the walls and returns across the ceiling into the
+rotor inflow. At $\dot V=A\vind$ a volume of air equal to the room's passes
+through the disks every $t_{\mathrm{ex}}$ of \cref{eq:exchange}, so within the
+first minute of a session the machine is drawing in air it has already
+accelerated, and the quiescent inflow of \cref{mod:disk} no longer holds.}
+\label{fig:recirc}
+\end{figure}
 
 \begin{finding}
 Within one minute of a thirty-minute session the machine is flying in air it

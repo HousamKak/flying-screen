@@ -1,0 +1,46 @@
+% Stability region of classical RK4, {z : |1+z+z^2/2+z^3/6+z^4/24| <= 1},
+% and the products h lambda of the design's closed-loop poles at h = 4 ms.
+\input{results/fig/d_macros}
+\begin{tikzpicture}
+  \begin{axis}[paperplot, name=full, width=0.47\linewidth, height=0.47\linewidth,
+      axis equal image, xmin=-3.3, xmax=0.9, ymin=-3.2, ymax=3.2,
+      xlabel={$\mathrm{Re}(h\lambda)$}, ylabel={$\mathrm{Im}(h\lambda)$},
+      title={(a) RK4 stability region}]
+    \addplot[cC!70!black, fill=cC!15] table[x=re, y=im] {results/fig/d_rk4.dat};
+    \draw[construct] (axis cs:-3.3,0) -- (axis cs:0.9,0);
+    \draw[construct] (axis cs:0,-3.2) -- (axis cs:0,3.2);
+    \draw[cD, line width=0.8pt] (axis cs:-0.2,-0.2) rectangle (axis cs:0.05,0.2);
+    \node[lbl, cD, anchor=west] at (axis cs:0.08,0.3) {(b)};
+    \fill[cA] (axis cs:-2.785,0) circle (1.6pt);
+    \node[lbl, anchor=north] at (axis cs:-2.785,-0.08) {$-2.79$};
+  \end{axis}
+  \begin{axis}[paperplot, at={(full.east)}, anchor=west, xshift=1.9cm,
+      width=0.47\linewidth, height=0.47\linewidth,
+      xmin=-0.12, xmax=0.02, ymin=-0.035, ymax=0.035,
+      xlabel={$\mathrm{Re}(h\lambda)$}, ylabel={$\mathrm{Im}(h\lambda)$},
+      title={(b) the design's poles, magnified},
+      scaled ticks=false,
+      xticklabel style={/pgf/number format/.cd, fixed, precision=2},
+      yticklabel style={/pgf/number format/.cd, fixed, precision=2},
+      legend pos=north west]
+    \fill[cC!15] (axis cs:-0.12,-0.035) rectangle (axis cs:0,0.035);
+    \draw[cC!70!black] (axis cs:0,-0.035) -- (axis cs:0,0.035);
+    % d_rk4_pts rows: 0 motor, 1 to 2 attitude, 3 to 4 position, 5 to 6 governor
+    \addplot[only marks, mark=triangle*, mark size=3pt, cE,
+             restrict expr to domain={\thisrow{kind}}{0:0}]
+      table[x=re, y=im] {results/fig/d_rk4_pts.dat};
+    \addlegendentry{motor, $-h/\tau_m$}
+    \addplot[only marks, mark=*, mark size=2.4pt, cA,
+             restrict expr to domain={\thisrow{kind}}{1:2}]
+      table[x=re, y=im] {results/fig/d_rk4_pts.dat};
+    \addlegendentry{attitude, $s^2+K_\omega s+K_R$}
+    \addplot[only marks, mark=square*, mark size=2pt, cB,
+             restrict expr to domain={\thisrow{kind}}{3:4}]
+      table[x=re, y=im] {results/fig/d_rk4_pts.dat};
+    \addlegendentry{position, $s^2+K_d s+K_p$}
+    \addplot[only marks, mark=diamond*, mark size=3pt, cG,
+             restrict expr to domain={\thisrow{kind}}{5:6}]
+      table[x=re, y=im] {results/fig/d_rk4_pts.dat};
+    \addlegendentry{governor, $(s+4)^2$}
+  \end{axis}
+\end{tikzpicture}

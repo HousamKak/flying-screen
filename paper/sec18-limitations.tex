@@ -8,7 +8,7 @@ change the conclusions.
 \subsection{Recirculation}
 
 \Cref{mod:disk} assumes quiescent inflow. By the exchange-time calculation of
-\cref{eq:exchange} the machine passes a room's volume of air through its disks
+\cref{eq:exchange} (\cref{fig:recirc}) the machine passes a room's volume of air through its disks
 every \SI{21}{\second}, so within a minute of a thirty-minute session the
 assumption is false. The correction is not a coefficient; it requires solving
 the room flow with a moving boundary. Two consequences are unquantified: the
@@ -63,7 +63,7 @@ Every result is a single point estimate. The quantities that carry the most
 uncertainty are the figure of merit of a low-Reynolds paddle rotor, the motor
 mass constant, the screen drag coefficients, the electrical efficiency, the
 cell specific energy at the discharge rate used, and above all the acoustic
-anchor, whose calibration spread alone is \SI{1.4}{\decibel}. No propagation
+anchor, whose calibration spread alone is \SI{1.5}{\decibel}. No propagation
 of these uncertainties through the closure was performed, so the paper does
 not show that the design ranking of \cref{tab:displays,tab:clearance} is
 robust to them, nor that the candidate satisfies its constraints across their
@@ -113,6 +113,22 @@ differential, and the display slab makes $J_{xx}$ exceed $J_{yy}$. The row sums
 $\sum_i|\mat M_{j+1,i}|$, which an earlier draft used and which predict pitch
 as the weak axis, mislead here (\cref{app:proofs}). The failure case therefore
 needs a different answer than more rotors, and none is offered here.
+\Cref{fig:hexfail} shows both failures.
+
+\begin{figure}[tbp]
+\centering
+\input{figures/sec18_hexfail}
+\caption{Rotor failure in the engine's layouts, top view, arcs showing each
+rotor's spin. Left: a quadrotor that loses a rotor has three inputs for four
+wrench components; with the remaining spins unbalanced it cannot hover at
+zero yaw rate, which is why the relaxed-hover controllers of~\cite{mueller2014}
+let it spin. Right: a hexacopter that loses the opposite pair 1 and 4 keeps
+four rotors, but their allocation columns satisfy
+$\mat M_{:,2}+\mat M_{:,5}=\mat M_{:,3}+\mat M_{:,6}$, so $\rank\mat M=3$ and
+every moment the four can produce satisfies the relation printed below it:
+roll, pitch and yaw can no longer be commanded independently.}
+\label{fig:hexfail}
+\end{figure}
 
 \begin{table}[t]
 \centering
@@ -157,6 +173,23 @@ head position is only as safe as the estimate, and a latency of
 \SI{14}{\centi\metre} of sphere in the wrong place, more than the whole
 tracking margin $\varepsilon$. No estimator is modelled and no sensor noise is
 injected.
+
+\begin{figure}[tbp]
+\centering
+\input{figures/sec18_latency}
+\caption{Why estimator latency erodes the keep-out guarantee, not to scale.
+The governor holds the reference outside the sphere of radius $\varrho$ about
+the estimated head $\hat{\vect c}=\vect c(t-\tau)$, and the vehicle stays
+within $\varepsilon$ of the reference. If the head has moved
+$\|\dt{\vect c}\|\tau$ since it was seen, the sphere is displaced by that much,
+and in the direction of motion the vehicle can be closer to the true head
+than \cref{prop:governor}(iv) allows. At \SI{1.4}{\metre\per\second} and
+\SI{100}{\milli\second} the displacement is \SI{0.14}{\metre}, larger than the
+whole margin $\varepsilon=\SI{0.10}{\metre}$.}
+\label{fig:latency}
+\end{figure}
+
+\Cref{fig:latency} draws the effect.
 
 \subsection{Mission energy and the operating policy}
 

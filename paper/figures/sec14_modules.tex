@@ -1,0 +1,72 @@
+% Import graph of the engine. An arrow A -> B means that module A imports B.
+% Every module imports params.py, drawn as the base; the three interfaces at
+% the top use most of the engine and their individual edges are omitted.
+\begin{tikzpicture}[
+    font=\footnotesize, y=1.05cm,
+    mod/.style={draw, rounded corners=2pt, fill=cA!6, minimum width=1.9cm,
+                minimum height=1.5em, font=\ttfamily\footnotesize},
+    ifc/.style={mod, fill=cB!12},
+    dep/.style={-{Stealth[length=1.8mm]}, cG, line width=0.55pt},
+  ]
+  % base
+  \node[draw, fill=cG!12, minimum width=13.8cm, minimum height=1.5em,
+        font=\ttfamily\footnotesize] (params) at (6.3,0)
+        {params.py: schema, presets, derived quantities};
+  % layer 1
+  \node[mod] (numerics)  at (1.0,1)  {numerics};
+  \node[mod] (acoustics) at (6.3,1)  {acoustics};
+  \node[mod] (payloads)  at (8.6,1)  {payloads};
+  \node[mod] (sizing)    at (11.6,1) {sizing};
+  % layer 2
+  \node[mod] (components) at (3.5,2) {components};
+  % layer 3
+  \node[mod] (electrical) at (0.8,3)  {electrical};
+  \node[mod] (dynamics)   at (3.5,3)  {dynamics};
+  \node[mod] (mission)    at (6.3,3)  {mission};
+  \node[mod] (sweep)      at (10.0,3) {sweep};
+  % layer 4
+  \node[mod] (tether)     at (0.8,4) {tether};
+  \node[mod] (control)    at (3.5,4) {control};
+  % layer 5
+  \node[mod] (simulate)   at (5.2,5) {simulate};
+  % layer 6
+  \node[mod] (closure)    at (2.8,6) {closure};
+  \node[mod] (optimize)   at (7.6,6) {optimize};
+  % interfaces
+  \node[ifc] (api) at (2.6,7.7) {api};
+  \node[ifc] (cli) at (6.3,7.7) {cli};
+  \node[ifc, minimum width=2.6cm] (mk) at (10.4,7.7) {make\_results};
+  \node (tool)  at (2.6,8.8)  {browser tool, \code{web/}};
+  \node (term)  at (6.3,8.8)  {command line};
+  \node (paper) at (10.4,8.8) {this paper};
+  \draw[flow, cB] (api) -- (tool);
+  \draw[flow, cB] (cli) -- (term);
+  \draw[flow, cB] (mk) -- (paper);
+
+  % engine edges: importer -> imported
+  \draw[dep] (components.south west) -- (numerics.north east);
+  \draw[dep] (dynamics.south west) -- (numerics.north);
+  \draw[dep] (dynamics) -- (components);
+  \draw[dep] (electrical.south east) -- (components.north west);
+  \draw[dep] (mission.south west) -- (components.north east);
+  \draw[dep] (sweep.south west) -- ($(components.east)+(0,0.12)$);
+  \draw[dep] (sweep.south east) -- (sizing.north west);
+  \draw[dep] (tether) -- (electrical);
+  \draw[dep] (tether.south east) -- ($(components.north west)+(0.25,0)$);
+  \draw[dep] (tether.west) -- ++(-0.55,0) |- (-0.35,0.52) -| (sizing.south);
+  \draw[dep] (control) -- (dynamics);
+  \draw[dep] (simulate.south west) -- (control.east);
+  \draw[dep] (simulate.south) -- (dynamics.north east);
+  \draw[dep] (simulate.south east) -- (mission.north);
+  \draw[dep] (closure) -- (simulate);
+  \draw[dep] ($(closure.south)+(-0.6,0)$) |- (components.west);
+  \draw[dep] (closure.north) -- ++(0,0.25) -| ($(sizing.north)+(0.6,0)$);
+  \draw[dep] (optimize) -- (simulate);
+  \draw[dep] (optimize.south) |- ($(components.east)+(0,-0.12)$);
+
+  % the interfaces use the whole engine
+  \draw[decorate, decoration={brace, amplitude=5pt, mirror}, cB]
+       ($(api.south west)+(-0.2,-0.12)$) -- ($(mk.south east)+(0.2,-0.12)$)
+       node[midway, below=5pt, font=\scriptsize, fill=white]
+       {the interfaces call across the whole engine};
+\end{tikzpicture}

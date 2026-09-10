@@ -1,0 +1,78 @@
+\input{results/fig/c_geom}%
+% Top view (left) and side view (right) of the design, drawn to scale from
+% the solved dimensions: arm length L from the gap rule, rotor radius R,
+% the envelope of radius L+R, and the display carried above the rotor plane.
+\begin{tikzpicture}[scale=4.4, >={Stealth[length=1.6mm]}]
+  \pgfmathsetmacro{\aa}{\cL/sqrt(2)}
+  \pgfmathsetmacro{\rch}{\cL+\cR}
+  % ---------------------------------------------------------------- top view
+  \begin{scope}
+    \draw[cD!70, dashed, line width=0.5pt] (0,0) circle (\rch);
+    \draw[construct] (0,0) circle (\cL);
+    \foreach \ang in {45,135,225,315}
+      \draw[line width=1.8pt, black!55] (0,0) -- (\ang:\cL);
+    \foreach \ang in {45,135,225,315} {
+      \fill[cA!9] (\ang:\cL) circle (\cR);
+      \draw[cA, line width=0.9pt] (\ang:\cL) circle (\cR);
+      \fill[cA] (\ang:\cL) circle (0.011);
+    }
+    \filldraw[fill=gray!35, draw=black!70] (-0.045,-0.045) rectangle (0.045,0.045);
+    \draw[cE, line width=2.2pt] (0,-0.5*\cScreenW) -- (0,0.5*\cScreenW);
+    \draw[cE, line width=0.5pt] (0,-0.5*\cScreenW) -- (0,-0.69)
+      node[below, lbl, cE] {display, above the rotor plane};
+    % L and R along the diagonal to rotor 1
+    \draw[dim, black] ($(0,0)+(315:0.05)$) -- ($(45:\cL)+(315:0.05)$);
+    \node[lbl] at ($(45:0.5*\cL)+(315:0.105)$) {$L$};
+    \draw[dim, black] ($(45:\cL)+(135:0.05)$) -- ($(45:\rch)+(135:0.05)$);
+    \node[lbl] at ($(45:\cL+0.5*\cR)+(135:0.105)$) {$R$};
+    % envelope radius, drawn through the gap between rotors 2 and 3
+    \draw[dim, cD] (0,0) -- (180:\rch);
+    \node[lbl, cD, anchor=south] at (-0.50,0.004) {$\mathcal{R}$};
+    \node[lbl, cD, anchor=north west] at (0.28,-0.57) {envelope, radius $\mathcal{R}=L+R$};
+    % chord between adjacent hubs, and the tip gap
+    \draw[construct] (45:\cL) -- (315:\cL);
+    \draw[cG, line width=0.4pt] (\aa,0.16) -- (\aa+\cR+0.05,0.16)
+      node[right, lbl, cG] {$2L\sin(\pi/N)$};
+    \draw[<-, cG, line width=0.5pt] (\aa+0.004,0) -- (\aa+\cR+0.05,-0.05)
+      node[right, lbl, cG] {tip gap $s$};
+    \foreach \ang/\n in {45/1,135/2,225/3,315/4}
+      \node[lbl, cA] at ($(\ang:\cL)+(\ang+90:0.14)$) {\n};
+    \draw[vec] (-0.74,-0.66) -- (-0.56,-0.66) node[right, lbl] {$\vect b_1$};
+    \draw[vec] (-0.74,-0.66) -- (-0.74,-0.48) node[above, lbl] {$\vect b_2$};
+    \node[lbl, anchor=south] at (0,0.66) {top view};
+  \end{scope}
+  % --------------------------------------------------------------- side view
+  \begin{scope}[shift={(1.85,0)}]
+    \foreach \sx in {-1,1} {
+      \fill[cA!20] (\sx*\aa,0) ellipse ({\cR} and 0.012);
+      \draw[cA, line width=0.9pt] (\sx*\aa,0) ellipse ({\cR} and 0.012);
+    }
+    \draw[line width=1.8pt, black!55] (-\aa,0) -- (\aa,0);
+    \filldraw[fill=gray!35, draw=black!70] (-0.045,-0.012) rectangle (0.045,0.012);
+    % display, edge-on, centred r_cp above the rotor plane
+    \filldraw[fill=cE!25, draw=cE, line width=0.8pt]
+      (-0.008,\cRcp-0.5*\cScreenH) rectangle (0.008,\cRcp+0.5*\cScreenH);
+    \draw[vec, cE] (0.012,\cRcp+0.06) -- ++(0.16,0) node[right, lbl] {$\vect n$};
+    % centre of mass
+    \begin{scope}[shift={(0,\cCoMz)}]
+      \fill[black] (0,0) -- (0.014,0) arc (0:90:0.014) -- cycle;
+      \fill[black] (0,0) -- (-0.014,0) arc (180:270:0.014) -- cycle;
+      \draw[black, line width=0.4pt] (0,0) circle (0.014);
+    \end{scope}
+    \draw[cG, line width=0.4pt] (0.016,\cCoMz-0.004) -- (0.20,-0.09)
+      node[right, lbl, black] {centre of mass};
+    % r_cp
+    \draw[construct] (0.012,\cRcp) -- (0.36,\cRcp);
+    \draw[dim, black] (0.33,0) -- (0.33,\cRcp) node[midway, right, lbl] {$r_{cp}$};
+    % display height
+    \draw[construct] (-0.012,\cRcp+0.5*\cScreenH) -- (-0.15,\cRcp+0.5*\cScreenH);
+    \draw[construct] (-0.012,\cRcp-0.5*\cScreenH) -- (-0.15,\cRcp-0.5*\cScreenH);
+    \draw[dim, black] (-0.12,\cRcp-0.5*\cScreenH) -- (-0.12,\cRcp+0.5*\cScreenH)
+      node[midway, left, lbl] {$h$};
+    % rotor diameter
+    \draw[dim, black] (-\aa-\cR,-0.06) -- (-\aa+\cR,-0.06) node[midway, below, lbl] {$D=2R$};
+    \draw[vec] (-0.62,-0.30) -- ++(0.18,0) node[right, lbl] {$\vect b_1$};
+    \draw[vec] (-0.62,-0.30) -- ++(0,0.18) node[above, lbl] {$\vect b_3$};
+    \node[lbl, anchor=south] at (0,0.40) {side view};
+  \end{scope}
+\end{tikzpicture}

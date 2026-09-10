@@ -1,0 +1,39 @@
+% The two coupling cycles of the problem, eq:cycle (algebraic, blue) and
+% eq:cycle2 (dynamic, orange). They share the spine E -> m_bat -> m.
+\begin{tikzpicture}[
+  st/.style={draw, circle, minimum size=2.7em, inner sep=0pt, font=\small,
+             fill=white, line width=0.8pt},
+  el/.style={font=\scriptsize, align=center, inner sep=2pt},
+  alg/.style={flow, cA, line width=0.9pt},
+  dyn/.style={flow, cB, line width=0.9pt},
+  both/.style={flow, black, line width=1.1pt}]
+  \node[st] (m)  at (0, 2.4)  {$m$};
+  \node[st] (mb) at (0, 0.2)  {$\mbat$};
+  \node[st] (E)  at (0,-2.0)  {$E$};
+  \node[st, draw=cA] (T)  at (-3.4, 2.4) {$T$};
+  \node[st, draw=cA] (P)  at (-3.4,-2.0) {$P$};
+  \node[st, draw=cB] (pl) at ( 3.4, 2.4) {plant};
+  \node[st, draw=cB] (u)  at ( 3.4, 0.2) {$u(t)$};
+  \node[st, draw=cB] (Pt) at ( 3.4,-2.0) {$P(t)$};
+  % algebraic cycle
+  \draw[alg] (m) -- node[el, above] {hover: $T = mg$} (T);
+  \draw[alg] (T) -- node[el, left, xshift=-1pt]
+      {momentum theory\\[2pt]
+       $P = \dfrac{T^{3/2}}{\FM\,\eta\sqrt{2\rho A}} + \Paux$} (P);
+  \draw[alg] (P) -- node[el, below] {$E = P\,t_f$} (E);
+  % shared spine
+  \draw[both] (E) -- node[el, right] {$\mbat = E/\eb$} (mb);
+  \draw[both] (mb) -- node[el, right, align=left]
+      {$m = \mfix + \mstr$\\$\phantom{m={}}+ \mprop + \mbat$} (m);
+  % dynamic cycle
+  \draw[dyn] (m) -- node[el, above] {$m$ and $J(m)$} (pl);
+  \draw[dyn] (pl) -- node[el, right] {controller\\ tracks $\vect r_d(t)$} (u);
+  \draw[dyn] (u) -- node[el, right, xshift=1pt]
+      {$P = \dfrac1\eta\displaystyle\sum_i k_P\Omega_i^3 + \Paux$} (Pt);
+  \draw[dyn] (Pt) -- node[el, below] {$E = \displaystyle\int_0^{t_f}\!P\,\dd t$} (E);
+  % loop labels
+  \node[el, cA, font=\footnotesize] at (-1.75, 0.2)
+      {algebraic\\cycle \labelcref{eq:cycle}};
+  \node[el, cB, font=\footnotesize] at (2.2, 0.2)
+      {dynamic\\cycle \labelcref{eq:cycle2}};
+\end{tikzpicture}

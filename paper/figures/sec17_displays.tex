@@ -1,0 +1,25 @@
+\input{results/fig/e_macros}%
+\begin{tikzpicture}
+\begin{groupplot}[
+  group style={group size=2 by 1, horizontal sep=0.35cm,
+               yticklabels at=edge left},
+  paperplot, width=0.40\linewidth, height=6.4cm,
+  xbar, /pgf/bar width=6.5pt, /pgf/bar shift=0pt,
+  y dir=reverse, symbolic y coords/.expand once={\eDisplayOrder},
+  ytick/.expand once={\eDisplayOrder}, enlarge y limits=0.09,
+  y tick label style={font=\footnotesize},
+  legend style={at={(0.98,0.98)}, anchor=north east}]
+\nextgroupplot[xlabel={gross mass $m$ [\si{\kilogram}]}, xmin=0, xmax=7]
+  \addplot[fill=cA!70, draw=cA] table[x=gross, y=tag] {results/fig/e_displays_ok.dat};
+  \addplot[fill=cD!55, draw=cD] table[x=gross, y=tag] {results/fig/e_displays_bad.dat};
+  \draw[cD, dashed, line width=0.8pt]
+    (axis cs:\eOptMass,{13.3 in laptop panel}) -- (axis cs:\eOptMass,{15.6 in laptop whole});
+  \addlegendimage{line legend, cD, dashed, line width=0.8pt}
+  \legend{closes, over limits, limit}
+\nextgroupplot[xlabel={$L_p(\SI{1}{\metre})$ [dBA]}, xmin=45, xmax=70]
+  \addplot[fill=cA!70, draw=cA] table[x=spl, y=tag] {results/fig/e_displays_ok.dat};
+  \addplot[fill=cD!55, draw=cD] table[x=spl, y=tag] {results/fig/e_displays_bad.dat};
+  \draw[cD, dashed, line width=0.8pt]
+    (axis cs:\eOptSpl,{13.3 in laptop panel}) -- (axis cs:\eOptSpl,{15.6 in laptop whole});
+\end{groupplot}
+\end{tikzpicture}

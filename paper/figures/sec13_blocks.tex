@@ -1,0 +1,39 @@
+% The co-design fixed point as the engine evaluates it: the inner map G
+% closes the mass for a given battery, the vehicle is rebuilt, the mission is
+% flown, the battery it needs is H(mu), and a guarded secant step updates mu.
+\begin{tikzpicture}[node distance=0.55cm and 0.6cm, font=\small]
+  \node (mu) [sumnode, minimum size=1.6em] {$\mu$};
+  \node (G) [block, right=0.7cm of mu, minimum width=3.0cm]
+    {inner map $\mathcal G$\\[1pt]$m=\mfix+S(m)+\mu$\\[1pt]\footnotesize algebraic, \cref{prop:inner}};
+  \node (V) [block, right=of G, minimum width=2.6cm]
+    {vehicle\\[1pt]$J$, $k_T$, $k_Q$, $k_P$\\$\Omega_{\max}$, $E_{\max}=\eb\mu$};
+  \node (gov) [block, right=1.0cm of V, minimum width=2.2cm] {governor\\\cref{mod:governor}};
+  \node (ctl) [block, below=0.45cm of gov, minimum width=2.2cm] {controller\\\cref{eq:leeused}};
+  \node (pl) [block, below=0.45cm of ctl, minimum width=2.2cm] {plant\\\cref{eq:ode}};
+  \begin{scope}[on background layer]
+    \node (sim) [draw=cA, dashed, rounded corners=3pt, fill=cA!5, inner sep=6pt,
+      fit=(gov)(ctl)(pl), label={[lbl, cA]above:mission simulation}] {};
+  \end{scope}
+  \draw[flow] (gov) -- (ctl);
+  \draw[flow] (ctl) -- (pl);
+  \draw[flow] (pl.east) -- ++(0.35,0) |- (ctl.east);
+  \node (H) [block, below=2.1cm of V, minimum width=4.4cm]
+    {battery requirement \cref{eq:batreq}\\[2pt]
+     $\mathcal H(\mu)=\max\Big\{\dfrac{\int_0^{t_f}P\,\dd t}{\eb(1-\varsigma)},\
+     \dfrac{\max_t P}{p_b}\Big\}$};
+  \node (S) [block, left=0.75cm of H, minimum width=2.8cm]
+    {secant step on\\$\mathcal H(\mu)-\mu$\\\cref{eq:secant}};
+  \node (Q) [draw, diamond, aspect=2.2, inner sep=1pt, font=\footnotesize, below=0.7cm of S]
+    {$|\mathcal H-\mu|<\epsilon$?};
+  \node (ver) [block, right=0.75cm of Q, minimum width=4.4cm]
+    {verification flight at $\mu\ge\mathcal H$:\\report margins and \cref{eq:cd4}};
+  \draw[flow] (mu) -- (G);
+  \draw[flow] (G) -- node[above, lbl] {$m$} (V);
+  \draw[flow] (V) -- (gov);
+  \draw[flow] (pl.south) |- node[pos=0.45, right, lbl] {$P(t)$} (H.east);
+  \draw[flow] (H) -- node[above, lbl] {$\mathcal H(\mu)$} (S);
+  \draw[flow] (S) -| node[pos=0.75, left, lbl] {$\mu_{k+1}$} (mu);
+  \draw[flow] (S) -- (Q);
+  \draw[flow] (Q) -- node[above, lbl] {yes} (ver);
+  \draw[flow] (Q.west) -- ++(-0.5,0) node[left, lbl] {no} |- ([yshift=-6pt]S.west);
+\end{tikzpicture}

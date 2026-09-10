@@ -1,0 +1,38 @@
+\input{results/fig/e_macros}%
+% Side views at the design standoff, to scale: the display is held at eye
+% height either way; what moves is the rotor plane.
+\begin{tikzpicture}[x=3.0cm, y=3.0cm]
+\foreach \zr/\sx/\anc/\dy/\ttl in {
+    \eZrotorBelow/0.00/south east/0.03/{screen below the rotors},
+    \eZrotor/2.30/north east/-0.03/{screen above the rotors: adopted}} {
+  \begin{scope}[shift={(\sx,0)}]
+    \pgfmathsetmacro\tip{\eStandoff-\eReach}
+    \pgfmathsetmacro\zlo{\eEye-\eScreenH/2}
+    \pgfmathsetmacro\zhi{\eEye+\eScreenH/2}
+    % eye height across the panel
+    \draw[construct] (-0.22,\eEye) -- (\eStandoff+\eReach,\eEye);
+    \node[lbl, text=cG!80!black, anchor=south west] at (-0.22,\eEye+0.13) {eye height \SI{\eEye}{\metre}};
+    \draw[construct, -{Stealth[length=1.2mm]}] (-0.02,\eEye+0.14) -- (-0.02,\eEye+0.01);
+    % the user: head and shoulders
+    \draw[line width=0.8pt, fill=white] (-0.10,\eEye+0.02) circle (0.10);
+    \draw[line width=0.8pt] (-0.10,\eEye-0.08) -- (-0.10,1.10);
+    \draw[line width=0.8pt] (-0.24,1.36) -- (0.04,1.36);
+    \fill (0,\eEye) circle (0.9pt);
+    % rotor plane: arms, two disks edge on, hubs
+    \draw[line width=1.0pt] (\eStandoff-\eArmL,\zr) -- (\eStandoff+\eArmL,\zr);
+    \draw[cB, line width=2.6pt] (\eStandoff-\eArmL-\eRotorR,\zr) -- (\eStandoff-\eArmL+\eRotorR,\zr);
+    \draw[cB, line width=2.6pt] (\eStandoff+\eArmL-\eRotorR,\zr) -- (\eStandoff+\eArmL+\eRotorR,\zr);
+    \fill (\eStandoff-\eArmL,\zr) circle (0.7pt) (\eStandoff+\eArmL,\zr) circle (0.7pt);
+    \node[lbl, text=cB!80!black, anchor=\anc] at (\eStandoff+\eReach,\zr+\dy)
+      {rotor plane \SI{\zr}{\metre}};
+    % mast and display at eye height
+    \draw[cG, line width=1.0pt] (\eStandoff,\zr) -- (\eStandoff,\eEye);
+    \draw[cA, line width=2.4pt] (\eStandoff,\zlo) -- (\eStandoff,\zhi);
+    \node[lbl, text=cA, anchor=west] at (\eStandoff+0.03,\zhi-0.03) {display};
+    % the nearest tip
+    \draw[cC, line width=1.1pt] (0,\eEye) -- (\tip,\zr);
+    \fill[cC] (\tip,\zr) circle (1.2pt);
+    \node[font=\small, anchor=south] at (\eStandoff/2+0.25,1.86) {\ttl};
+  \end{scope}
+}
+\end{tikzpicture}

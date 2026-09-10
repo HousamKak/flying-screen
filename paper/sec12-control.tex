@@ -31,6 +31,25 @@ position $\to$ velocity $\to$ attitude $\to$ body rate $\to$ rotor speed,
 
 each level treating the level below as instantaneous. This is standard
 practice~\cite{mahony2012}, and \cref{eq:linhover} is its justification.
+\Cref{fig:cascade} shows the cascade as the engine implements it, and
+\cref{fig:bandwidth} the separation of its time scales that the argument
+needs.
+
+\begin{figure}[tbp]
+\centering
+\input{figures/sec12_cascade}
+\caption{The cascade as the engine implements it. Blue boxes are computed at
+each sample of the controller, orange boxes are physical. The reference
+governor turns the ideal display trajectory into one the aircraft can fly and
+holds it outside the keep-out sphere about the user's head; the position loop
+turns the governed reference into a force $\vect F_c$; the thrust magnitude,
+the desired attitude $R_d$ and its rate $\vect\omega_d$ follow from that force
+and its derivative; the attitude loop and the mixer turn them into rotor speed
+commands. The translational state closes the outer loop, the rotational state
+the inner one. The gimbal loop runs beside the cascade and keeps the screen
+upright while the airframe tilts.}
+\label{fig:cascade}
+\end{figure}
 
 \begin{remark}[Flatness]
 The quadrotor with these dynamics is differentially flat with flat outputs
@@ -124,7 +143,22 @@ $R_d\transp R = 2\vect u\vect u\transp - I$ for a unit vector $\vect u$, the
 matrix is symmetric and $\vect e_R=0$. The critical set of $\Psi$ is therefore
 the identity together with a two-dimensional family of attitudes, not three
 isolated points. \Cref{thm:lee} is a statement on the sublevel set
-\cref{eq:roa}, and no almost-global claim is made here.
+\cref{eq:roa}, and no almost-global claim is made here. \Cref{fig:psi} shows
+the mechanism along any single axis of rotation.
+
+\begin{figure}[tbp]
+\centering
+\input{figures/sec12_psi}
+\caption{The attitude error for a rotation of $R_d\transp R$ by the angle
+$\theta$ about any unit axis $\vect u$, for which $\tr(R_d\transp R)=1+2\cos\theta$
+gives $\Psi=1-\cos\theta$ and $\vect e_R=\sin\theta\,\vect u$. The configuration
+error grows monotonically to its maximum $2$ at $\theta=\pi$, but the restoring
+term, proportional to $\vect e_R$, peaks at $\pi/2$ and decays to zero at $\pi$
+(shaded). Every rotation by $\pi$ is therefore a critical point of $\Psi$ at
+which the proportional feedback vanishes, which is why \cref{eq:roa} excludes
+$\Psi=2$ and why no continuous feedback of this kind is global on $\SOthree$.}
+\label{fig:psi}
+\end{figure}
 
 The engine implements
 \begin{equation}
@@ -164,7 +198,8 @@ acceleration commanded per radian of attitude error.
 
 \begin{remark}[Why the rate feedforward matters]
 An earlier version of the engine set $\vect\omega_d=0$. On a curved path the
-thrust direction rotates at the turn rate of the path, and a loop with no rate
+thrust direction rotates at the turn rate of the path (\cref{fig:thrustrot}),
+and a loop with no rate
 feedforward follows it with a standing attitude error of about
 $K_\omega\|\vect\omega_d\|/K_R$. On the turnaround mission of
 \cref{sec:results} that version reached a peak tracking error of
@@ -172,6 +207,21 @@ $K_\omega\|\vect\omega_d\|/K_R$. On the turnaround mission of
 eye. With \cref{eq:omegad} the same mission gives \SI{\rTurnTrack}{\milli\metre}
 and \SI{\rTurnClear}{\metre}.
 \end{remark}
+
+\begin{figure}[tbp]
+\centering
+\input{figures/sec12_thrustrot}
+\caption{Why a curved path needs angular-rate feedforward. (a) On a turn of
+radius $\rho$ flown at speed $V$ the commanded force has a horizontal part
+pointing at the centre of the turn, so the horizontal part of $\vect b_3^d$
+turns with the path at $\Omega=V/\rho$. (b) $\vect b_3^d$ therefore sweeps a cone
+of half-angle $\theta_t$ about $\ez$, with $\tan\theta_t=V^2/(\rho g)$, and changes
+at the rate $\Omega\sin\theta_t$ even in a perfectly steady turn. With
+$\vect\omega_d=0$ the attitude loop sees that rate as a persistent error and
+settles at a lag of about $K_\omega\|\vect\omega_d\|/K_R$; \cref{eq:omegad}
+supplies the rate instead.}
+\label{fig:thrustrot}
+\end{figure}
 
 \subsection{Control authority and gain selection}
 
@@ -214,7 +264,28 @@ version of \cref{eq:authority} divided the sum by $N$, on the reasoning that
 the thrust constraint ``shares'' the differential among the rotors; it does
 not, the constraint is met by pairing increments with decrements, and the
 error was a factor of four. It was found by independent review and is
-recorded in \cref{sec:verification}.
+recorded in \cref{sec:verification}. \Cref{fig:attainable} draws the whole
+attainable set, of which \cref{eq:authority} takes the axis intercepts.
+
+\begin{figure}[tbp]
+\centering
+\input{figures/sec12_attainable}
+\caption{Attainable torque sets in the roll and pitch plane with thrust held
+at $mg$ and the yaw moment at zero, computed from the engine through their
+support function: one linear program of the form \cref{eq:authority} for each
+of \num{240} directions. The quadrotor's set is a square turned by \ang{45}
+whose axis intercepts are
+$\tau^{\max}_{\mathrm{roll}}=\tau^{\max}_{\mathrm{pitch}}=\SI{\fdQuadRoll}{\newton\metre}$,
+the balanced differential of \cref{eq:authquad}; the crosses mark the earlier
+estimate with the factor $1/N$, a quarter of it. The hexacopter of
+\cref{tab:hex}, re-optimised under the same limits (gross
+\SI{\fdHexGross}{\kilo\gram}), has a hexagonal set that reaches further in
+pitch than in roll: its roll
+differential also produces a yaw moment, which the zero-yaw constraint must
+cancel, while its pitch differential does not. Its authority in the sense of
+\cref{eq:authority} is the smaller intercept, roll.}
+\label{fig:attainable}
+\end{figure}
 
 \begin{model}[Gain heuristic]
 \label{mod:gains}
@@ -254,6 +325,20 @@ the resulting loop stays out of saturation on the missions flown. For the
 design the two bounds are \SI{\rKRauth}{\per\second\squared} and
 \SI{\rKRlag}{\per\second\squared}, the lag bound binds, and the value used is
 $K_R=\SI{\rKR}{\per\second\squared}$, $K_\omega=\SI{\rKw}{\per\second}$.
+
+\begin{figure}[htbp]
+\centering
+\input{figures/sec12_bandwidth}
+\caption{The frequency ladder of the design's cascade on a logarithmic axis.
+Each loop is at least a factor of three slower than the one it relies on:
+position at $\sqrt{K_p}$, attitude at $\sqrt{K_R}$, the motors at $1/\tau_m$.
+The governor's filter at $\sqrt{k_p}$ shapes the reference and closes no loop
+on the vehicle. The first bending mode of the arms and the sampling rate of
+the controller lie one and two orders of magnitude above the fastest loop,
+which is the condition under which the airframe may be treated as rigid and
+the sampled controller as continuous.}
+\label{fig:bandwidth}
+\end{figure}
 
 \begin{remark}[Yaw is the weak axis]
 By \cref{eq:alloc} the yaw column involves $k_Q$ rather than $k_T L$, and
@@ -408,6 +493,23 @@ $\|\vect r-\vect c\|\ge\|\vect r_g-\vect c\|-\|\vect r-\vect r_g\|
 \cref{eq:reach}.
 \end{proof}
 
+\Cref{fig:barrier} draws part (ii) in the phase plane of $h$.
+
+\begin{figure}[tbp]
+\centering
+\input{figures/sec12_barrier}
+\caption{The phase plane of the keep-out barrier $h=\|\vect r_g-\vect c\|-\varrho$
+with $\gamma=4$. The shaded set $\{h\ge0,\ \dt h+\gamma h\ge0\}$ is forward
+invariant under the slowest recession that the first term of
+\cref{eq:barrier} permits, $\ddt h=-2\gamma\dt h-\gamma^2h$, whose solutions
+$h(t)=(h_0+\psi_0t)\,e^{-\gamma t}$ with $\psi_0=\dt h_0+\gamma h_0$ are drawn
+from four admissible starts: each reaches the origin without crossing $h=0$.
+A start that closes faster than $\gamma h_0$ (dashed) is not protected and
+enters the sphere. This is why the governor maintains the invariant set and
+not the half-space $h\ge0$ alone.}
+\label{fig:barrier}
+\end{figure}
+
 Three things the proposition does not say. The invariance in (ii) is a
 statement about the continuous-time reference; the engine enforces (iii) at
 update instants, and between them the reference moves under a constant
@@ -416,6 +518,31 @@ executes. The guarantee lapses whenever the step is infeasible, which is why
 that is reported as a violation rather than absorbed. And $\vect c$ is the
 true head position: an estimator with latency or dropouts moves the sphere
 away from the head, and no estimator is modelled (\cref{as:estimation}).
+
+\Cref{fig:turnaround} shows the governor on the most demanding mission of
+\cref{sec:results}, the turnaround.
+
+\begin{figure}[tbp]
+\centering
+\input{figures/sec12_turnaround}
+\caption{The turnaround flown by the engine with the governor of
+\cref{mod:governor} at $v_{\max}=\SI{2.5}{\metre\per\second}$,
+$a_{\max}=\SI{2.5}{\metre\per\second\squared}$ and
+$\varepsilon=\SI{0.10}{\metre}$. (a) Top view around one reversal of the user.
+The ideal display trajectory is a semicircle of radius
+$d=\SI{\fdStandoff}{\metre}$ about the head, which \cref{prop:turn} shows is
+not flyable; the governed reference yields, swings wide and catches up after
+the turn, and the vehicle follows it, the arrows giving the direction of
+travel. The dashed circle is the keep-out sphere at the reversal, cut at the
+vehicle's altitude. (b) Distances from the head over the whole window, the
+vertical line marking the reversal shown in (a). The governed reference does
+not enter $\varrho$, as \cref{prop:governor}(ii) and (iii) require; the
+vehicle falls below $\varrho$ by at most its tracking error and stays above
+$d_{\mathrm{safe}}+\mathcal{R}$, which is \cref{prop:governor}(iv) with the
+tracking bound measured on this run. The peaks are the display lagging the
+user after each reversal.}
+\label{fig:turnaround}
+\end{figure}
 
 \begin{remark}[The governor's bandwidth must be high]
 The gains $k_p,k_d$ in \cref{eq:gov1} must place the filter's natural frequency

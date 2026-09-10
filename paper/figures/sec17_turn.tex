@@ -1,0 +1,27 @@
+\input{results/fig/e_macros}%
+\begin{tikzpicture}
+\begin{groupplot}[
+  group style={group size=1 by 4, vertical sep=0.22cm,
+               xlabels at=edge bottom, xticklabels at=edge bottom},
+  paperplot, height=3.2cm, xmin=0, xmax=16,
+  xlabel={time $t$ [\si{\second}]},
+  ylabel style={align=center, font=\footnotesize}]
+\nextgroupplot[ylabel={$e_{\mathrm{track}}$\\ {[}\si{\milli\metre}{]}}, ymin=0, ymax=125]
+  \fill[cG!12] (axis cs:0,0) rectangle (axis cs:3,125);
+  \addplot[cA] table[x=t, y=track] {results/fig/e_turn.dat};
+  \addplot[cD, dashed, domain=0:16, samples=2] {\eTrackMargin};
+  \node[lbl, text=cD, anchor=south east] at (axis cs:15.9,\eTrackMargin) {$\varepsilon$};
+  \node[lbl, text=cG!80!black, anchor=north west] at (axis cs:0.1,90) {settling};
+\nextgroupplot[ylabel={$e_{\mathrm{lag}}$\\ {[}\si{\metre}{]}}, ymin=0]
+  \fill[cG!12] (axis cs:0,0) rectangle (axis cs:3,4);
+  \addplot[cB] table[x=t, y expr=\thisrow{lag}/1000] {results/fig/e_turn.dat};
+\nextgroupplot[ylabel={rotor to eye\\ {[}\si{\metre}{]}}, ymin=0.3, ymax=1.5]
+  \fill[cG!12] (axis cs:0,0.3) rectangle (axis cs:3,1.5);
+  \addplot[cC!70!black] table[x=t, y=clear] {results/fig/e_turn.dat};
+  \addplot[cD, dashed, domain=0:16, samples=2] {\eDsafe};
+  \node[lbl, text=cD, anchor=south] at (axis cs:4.6,\eDsafe) {$d_{\mathrm{safe}}$};
+\nextgroupplot[ylabel={power\\ {[}\si{\watt}{]}}]
+  \fill[cG!12] (axis cs:0,90) rectangle (axis cs:3,140);
+  \addplot[cE] table[x=t, y=P] {results/fig/e_turn.dat};
+\end{groupplot}
+\end{tikzpicture}

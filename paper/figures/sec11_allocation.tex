@@ -1,0 +1,40 @@
+% The X layout of eq:alloc: rotor numbering, positions and spin senses, and
+% the sign pattern each rotor contributes to the four rows of M.
+\begin{tikzpicture}[>={Stealth[length=1.6mm]}, font=\footnotesize]
+  \pgfmathsetmacro{\Lh}{1.55}
+  \pgfmathsetmacro{\rr}{0.72}
+  % arms and rotors
+  \foreach \ang in {45,135,225,315}
+    \draw[line width=1.8pt, black!50] (0,0) -- (\ang:\Lh);
+  \foreach \ang/\n/\s in {45/1/+1,135/2/-1,225/3/+1,315/4/-1} {
+    \fill[cA!8] (\ang:\Lh) circle (\rr);
+    \draw[cA, line width=0.7pt] (\ang:\Lh) circle (\rr);
+    \node[circle, draw=cA, fill=white, inner sep=1.2pt, font=\footnotesize\bfseries] at (\ang:\Lh) {\n};
+  }
+  % spin arrows: s_i = +1 turns counterclockwise seen from above (about +b3)
+  \foreach \ang in {45,225}
+    \draw[cB, line width=0.9pt, ->] ($(\ang:\Lh)+(-30:0.5)$) arc (-30:210:0.5);
+  \foreach \ang in {135,315}
+    \draw[cB, line width=0.9pt, ->] ($(\ang:\Lh)+(210:0.5)$) arc (210:-30:0.5);
+  \foreach \ang/\s in {45/{+1},135/{-1},225/{+1},315/{-1}}
+    \node[cB, anchor=center] at ($(\ang:\Lh)+(\ang:0.98)$) {$s=\s$};
+  % hub and axes
+  \filldraw[fill=gray!35, draw=black!70] (-0.18,-0.18) rectangle (0.18,0.18);
+  \draw[vec] (0,0) -- (0.95,0) node[right] {$\vect b_1$};
+  \draw[vec] (0,0) -- (0,0.95) node[above] {$\vect b_2$};
+  \node[anchor=east] at (-0.22,0) {$\vect b_3\odot$};
+  % the allocation matrix
+  \node[anchor=west] at (3.3,0.15) {%
+    $\begin{bmatrix} T\\ \tau_x\\ \tau_y\\ \tau_z \end{bmatrix}
+     =\underbrace{\begin{bmatrix}
+        k_T & k_T & k_T & k_T\\
+        \ell k_T & \ell k_T & -\ell k_T & -\ell k_T\\
+        -\ell k_T & \ell k_T & \ell k_T & -\ell k_T\\
+        -k_Q & k_Q & -k_Q & k_Q
+      \end{bmatrix}}_{\mat M}
+      \begin{bmatrix}\Omega_1^2\\ \Omega_2^2\\ \Omega_3^2\\ \Omega_4^2\end{bmatrix}$};
+  \node[anchor=west, align=left] at (3.3,-1.55)
+    {rows: thrust; roll $y_ik_T$; pitch $-x_ik_T$; yaw $-s_ik_Q$\\
+     rotor $i$ at $(x_i,y_i)=L(\cos\psi_i,\sin\psi_i)$, $\psi_i=\tfrac{\pi}{4}+\tfrac{(i-1)\pi}{2}$,
+     $\ell=L/\sqrt2$};
+\end{tikzpicture}

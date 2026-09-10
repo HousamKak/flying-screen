@@ -72,6 +72,24 @@ be the gross mass consistent with that battery, and let
 be the battery mass that the resulting mission demands, by \cref{eq:batreq}.
 \end{definition}
 
+\Cref{fig:codesignblocks} shows how the engine evaluates the two maps.
+
+\begin{figure}[tbp]
+\centering
+\input{figures/sec13_blocks}
+\caption{The co-design fixed point \cref{eq:fixedpoint} as the engine evaluates
+it. For a battery guess $\mu$ the inner map closes the mass algebraically; the
+vehicle is rebuilt from that mass (inertia tensor, rotor constants, pack
+energy); the mission is flown through the governor, the controller and the
+plant; the battery the flown mission needs is $\mathcal H(\mu)$, by
+\cref{eq:batreq}; and a guarded secant step on $\mathcal H(\mu)-\mu$ produces
+the next guess. Only the simulation is expensive, and it is run once per
+update. Convergence is followed by a verification flight at a battery no
+smaller than the last requirement, and only that flight's margins and path
+constraints are reported.}
+\label{fig:codesignblocks}
+\end{figure}
+
 \begin{proposition}[Well-posedness of the inner map]
 \label{prop:inner}
 Let $S(m)\coloneqq\mstr(m)+\mprop(m)$ map $[0,\infty)$ into $[0,\infty)$ (masses
@@ -117,8 +135,23 @@ For the lumped models $S'=f_s+\gamma_m$. For the component models of
 \cref{sec:components}, evaluated on the design of \cref{sec:results}, $S'$ lies
 between $0.13$ and $0.23$ over \SIrange{0.8}{50}{\kilo\gram}; the test suite
 asserts $0\le S'<0.9$ on that interval. That is a check on one design over a
-bounded interval, not a proof for every parameter set.
+bounded interval, not a proof for every parameter set. \Cref{fig:innermap}
+puts the counterexample beside the component models.
 \end{remark}
+
+\begin{figure}[tbp]
+\centering
+\input{figures/sec13_innermap}
+\caption{Uniqueness of the inner map \cref{eq:innermap} needs a slope bound,
+not a growth bound. (a) The counterexample of the remark: $S$ is smooth,
+increasing and bounded, yet $m=1+S(m)$ has three solutions, because
+$S'(3)=4>1$ lets the curve cross the diagonal from below. (b) The component
+models of \cref{sec:components} at the design battery of \cref{sec:results}:
+$\mfix+S(m)+\mu$ crosses the diagonal once, at the design mass, with slope
+between $0.13$ and $0.20$ on the plotted range, so \cref{prop:inner} applies
+and the inner iteration contracts at that rate.}
+\label{fig:innermap}
+\end{figure}
 
 \begin{theorem}[Existence of a closed design]
 \label{thm:codesignfixed}
@@ -139,6 +172,25 @@ Equivalence is by construction. The existence and uniqueness statements are
 Brouwer's fixed-point theorem and the Banach fixed-point theorem
 respectively~\cite[Ch.~5]{ortega1970}.
 \end{proof}
+
+\Cref{fig:fixedpoint} shows $\mathcal H$ for the design, computed with the
+simulator: it is nearly affine, well inside the contraction regime, and the
+fixed point is found in two updates.
+
+\begin{figure}[tbp]
+\centering
+\input{figures/sec13_fixedpoint}
+\caption{The outer map $\mathcal H$ for the design of \cref{sec:results},
+sampled with the simulator at five battery masses for two missions, with the
+engine's iterates for the turnaround. $\mathcal H$ is nearly affine with slope
+$0.27$ turning and $0.26$ standing, the contraction factor of
+\cref{prop:contraction}; the fixed point $\mu^\star$ is where it crosses the
+diagonal. The first update is a plain fixed-point step, vertically to
+$\mathcal H$ and horizontally back to the diagonal; the second is a secant step
+that lands on $\mu^\star$. The two verification flights that follow are not
+drawn.}
+\label{fig:fixedpoint}
+\end{figure}
 
 \begin{proposition}[Contraction criterion]
 \label{prop:contraction}
@@ -191,8 +243,24 @@ into
 \end{equation}
 which scales the energy coupling and the auxiliary part of $\Mzero$ together,
 and by \cref{eq:closedform} lowers the critical load by the factor
-$1/\varkappa^2$. A change of $\alpha$ would do neither.
+$1/\varkappa^2$. A change of $\alpha$ would do neither. \Cref{fig:kappa} shows
+both effects on the design.
 \end{remark}
+
+\begin{figure}[tbp]
+\centering
+\input{figures/sec13_kappa}
+\caption{A mission overhead $\varkappa$ applied to the lumped closure of the
+design, \cref{eq:kappaclosure}. (a) Multiplying all power by $\varkappa$
+multiplies $\beta$ by $\varkappa$: the fold moves to smaller mass and the
+critical load falls as $\varkappa^{-2}$, from \SI{2.83}{\kilo\gram} at
+$\varkappa=1$ to \SI{1.81}{\kilo\gram} at $\varkappa=1.25$; the load, dashed,
+rises only slightly because the auxiliary part is small. The rectangle marks
+panel (b). (b) Near the light root the design mass moves from
+\SI{1.12}{\kilo\gram} to \SI{1.24}{\kilo\gram} over the same range, about
+\SI{10}{\percent}, while the margin to the fold shrinks by more than a third.}
+\label{fig:kappa}
+\end{figure}
 
 \subsection{Residual formulation}
 

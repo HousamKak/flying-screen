@@ -1,0 +1,37 @@
+\input{results/fig/e_macros}%
+\begin{tikzpicture}
+\begin{groupplot}[
+  group style={group size=1 by 2, vertical sep=0.35cm,
+               xlabels at=edge bottom, xticklabels at=edge bottom},
+  paperplot, height=4.6cm, xmin=0.35, xmax=2.0,
+  xlabel={standoff $d$ from the eye to the display [\si{\metre}]}]
+% (a) usable desktop once text is scaled to 16 arcmin
+\nextgroupplot[ylabel={logical width [px]}, ymin=0, ymax=2150,
+  ytick={0,500,1000,1280,1920}]
+  \fill[cC!14] (axis cs:0.35,0) rectangle (axis cs:\eDfull,2150);
+  \addplot[cA] table[x=d, y=logical] {results/fig/e_readability.dat};
+  \addplot[cG, dashed, domain=0.35:2.0, samples=2] {1280};
+  \node[lbl, cG, anchor=south east] at (axis cs:1.98,1280) {full desktop, \num{1280} px};
+  \node[lbl, text=cC!55!black, anchor=south west, align=left]
+    at (axis cs:0.37,120) {full\\ desktop\\ legible};
+  \draw[construct] (axis cs:\eDsafeCross,0) -- (axis cs:\eDsafeCross,2150);
+  \draw[cA, densely dotted, line width=0.7pt] (axis cs:\eStandoff,0) -- (axis cs:\eStandoff,2150);
+  \node[lbl, text=cA, anchor=south west] at (axis cs:\eStandoff,1500) {design};
+  \addplot[only marks, mark=*, mark size=1.8pt, cB]
+    coordinates {(\eDsafeCross,\eLogicalAtCross)};
+  \node[lbl, text=cB!80!black, anchor=south west]
+    at (axis cs:\eDsafeCross,\eLogicalAtCross) {\eLogicalAtCross\ px at $d=\SI{\eDsafeCross}{\metre}$};
+% (b) nearest blade tip, prop:clearance
+\nextgroupplot[ylabel={blade tip to eye $\ell_0$ [\si{\metre}]}, ymin=0, ymax=1.35]
+  \fill[cC!14] (axis cs:\eDsafeCross,0) rectangle (axis cs:2.0,1.35);
+  \addplot[cB] table[x=d, y=gap] {results/fig/e_readability.dat};
+  \addplot[cD, dashed, domain=0.35:2.0, samples=2] {\eDsafe};
+  \node[lbl, text=cD, anchor=south west] at (axis cs:0.37,\eDsafe) {$d_{\mathrm{safe}}=\SI{\eDsafe}{\metre}$};
+  \node[lbl, text=cC!55!black, anchor=north east, align=right]
+    at (axis cs:1.98,1.30) {blades outside\\ $d_{\mathrm{safe}}$};
+  \node[lbl, text=cB!80!black, anchor=south west, align=left]
+    at (axis cs:0.37,0.16) {rotors overhang the user: $\ell_0=|\Delta z|$};
+  \draw[construct] (axis cs:\eDsafeCross,0) -- (axis cs:\eDsafeCross,1.35);
+  \draw[cA, densely dotted, line width=0.7pt] (axis cs:\eStandoff,0) -- (axis cs:\eStandoff,1.35);
+\end{groupplot}
+\end{tikzpicture}

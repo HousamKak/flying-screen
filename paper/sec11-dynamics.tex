@@ -84,6 +84,21 @@ The forces are
   \label{eq:forces}
 \end{equation}
 with $T$ the total rotor thrust along the body $\vect b_3$ axis.
+\Cref{fig:fbd} shows the forces in forward flight.
+
+\begin{figure}[tbp]
+\centering
+\input{figures/sec11_fbd}
+\caption{Free-body diagram in forward flight, side view with $\vect b_2$ into
+the page. The rotor thrusts act along $\vect b_3$, tilted by $\theta$ toward the
+motion, so that $TR\vect e_3-mg\vect e_3$ has a horizontal component that
+accelerates the machine; the weight acts at the centre of mass; the screen drag
+acts at the offset $\vect d_s$ and produces the moment
+$\vect d_s\times\vect F_{\mathrm{screen}}$ of \cref{eq:screenmoment}. With the
+display above the centre of mass that moment turns the airframe back against
+its tilt.}
+\label{fig:fbd}
+\end{figure}
 
 \subsection{Rotor wrench and the allocation map}
 
@@ -125,6 +140,23 @@ Collecting \cref{eq:wrench} with $\vect{u} = (\Omega_1^2,\dots,\Omega_N^2)$,
   \label{eq:alloc}
 \end{equation}
 \end{definition}
+
+\Cref{fig:allocation} writes $\mat M$ out for the layout used throughout.
+
+\begin{figure}[tbp]
+\centering
+\input{figures/sec11_allocation}
+\caption{The allocation map \cref{eq:alloc} for the $\times$-layout quadrotor
+used throughout. Rotor $i$ sits at angle $\psi_i=\pi/4+(i-1)\pi/2$ from
+$\vect b_1$, with alternating spin: $s_i=+1$ turns counterclockwise seen from
+above and reacts on the body with $-k_Q\Omega_i^2$ about $\vect b_3$. Each
+column of $\mat M$ is one rotor's contribution to thrust, roll, pitch and yaw.
+The sign patterns of the three moment rows, $(+,+,-,-)$, $(-,+,+,-)$ and
+$(-,+,-,+)$, are orthogonal to each other and to the thrust row: that is why
+$\rank\mat M=4$ (\cref{prop:alloc}), and why a balanced change of rotor speeds
+can move one moment and nothing else.}
+\label{fig:allocation}
+\end{figure}
 
 \begin{proposition}[Controllability of the wrench]
 \label{prop:alloc}
@@ -236,7 +268,22 @@ above the centre of mass produces a nose-up moment that opposes the forward
 tilt, a weathercock-stable arrangement, while a screen below produces a
 nose-down moment that reinforces it. The magnitude is identical; only the sign
 changes, and it changes the closed-loop behaviour measurably.
+\Cref{fig:plate} shows the decomposition and the two signs.
 \end{remark}
+
+\begin{figure}[tbp]
+\centering
+\input{figures/sec11_plate}
+\caption{(a) The flat-plate model \cref{eq:screendrag}. The plate's velocity
+relative to the air splits into a normal part $v_n\vect n$, resisted with
+$C_{D,n}$ over the whole area, and a tangential part $\vect v_t$, resisted only
+by skin friction, so the drag points almost along $-\vect n$ whatever the
+direction of motion. (b), (c) The moment of that drag about the centre of mass
+in forward flight, airframe tilted toward the motion. With the display above,
+the moment turns the airframe back against its tilt; with the display below,
+further into it. The magnitude is the same; the sign is not.}
+\label{fig:plate}
+\end{figure}
 
 \begin{remark}[Why the screen is nearly transparent to the rotors]
 The screen is vertical and the rotor inflow and wake are vertical, so the plate
@@ -276,8 +323,23 @@ the angle between the top of the image and vertical.
 \Cref{eq:readability} is deliberately not the angle between the screen normal
 and horizontal. Gimbal roll leaves the normal unchanged while rotating the
 image in its own plane, so a normal-based metric is blind to exactly the error a
-reader notices most. Measuring the up-vector captures both axes.
+reader notices most. Measuring the up-vector captures both axes
+(\cref{fig:gimbal}).
 \end{remark}
+
+\begin{figure}[tbp]
+\centering
+\input{figures/sec11_gimbal}
+\caption{The gimbal and the readability error \cref{eq:readability}, airframe
+level, dashed outline the display at rest in the $\vect b_2\vect b_3$ plane.
+(a) Gimbal pitch about $\vect b_2$ tilts the normal $\vect n$ and the up vector
+$\vect u_s$ together, and $\theta_{\mathrm{read}}$ equals the pitch angle.
+(b) Gimbal roll about $\vect b_1$ turns the image in its own plane: $\vect n$
+does not move, so a metric built on the normal reads zero while the reader sees
+the image rotated by the roll angle. Measuring $\vect u_s$ against $\vect e_3$
+catches both.}
+\label{fig:gimbal}
+\end{figure}
 
 \subsection{The complete system}
 
@@ -297,6 +359,22 @@ of dimension $18+N$, and the dynamics are
 \end{equation}
 with control $u = (\Omega^{\mathrm{cmd}}_{1:N}, \vect\tau_g)$, disturbance $w$
 comprising wind and human motion, and design parameters $p$.
+\Cref{fig:plant} shows how the pieces of this section connect.
+
+\begin{figure}[tbp]
+\centering
+\input{figures/sec11_plant}
+\caption{The plant $\dt x=f(x,u,w;p)$ of \cref{eq:ode}. Commanded rotor speeds
+pass through the motor lag \cref{eq:motorlag} and the allocation \cref{eq:alloc}
+into the rigid-body equations \cref{eq:vdot,eq:wdot}; velocity and attitude feed
+back through the screen and frame drag, and the gimbal enters through the
+screen's orientation and its reaction torque. The battery integrates the
+electrical power \cref{eq:edot} and is the one state that does not feed back
+into the motion, since no voltage sag is modelled: within a flight the energy
+coupling runs one way, and it closes only through the battery mass of
+\cref{sec:codesign}.}
+\label{fig:plant}
+\end{figure}
 
 Crucially, \cref{eq:ode} is not the whole problem. The parameters $p$ are
 themselves constrained by the algebraic closure of \cref{sec:closure}, giving a

@@ -1,0 +1,48 @@
+﻿% Actuator-disk streamtube in hover, flow downward. The boundary radius is
+% drawn from continuity, r(x)^2 u(x) = R^2 v_i, with the axial velocity of
+% the vortex-cylinder solution on the axis, u/v_i = 1 + xi/sqrt(1+xi^2),
+% xi = x/R positive downstream. One-dimensional, but the shape is earned.
+\begin{tikzpicture}[scale=1.25,
+  declare function={u(\s) = 1 + \s/sqrt(1+\s*\s);
+                    trad(\s) = 1/sqrt(u(\s));}]
+  \def\xa{-1.05} \def\xb{3.6}
+  % streamtube boundaries (y = -xi, flow downward)
+  \fill[cA!6] plot[domain=\xa:\xb, samples=80] ({ trad(\x)}, {-\x})
+      -- plot[domain=\xb:\xa, samples=80] ({-trad(\x)}, {-\x}) -- cycle;
+  \draw[cA, line width=0.9pt] plot[domain=\xa:\xb, samples=80] ({ trad(\x)}, {-\x});
+  \draw[cA, line width=0.9pt] plot[domain=\xa:\xb, samples=80] ({-trad(\x)}, {-\x});
+  % interior streamlines, scaled boundaries
+  \foreach \f in {0.35, 0.7}{
+    \draw[cA!55, line width=0.4pt] plot[domain=\xa:\xb, samples=60] ({ \f*trad(\x)}, {-\x});
+    \draw[cA!55, line width=0.4pt] plot[domain=\xa:\xb, samples=60] ({-\f*trad(\x)}, {-\x});
+  }
+  % axis
+  \draw[cG, dash dot, line width=0.4pt] (0,0.95) -- (0,-3.75);
+  % actuator disk
+  \draw[line width=2.4pt, black] (-1,0) -- (1,0);
+  \node[lbl, anchor=west] at (1.28,0.1) {disk, area $A$};
+  \draw[vec, cD, line width=1.2pt] (0,0.05) -- (0,0.72) node[right, lbl] {$T$};
+  % control volume
+  \draw[construct] (-2.45,1.0) rectangle (2.45,-3.72);
+  \node[lbl, cG, anchor=north west] at (-2.42,-3.3) {control volume};
+  % stations
+  \foreach \y/\n in {0.92/0, 0.13/1, -0.13/2, -3.55/3}
+    \node[lbl, anchor=east] at (-2.55,\y) {\n};
+  \draw[cG, line width=0.3pt] (-2.45,0.13) -- (-1.05,0.13);
+  \draw[cG, line width=0.3pt] (-2.45,-0.13) -- (-1.05,-0.13);
+  % velocity arrows: 0 far upstream, v_i at the disk, w = 2 v_i far downstream
+  \node[lbl, anchor=west, align=left] at (3.3,0.92)
+      {0: $p_\infty$, at rest};
+  \node[lbl, anchor=west, align=left] at (3.3,0.28)
+      {1: $p_1 = p_\infty - \tfrac12\rho\vind^2$, speed $\vind$};
+  \node[lbl, anchor=west, align=left] at (3.3,-0.28)
+      {2: $p_2 = p_1 + \Delta p$, speed $\vind$};
+  \node[lbl, anchor=west, align=left] at (3.3,-3.55)
+      {3: $p_\infty$, speed $w = 2\vind$, area $A_\infty = A/2$};
+  \foreach \xx in {-0.55, 0, 0.55}
+    \draw[vec, cA, line width=0.8pt] (\xx,-0.35) -- ++(0,-0.5);
+  \foreach \xx in {-0.35, 0, 0.35}
+    \draw[vec, cA, line width=0.8pt] (\xx,-2.75) -- ++(0,-0.75);
+  \node[lbl, cA, anchor=west] at (0.62,-0.62) {$\vind$};
+  \node[lbl, cA, anchor=west] at (0.8,-3.1) {$w$};
+\end{tikzpicture}

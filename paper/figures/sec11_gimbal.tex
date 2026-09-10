@@ -1,0 +1,43 @@
+% The gimbal and the readability error of eq:readability. (a) Gimbal pitch
+% about b2 tilts the normal n and the up vector u_s together. (b) Gimbal roll
+% about b1 turns the image in its own plane: n does not move, u_s does.
+\begin{tikzpicture}[>={Stealth[length=1.8mm]}, font=\footnotesize,
+                    x={(-0.45cm,-0.65cm)}, y={(1cm,0cm)}, z={(0cm,1cm)}]
+  \def\w{1.5}\def\h{1.0}
+  % ================================================= (a) pitch about b2
+  \begin{scope}
+    \pgfmathsetmacro{\tp}{24}
+    \pgfmathsetmacro{\cp}{cos(\tp)}\pgfmathsetmacro{\sp}{sin(\tp)}
+    \draw[cG, dashed] (0,-\w,-\h) -- (0,\w,-\h) -- (0,\w,\h) -- (0,-\w,\h) -- cycle;
+    % pitched screen: (0,y,z) -> (z sin, y, z cos)
+    \filldraw[fill=cE!18, draw=cE, line width=0.8pt]
+      ({-\h*\sp},-\w,{-\h*\cp}) -- ({-\h*\sp},\w,{-\h*\cp}) --
+      ({\h*\sp},\w,{\h*\cp}) -- ({\h*\sp},-\w,{\h*\cp}) -- cycle;
+    \draw[vec, black!60] (0,0,0) -- (0,0,2.0) node[above] {$\vect b_3=\vect e_3$};
+    \draw[vec, black!60] (0,0,0) -- (2.4,0,0) node[below] {$\vect b_1$};
+    \draw[cB, line width=1pt, ->] (0,-2.0,0) -- (0,2.3,0) node[right] {pitch axis $\vect b_2$};
+    \draw[vec, cE, line width=1.1pt] (0,0,0) -- ({1.7*\cp},0,{-1.7*\sp}) node[right] {$\vect n$};
+    \draw[vec, cD, line width=1.1pt] (0,0,0) -- ({1.6*\sp},0,{1.6*\cp}) node[left] {$\vect u_s$};
+    \node[cD, anchor=west] at (0,0.2,1.75) {$\theta_{\mathrm{read}}=\theta_{g,\mathrm{pitch}}$};
+    \node at (0,0,-3.15) {(a) gimbal pitch};
+  \end{scope}
+  % ================================================= (b) roll about b1
+  \begin{scope}[shift={(0,6.0,0)}]
+    \pgfmathsetmacro{\tr}{24}
+    \pgfmathsetmacro{\cc}{cos(\tr)}\pgfmathsetmacro{\ss}{sin(\tr)}
+    \draw[cG, dashed] (0,-\w,-\h) -- (0,\w,-\h) -- (0,\w,\h) -- (0,-\w,\h) -- cycle;
+    % rolled screen: (0,y,z) -> (0, y c - z s, y s + z c)
+    \filldraw[fill=cE!18, draw=cE, line width=0.8pt]
+      (0,{-\w*\cc+\h*\ss},{-\w*\ss-\h*\cc}) -- (0,{\w*\cc+\h*\ss},{\w*\ss-\h*\cc}) --
+      (0,{\w*\cc-\h*\ss},{\w*\ss+\h*\cc}) -- (0,{-\w*\cc-\h*\ss},{-\w*\ss+\h*\cc}) -- cycle;
+    \draw[vec, black!60] (0,0,0) -- (0,0,2.0) node[above] {$\vect e_3$};
+    \draw[vec, black!60] (0,0,0) -- (0,2.3,0) node[right] {$\vect b_2$};
+    \draw[cB, line width=1pt, ->] (-0.4,0,0) -- (2.4,0,0) node[left] {roll axis $\vect b_1$};
+    \draw[vec, cE, line width=1.1pt] (0,0,0) -- (1.7,0,0) node[right=2pt] {$\vect n$};
+    \draw[vec, cD, line width=1.1pt] (0,0,0) -- (0,{-1.6*\ss},{1.6*\cc}) node[left] {$\vect u_s$};
+    \node[cD, anchor=west] at (0,0.2,1.75) {$\theta_{\mathrm{read}}=\theta_{g,\mathrm{roll}}$};
+    \node[anchor=north, align=center] at (0,0.3,-1.95)
+      {$\vect n$ unchanged: a metric built on\\the normal would read zero};
+    \node at (0,0,-3.15) {(b) gimbal roll};
+  \end{scope}
+\end{tikzpicture}

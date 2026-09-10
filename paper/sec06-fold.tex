@@ -89,6 +89,24 @@ $m_+\in(m^*,\infty)$ with $F(m_+)=\Mzero$. Strictness gives $m_-<m^*<m_+$ and
 excludes further roots.
 \end{proof}
 
+\Cref{fig:trichotomy} draws the three cases for the worked example of
+\cref{sec:closure}.
+
+\begin{figure}[tbp]
+\centering
+\input{figures/sec06_trichotomy}
+\caption{The closure function $F(m)=\alpha m-\beta m^{3/2}$ of \cref{eq:F} for
+the worked example of \cref{sec:closure}, $\alpha=0.6366$ and
+$\beta=\SI{0.2271}{\kilo\gram^{-1/2}}$. $F$ is strictly concave with its
+maximum $\Mmax=\SI{0.741}{\kilo\gram}$ at $m^*=\SI{3.49}{\kilo\gram}$
+(\cref{lem:concave}). A horizontal line at height $\Mzero$ meets it twice, once
+or never, which is \cref{thm:trichotomy}; at $\Mzero=\SI{0.45}{\kilo\gram}$ the
+roots are $m_-=\SI{1.14}{\kilo\gram}$ and $m_+=\SI{6.16}{\kilo\gram}$. On the
+shaded interval $F(m)>\Mzero$: a machine of that mass could carry more than it
+is asked to, and by \cref{thm:iteration} the sizing iteration moves down there.}
+\label{fig:trichotomy}
+\end{figure}
+
 \begin{corollary}[Closed forms at $q=3/2$]
 \label{cor:closedform}
 For the fixed-rotor case $q=3/2$,
@@ -167,6 +185,21 @@ using $F'(m^*)=0$. Solving for $m-m^*$ and inserting
 $F''(m^*)=-q(q-1)\beta(m^*)^{q-2}$ gives the stated expansion.
 \end{proof}
 
+The bifurcation diagram is \cref{fig:saddlenode}.
+
+\begin{figure}[tbp]
+\centering
+\input{figures/sec06_saddlenode}
+\caption{The roots of $F(m)=\Mzero$ against the load for the worked example,
+drawn as the parametric curve $(F(m),m)$. The light branch $m_-$ (solid) and
+the heavy branch $m_+$ (dashed) meet at the fold $(\Mmax,m^*)$ and annihilate;
+beyond it no mass closes. Near the fold both branches follow the square-root
+law \cref{eq:sqrtlaw} (dotted), with $K=q(q-1)\beta(m^*)^{q-2}$, so
+$\dd m_-/\dd\Mzero\to\infty$ as $\Mzero\uparrow\Mmax$: the design mass becomes
+infinitely sensitive to the load just before it ceases to exist.}
+\label{fig:saddlenode}
+\end{figure}
+
 \begin{remark}[Why this matters practically]
 \Cref{eq:sqrtlaw} says that near the boundary of feasibility the design mass is
 an infinitely sensitive function of the requirement: $\dd m_-/\dd \Mzero \to
@@ -240,6 +273,22 @@ above $m_+$; hence it diverges.
 $m_{k+1}>m_k$ always and there is no fixed point to converge to.
 \end{proof}
 
+\Cref{fig:cobweb} shows the iteration as a cobweb diagram.
+
+\begin{figure}[tbp]
+\centering
+\input{figures/sec06_cobweb}
+\caption{Cobweb diagram of the sizing iteration \cref{eq:iteration} for the
+worked example at $\Mzero=\SI{0.45}{\kilo\gram}$. Each vertical step evaluates
+$\Phi$ and each horizontal step returns to the diagonal. (a) Started below
+$m_-$ or between the roots, the iterates go monotonically to $m_-$; started
+above $m_+$ they escape, as \cref{thm:iteration}(iii) and (iv) state. The
+fixed points are where $\Phi$ crosses the diagonal, $\Phi$ being below it
+exactly on $(m_-,m_+)$. (b) Near $m_-$ the slope of $\Phi$ is
+$1-F'(m_-)=0.73<1$, so the error shrinks by that factor at each step.}
+\label{fig:cobweb}
+\end{figure}
+
 \begin{corollary}[Local stability criterion]
 \label{cor:dmdm}
 A design is a stable fixed point of the sizing iteration if and only if
@@ -264,8 +313,23 @@ from infeasible ones by a fixed iteration budget. This is a real trap. A
 practical consequence is that a solver which reports ``did not converge in $K$
 iterations'' cannot be used to decide feasibility; the analytic criterion
 $\Mzero \lessgtr \Mmax$ must be used instead. The engine does exactly this and
-classifies slow convergence separately from divergence.
+classifies slow convergence separately from divergence. \Cref{fig:slowdown}
+quantifies the effect.
 \end{remark}
+
+\begin{figure}[tbp]
+\centering
+\input{figures/sec06_slowdown}
+\caption{Critical slowing down of the sizing iteration, for the worked example.
+(a) The contraction factor $\Phi'(m_-)=1-F'(m_-)$ of \cref{thm:iteration}(ii)
+tends to one as the utilisation $\Mzero/\Mmax$ tends to one. (b) The number of
+plain iterations from $m_0=0$ to a relative error of $10^{-6}$ grows like
+$(1-\Mzero/\Mmax)^{-1/2}$, because by \cref{eq:sqrtlaw}
+$F'(m_-)=K(m^*-m_-)\approx\sqrt{2K\Mmax(1-\Mzero/\Mmax)}$. A fixed iteration
+budget therefore cannot separate a design close to the fold from one beyond
+it.}
+\label{fig:slowdown}
+\end{figure}
 
 \subsection{Behaviour when \texorpdfstring{$q\le1$}{q <= 1}}
 
@@ -298,6 +362,20 @@ $F=\Mzero>0$, and none on $(0,m_{\min})$ where $F\le0<\Mzero$.
 
 The final statement follows from $q=(3-p)/2$: $q>1 \iff p<1$.
 \end{proof}
+
+\Cref{fig:qshapes} contrasts the three regimes.
+
+\begin{figure}[tbp]
+\centering
+\input{figures/sec06_qshapes}
+\caption{The shape of $F(m)=\alpha m-\beta m^q$ decides whether a fold exists
+(\cref{thm:pfold}), drawn with $\alpha=1$ and illustrative $\beta$. For $q>1$
+($p<1$) $F$ is concave with an interior maximum, so a load meets it twice or
+not at all. For $q=1$ it is a straight line, met once if $\alpha>\beta$. For
+$q<1$ it dips below zero to a minimum at $m_{\min}=(q\beta/\alpha)^{1/(1-q)}$
+and then grows without bound, so every positive load is met exactly once.}
+\label{fig:qshapes}
+\end{figure}
 
 \begin{finding}
 The catastrophe is not a property of flight. It is a property of holding the

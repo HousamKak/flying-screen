@@ -1,0 +1,32 @@
+% Theta_p(m) / t_f against m / m0 at the engine defaults, anchor m0 = fold
+% mass of the fixed-area closure (gen_b.theta). For p < 1 the curve has an
+% interior maximum (marked); at p = 1 it rises to alpha e_b / c_P = (3/2) t_f
+% without reaching it; for p > 1 it grows without bound.
+\begin{tikzpicture}
+\begin{axis}[paperplot, height=6.4cm, xmode=log,
+  xlabel={gross mass relative to the anchor, $m/m_0$},
+  ylabel={longest closed mission $\Theta_p(m)/t_f$},
+  xmin=0.3, xmax=300, ymin=0, ymax=2.1, unbounded coords=jump,
+  legend style={at={(0.5,1.03)}, anchor=south, font=\scriptsize},
+  legend columns=4]
+  \addplot[cA] table[x=x, y=p0] {results/fig/b_theta.dat};
+  \addlegendentry{$p=0$}
+  \addplot[cC] table[x=x, y=p1] {results/fig/b_theta.dat};
+  \addlegendentry{$p=0.5$}
+  \addplot[cE] table[x=x, y=p2] {results/fig/b_theta.dat};
+  \addlegendentry{$p=0.75$}
+  \addplot[cB] table[x=x, y=p3] {results/fig/b_theta.dat};
+  \addlegendentry{$p=1$}
+  \addplot[cD] table[x=x, y=p4] {results/fig/b_theta.dat};
+  \addlegendentry{$p=1.25$}
+  \addplot[cB, dashed, line width=0.7pt] table[x=x, y=t] {results/fig/b_theta_lim.dat};
+  \addlegendentry{$\alpha\eb/(c_Pt_f)=\tfrac32$}
+  \addplot[only marks, mark=*, mark size=2pt, black] table[x=x, y=t]
+    {results/fig/b_theta_peaks.dat};
+  \addlegendentry{$\hat m(p)$, $t_f^{\max}(p)$}
+  \draw[construct] (axis cs:1,0) -- (axis cs:1,2.1);
+  \node[lbl, cG, anchor=south west, rotate=90] at (axis cs:0.97,0.05) {anchor $m_0$};
+  \draw[cG, densely dotted] (axis cs:0.3,1) -- (axis cs:300,1);
+  \node[lbl, cG, anchor=south east] at (axis cs:290,1.0) {nominal $t_f$};
+\end{axis}
+\end{tikzpicture}

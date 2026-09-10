@@ -1,0 +1,39 @@
+% Pi(u) = beta u^3 - alpha u^2 + M0 for the worked example, u = sqrt(m).
+% u* = 2 alpha / (3 beta) = 1.8688; Pi(u*) = M0 - M0max.
+% Roots: M0 = 0.45: -0.7471, 1.0689, 2.4813; M0 = M0max: -0.9344, 1.8688 (double);
+% M0 = 0.95: -1.0429 and a complex pair.
+\begin{tikzpicture}
+\begin{axis}[paperplot, height=6.2cm,
+  xlabel={$u=\sqrt m$ [\si{\kilo\gram^{1/2}}]},
+  ylabel={$\Pi(u)=\beta u^3-\alpha u^2+\Mzero$},
+  xmin=-1.25, xmax=2.95, ymin=-0.52, ymax=1.25, domain=-1.25:2.95,
+  samples=200, legend style={at={(0.5,1.03)}, anchor=south}, legend columns=3]
+  \fill[cG!10] (axis cs:-1.25,-0.52) rectangle (axis cs:0,1.25);
+  \node[lbl, cG] at (axis cs:-0.62,1.12) {$u<0$: not a mass};
+  \draw[black, line width=0.5pt] (axis cs:-1.25,0) -- (axis cs:2.95,0);
+  \addplot[cC] {0.2271*x^3 - 0.6366*x^2 + 0.45};
+  \addlegendentry{$\Mzero=0.45<\Mmax$}
+  \addplot[cB] {0.2271*x^3 - 0.6366*x^2 + 0.7411};
+  \addlegendentry{$\Mzero=\Mmax$}
+  \addplot[cD] {0.2271*x^3 - 0.6366*x^2 + 0.95};
+  \addlegendentry{$\Mzero=0.95>\Mmax$}
+  \draw[construct] (axis cs:1.8688,-0.52) -- (axis cs:1.8688,1.25);
+  \node[lbl, anchor=north west] at (axis cs:1.89,1.2) {$u^*=\tfrac{2\alpha}{3\beta}$};
+  \addplot[only marks, mark=*, mark size=1.7pt, cC, forget plot]
+    coordinates {(-0.7471,0) (1.0689,0) (2.4813,0)};
+  \addplot[only marks, mark=*, mark size=1.9pt, cB, forget plot]
+    coordinates {(-0.9344,0) (1.8688,0)};
+  \addplot[only marks, mark=*, mark size=1.7pt, cD, forget plot]
+    coordinates {(-1.0429,0)};
+  \addplot[only marks, mark=square*, mark size=1.6pt, cC, forget plot]
+    coordinates {(1.8688,-0.2911)};
+  \addplot[only marks, mark=square*, mark size=1.6pt, cD, forget plot]
+    coordinates {(1.8688,0.2089)};
+  \node[lbl, anchor=north, cC!70!black] at (axis cs:1.8688,-0.32)
+    {$\Pi(u^*)=\Mzero-\Mmax<0$};
+  \node[lbl, anchor=south, cD] at (axis cs:1.8688,0.24) {$\Pi(u^*)>0$};
+  \node[lbl, anchor=south east] at (axis cs:1.06,0.02) {$\sqrt{m_-}$};
+  \node[lbl, anchor=south west] at (axis cs:2.49,0.02) {$\sqrt{m_+}$};
+  \node[lbl, anchor=north] at (axis cs:-0.75,-0.04) {$u_3<0$};
+\end{axis}
+\end{tikzpicture}

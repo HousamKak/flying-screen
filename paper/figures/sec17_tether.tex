@@ -1,0 +1,21 @@
+\input{results/fig/e_macros}%
+\begin{tikzpicture}
+\begin{axis}[paperplot, height=5.4cm, xmin=0, xmax=400, ymin=0, ymax=0.9,
+  xlabel={power drawn at the source $P$ [\si{\watt}]},
+  ylabel={conductor area per leg [\si{\milli\metre\squared}]},
+  legend style={at={(0.02,0.98)}, anchor=north west}]
+  \addplot[cA] table[x=P, y=drop] {results/fig/e_tether.dat};
+  \addplot[cB] table[x=P, y=amp] {results/fig/e_tether.dat};
+  \addplot[cG, dashed] table[x=P, y=hand] {results/fig/e_tether.dat};
+  \addplot[black, line width=2.2pt, opacity=0.25] table[x=P, y=req] {results/fig/e_tether.dat};
+  \addplot[only marks, mark=*, mark size=2.2pt, cD]
+    coordinates {(\eTethPsrc,\eTethArea)};
+  \draw[cD, line width=0.5pt] (axis cs:\eTethPsrc,\eTethArea) -- (axis cs:190,0.05);
+  \node[lbl, text=cD, anchor=west, fill=white, inner sep=1.5pt] at (axis cs:190,0.05)
+    {design: \SI{\eTethArea}{\milli\metre\squared} at \SI{\eTethPsrc}{\watt}};
+  \legend{voltage drop $\le\SI{\eTethDrop}{\percent}$,
+          current density $\le J_{\max}$,
+          handling floor,
+          required: the largest}
+\end{axis}
+\end{tikzpicture}

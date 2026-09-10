@@ -1,0 +1,61 @@
+﻿\input{results/fig/e_macros}%
+\begin{tikzpicture}[x=4.9cm, y=4.9cm]
+\pgfmathsetmacro\cc{\eArmL*cos(45)}
+\pgfmathtruncatemacro\hubmm{round(2*\cc*1000)}
+% ---- top view --------------------------------------------------------------
+\begin{scope}
+  \foreach \sx/\sy/\ang in {1/1/20, -1/1/-35, -1/-1/60, 1/-1/-10} {
+    \coordinate (h) at (\sx*\cc,\sy*\cc);
+    \draw[line width=1.6pt, cG!70!black] (0,0) -- (h);
+    \draw[cB, fill=cB!7, line width=0.6pt] (h) circle (\eRotorR);
+    \draw[cG, line width=0.4pt] (h) circle (\eRotorR+0.012);
+    \draw[cB!70!black, line width=1.3pt]
+      ($(h)+(\ang:\eRotorR-0.01)$) -- ($(h)+(\ang+180:\eRotorR-0.01)$);
+    \fill (h) circle (0.8pt);
+  }
+  \draw[fill=cG!25] (-0.055,-0.055) rectangle (0.055,0.055);
+  % the display seen from above: the panel lies in the b2-b3 plane
+  \draw[cA, line width=2.4pt] (0,-\eScreenW/2) -- (0,\eScreenW/2);
+  \draw[cA, line width=0.4pt] (0,-\eScreenW/2) -- (0,-0.62)
+    node[below right, lbl, text=cA, xshift=-2pt] {display, above the rotor plane};
+  % hub spacing across the top
+  \draw[construct] (-\cc,\cc) -- (-\cc,\cc+\eRotorR+0.07);
+  \draw[construct] (\cc,\cc) -- (\cc,\cc+\eRotorR+0.07);
+  \draw[dim] (-\cc,\cc+\eRotorR+0.05) -- (\cc,\cc+\eRotorR+0.05)
+    node[midway, above, lbl] {$2L\cos\ang{45}=\SI{\hubmm}{\milli\metre}$};
+  % rotor diameter on rotor 1
+  \draw[construct] (\cc,\cc+\eRotorR) -- (\cc+\eRotorR+0.08,\cc+\eRotorR);
+  \draw[construct] (\cc,\cc-\eRotorR) -- (\cc+\eRotorR+0.08,\cc-\eRotorR);
+  \draw[dim] (\cc+\eRotorR+0.06,\cc-\eRotorR) -- (\cc+\eRotorR+0.06,\cc+\eRotorR)
+    node[midway, right, lbl] {$D=\SI{\rDiam}{\milli\metre}$};
+  % body axes, set apart: b1 toward the user
+  \draw[vec, cA] (-0.68,-0.64) -- (-0.50,-0.64) node[right, lbl] {$\vect b_1$};
+  \draw[vec, cA] (-0.68,-0.64) -- (-0.68,-0.46) node[above, lbl] {$\vect b_2$};
+  \node[lbl, anchor=west] at (0.60,-0.10) {user $\rightarrow$};
+  \node[font=\small, anchor=south] at (0,0.70) {top view};
+\end{scope}
+% ---- side view --------------------------------------------------------------
+\begin{scope}[shift={(1.50,0)}]
+  \pgfmathsetmacro\zlo{\eRcp-\eScreenH/2}
+  \pgfmathsetmacro\zhi{\eRcp+\eScreenH/2}
+  \draw[line width=1.6pt, cG!70!black] (-\cc,0) -- (\cc,0);
+  \draw[cB, line width=2.6pt] (-\cc-\eRotorR,0) -- (-\cc+\eRotorR,0);
+  \draw[cB, line width=2.6pt] (\cc-\eRotorR,0) -- (\cc+\eRotorR,0);
+  \draw[fill=cG!25] (-0.055,-0.035) rectangle (0.055,0.02);
+  \draw[cG, line width=1.0pt] (0,0.02) -- (0,\zlo);
+  \draw[cA, line width=2.4pt] (0,\zlo) -- (0,\zhi);
+  \draw[cA, fill=white] (0,\eRcp) circle (0.011);
+  \node[lbl, text=cA, anchor=west] at (0.02,\zhi) {display, gimbal pivot};
+  \draw[vec, cA] (0.40,-0.20) -- (0.58,-0.20) node[right, lbl] {$\vect b_1$};
+  \draw[vec, cA] (0.40,-0.20) -- (0.40,-0.02) node[above, lbl] {$\vect b_3$};
+  % dimensions
+  \draw[dim] (-0.16,0) -- (-0.16,\eRcp) node[midway, left, lbl] {$r_{cp}$};
+  \draw[construct] (-0.19,\eRcp) -- (-0.012,\eRcp);
+  \draw[dim] (0.12,\zlo) -- (0.12,\zhi) node[midway, right, lbl] {$h=\SI{194}{\milli\metre}$};
+  \draw[dim] (-\cc-\eRotorR,-0.10) -- (\cc+\eRotorR,-0.10)
+    node[midway, below, lbl] {$2(L\cos\ang{45}+R)$};
+  \draw[construct] (-\cc-\eRotorR,0) -- ++(0,-0.12);
+  \draw[construct] (\cc+\eRotorR,0) -- ++(0,-0.12);
+  \node[font=\small, anchor=south] at (0,0.70) {side view};
+\end{scope}
+\end{tikzpicture}

@@ -1,0 +1,34 @@
+\input{results/fig/c_geom}%
+% The interference factor of eq:interference against the tip gap over
+% diameter, with the geometry of two adjacent disks and the design point.
+\begin{tikzpicture}
+  \begin{axis}[halfplot, width=0.56\linewidth, height=5.2cm,
+      xlabel={tip-to-tip gap over diameter, $s/D$},
+      ylabel={$\kappa_{\mathrm{int}}$},
+      xmin=0, xmax=0.4, ymin=0.995, ymax=1.08,
+      yticklabel style={/pgf/number format/fixed, /pgf/number format/precision=2}]
+    \addplot[cA, domain=0:0.25, samples=60] {1 + 0.07*(1 - x/0.25)^2};
+    \addplot[cA, domain=0.25:0.4, samples=2] {1};
+    \draw[construct] (axis cs:0.25,0.995) -- (axis cs:0.25,1.08);
+    \node[lbl, cG, anchor=south west] at (axis cs:0.25,1.035) {$s/D=0.25$};
+    \node[lbl, cA, anchor=south west] at (axis cs:0.005,1.07) {$1+\varepsilon$};
+    \addplot[only marks, mark=*, mark size=2.3pt, cA] coordinates {(\cSoverD,\cKint)};
+    \node[lbl, cA, anchor=south west] at (axis cs:\cSoverD,\cKint) {design};
+  \end{axis}
+  % geometry of two adjacent rotors
+  \begin{scope}[shift={(11.4,2.0)}, scale=0.78, every node/.style={scale=1}]
+    \pgfmathsetmacro{\rr}{1.0}
+    \pgfmathsetmacro{\ss}{0.42}
+    \fill[cA!10] (-\rr-0.5*\ss,0) circle (\rr);
+    \draw[cA, line width=0.8pt] (-\rr-0.5*\ss,0) circle (\rr);
+    \fill[cA!10] (\rr+0.5*\ss,0) circle (\rr);
+    \draw[cA, line width=0.8pt] (\rr+0.5*\ss,0) circle (\rr);
+    \draw[dim, black] (-0.5*\ss,0) -- (0.5*\ss,0);
+    \node[lbl, anchor=south] at (0,0.08) {$s$};
+    \draw[dim, black] (-2*\rr-0.5*\ss,-1.25) -- (-0.5*\ss,-1.25) node[midway, below, lbl] {$D$};
+    \draw[construct] (-1.0-0.5*\ss,0) -- (1.0+0.5*\ss,0);
+    \draw[dim, cG] (-\rr-0.5*\ss,1.25) -- (\rr+0.5*\ss,1.25)
+      node[midway, above, lbl, cG] {$2L\sin(\pi/N)$};
+    \node[lbl, align=center, anchor=north] at (0,-1.7) {$s=2L\sin(\pi/N)-2R$};
+  \end{scope}
+\end{tikzpicture}

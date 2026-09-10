@@ -36,6 +36,20 @@ $u^* = 2\alpha/(3\beta)$ satisfies $(u^*)^2 = 4\alpha^2/(9\beta^2) = m^*$, as
 required for consistency.
 \end{proof}
 
+\Cref{fig:cubic} draws $\Pi$ in the three cases.
+
+\begin{figure}[tbp]
+\centering
+\input{figures/appB_cubic}
+\caption{The cubic \cref{eq:cubic} in $u=\sqrt m$ for the worked example of
+\cref{sec:closure}. $\Pi(0)=\Mzero>0$ is a local maximum and $\Pi$ has its
+local minimum at $u^*=2\alpha/(3\beta)$, where $(u^*)^2=m^*$ and
+$\Pi(u^*)=\Mzero-\Mmax$. One root is always negative and is not a mass. The
+two positive roots $\sqrt{m_\pm}$ exist exactly when the minimum is not above
+the axis, and they merge at $u^*$ when $\Mzero=\Mmax$.}
+\label{fig:cubic}
+\end{figure}
+
 \subsection{Derivative of the closure solution with respect to endurance}
 
 Differentiating $F(m(t_f))=\Mzero(t_f)$ implicitly, with
@@ -106,7 +120,23 @@ constraint by the orthogonality, hence
 \end{equation}
 which is \cref{eq:authority}. There is no factor $1/N$: the thrust sum is held by
 pairing increments with decrements, not by dividing the moment. For
-$\lambda\le2$, $\Delta=(\lambda-1)\Omega_h^2$.
+$\lambda\le2$, $\Delta=(\lambda-1)\Omega_h^2$. \Cref{fig:differential} shows
+the two cases of the minimum.
+
+\begin{figure}[tbp]
+\centering
+\input{figures/appB_differential}
+\caption{The balanced differential that attains the torque authority of the
+$\times$ quadrotor, drawn for roll. The sign vector $\vect s$ of the roll row
+is orthogonal to the thrust, pitch and yaw rows, so
+$\vect u=\Omega_h^2\vect 1+\Delta\vect s$ changes the roll moment and nothing
+else. $\Delta$ is the smaller of the room to speed rotors up and the room to
+slow them down: at $\lambda=1.8$ the increments reach $\Omega_{\max}^2$ first,
+at $\lambda=2.5$ the decrements reach zero first. Either way each of the four
+rotors contributes $\Delta$, which is why \cref{eq:authderiv} carries no factor
+$1/N$.}
+\label{fig:differential}
+\end{figure}
 
 The closed form uses the equal-magnitude and orthogonality properties of this
 layout and should not be extended blindly. For the hexacopter with

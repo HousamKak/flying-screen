@@ -1,0 +1,57 @@
+% Why a curved path needs angular-rate feedforward. Left: top view of a turn
+% of radius rho at speed V; the horizontal part of b3^d points at the centre
+% and turns with the path at Omega = V/rho. Right: b3^d sweeps a cone of
+% half-angle theta_t = atan(V^2/(rho g)) about e3, so its derivative has
+% magnitude Omega sin(theta_t); omega_d supplies that rate.
+\begin{tikzpicture}[font=\footnotesize]
+  % ---- left: top view ----
+  \begin{scope}
+    \def\rr{1.9}
+    \draw[construct] (0,0) circle (\rr);
+    \fill[cG] (0,0) circle (1.2pt);
+    \foreach \a in {90, 30, -30, -90} {
+      \coordinate (P) at (\a:\rr);
+      \draw[cA, line width=0.6pt] ($(P)+(\a+45:0.16)$) -- ($(P)+(\a+225:0.16)$)
+           ($(P)+(\a-45:0.16)$) -- ($(P)+(\a+135:0.16)$);
+      \fill[cA] (P) circle (1.3pt);
+      \draw[vec, cA] (P) -- ($(P)!0.36!(0,0)$);
+      \draw[vec, cB] (P) -- ($(P)+(\a-90:0.62)$);
+    }
+    \node[cB, anchor=north west] at ($(-90:\rr)+(-180:0.62)+(0.0,-0.02)$) {$\vect v$};
+    \node[cA, align=left, anchor=west] at ($(90:\rr)!0.4!(0,0)+(0.1,0.05)$)
+         {horizontal part\\ of $\vect b_3^d$};
+    % the motion is clockwise (velocity at angle a - 90 degrees)
+    \draw[-{Stealth[length=2mm]}, cE, line width=0.8pt]
+         (260:0.8) arc (260:190:0.8);
+    \node[cE, anchor=east] at (228:0.85) {$\Omega=V/\rho$};
+    \draw[dim] (0,0) -- (145:\rr) node[pos=0.6, above, sloped] {$\rho$};
+    \node[anchor=north] at (0,-\rr-0.4) {(a) top view of a turn};
+  \end{scope}
+  % ---- right: the cone swept by b3^d ----
+  \begin{scope}[xshift=6.6cm, yshift=-1.7cm]
+    \def\L{3.2}
+    \def\th{26}
+    \pgfmathsetmacro{\rc}{\L*sin(\th)}
+    \pgfmathsetmacro{\hc}{\L*cos(\th)}
+    \coordinate (O) at (0,0);
+    \coordinate (Z) at (0,1);
+    \coordinate (S) at (\rc,\hc);
+    \draw[vec, cG] (O) -- (0,\L+0.5) node[above] {$\ez$};
+    \draw[construct] (0,\hc) ellipse ({\rc} and {0.3*\rc});
+    \draw[construct] (O) -- (-\rc,\hc);
+    \draw[construct] (O) -- (S);
+    \coordinate (B1) at ({\rc*cos(-110)},{\hc+0.3*\rc*sin(-110)});
+    \coordinate (B2) at ({\rc*cos(-55)},{\hc+0.3*\rc*sin(-55)});
+    \draw[vec, cA!50] (O) -- (B1) node[pos=0.62, left] {$\vect b_3^d(t)$};
+    \draw[vec, cA] (O) -- (B2) node[pos=1, below right=-1pt] {$\vect b_3^d(t+\delta t)$};
+    \draw[-{Stealth[length=2mm]}, cE, line width=0.8pt, domain=-120:-60, samples=24]
+         plot ({1.15*\rc*cos(\x)},{\hc+0.345*\rc*sin(\x)});
+    \node[cE, anchor=west, align=left] at ({1.15*\rc},{\hc+0.35})
+         {$\|\dt{\vect b}{}_3^d\| = \Omega\sin\theta_t$,\\
+          supplied by $\vect\omega_d$ of \labelcref{eq:omegad}};
+    \pic[draw, cG, angle radius=1.2cm, "$\theta_t$", angle eccentricity=1.3]
+         {angle=S--O--Z};
+    \node[anchor=north, align=center] at (0.6,-0.3)
+         {(b) $\vect b_3^d$ sweeps a cone about $\ez$,\\ $\tan\theta_t = V^2/(\rho g)$};
+  \end{scope}
+\end{tikzpicture}

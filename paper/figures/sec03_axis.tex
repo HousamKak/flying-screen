@@ -1,0 +1,33 @@
+% Axial velocity and static pressure along the rotor axis, from Bernoulli on
+% each side of the disk with the vortex-cylinder axial velocity
+% u/v_i = 1 + xi/sqrt(1+xi^2). Pressure in units of rho v_i^2.
+\begin{tikzpicture}[declare function={u(\s) = 1 + \s/sqrt(1+\s*\s);}]
+\begin{groupplot}[group style={group size=1 by 2, vertical sep=0.45cm,
+                  xlabels at=edge bottom, xticklabels at=edge bottom},
+    paperplot, height=4.1cm, xmin=-4, xmax=5, samples=160,
+    xlabel={$x/R$, distance along the axis, positive downstream}]
+  \nextgroupplot[ylabel={$u/\vind$}, ymin=0, ymax=2.25, ytick={0,1,2}]
+    \addplot[cA, domain=-4:5] {u(x)};
+    \addplot[construct, domain=-4:5] {2};
+    \addplot[construct, domain=-4:5] {1};
+    \draw[cG, dashed] (axis cs:0,0) -- (axis cs:0,2.25);
+    \node[lbl, anchor=south west] at (axis cs:0.1,0.05) {disk};
+    \node[lbl, anchor=north east, fill=white, inner sep=1pt] at (axis cs:4.9,1.88) {$w = 2\vind$};
+    \draw[dim] (axis cs:-2.2,0) -- node[lbl, left, fill=white, inner sep=1pt]
+        {half upstream} (axis cs:-2.2,1);
+    \draw[dim] (axis cs:2.2,1) -- node[lbl, right, fill=white, inner sep=1pt]
+        {half downstream} (axis cs:2.2,2);
+  \nextgroupplot[ylabel={$(p-p_\infty)/\rho\vind^2$}, ymin=-2.25, ymax=1.9,
+                 ytick={-2,-0.5,0,1.5}]
+    \addplot[cA, domain=-4:0] {-0.5*u(x)^2};
+    \addplot[cA, domain=0:5] {2 - 0.5*u(x)^2};
+    \addplot[construct, domain=-4:5] {0};
+    \draw[cD, line width=1.1pt, -{Stealth[length=2mm]}] (axis cs:0,-0.5) -- (axis cs:0,1.5);
+    \node[lbl, cD, anchor=east, fill=white, inner sep=1pt] at (axis cs:-0.15,0.75)
+        {$\Delta p = 2\rho\vind^2 = \tfrac12\rho w^2$};
+    \node[lbl, anchor=north, fill=white, inner sep=1pt] at (axis cs:-2.4,-1.0)
+        {suction ahead of the disk};
+    \node[lbl, anchor=north, fill=white, inner sep=1pt] at (axis cs:3.0,-1.0)
+        {recovers to $p_\infty$ in the wake};
+\end{groupplot}
+\end{tikzpicture}

@@ -1,0 +1,25 @@
+\input{results/fig/e_macros}%
+\begin{tikzpicture}
+\begin{groupplot}[
+  group style={group size=2 by 1, horizontal sep=1.6cm},
+  halfplot, height=5.2cm, ybar, /pgf/bar width=13pt,
+  symbolic x coords={standing,pacing,loop,jogging,turning},
+  xtick=data, enlarge x limits=0.14,
+  x tick label style={font=\footnotesize, rotate=25, anchor=north east}]
+\nextgroupplot[ylabel={battery the mission needs [\si{\gram}]}, ymin=270, ymax=320,
+  title={closed around the flown mission}]
+  \addplot[fill=cA!70, draw=cA] table[x=mission, y=mbat] {results/fig/e_coupled.dat};
+  \draw[cG, dashed, line width=0.8pt]
+    ({rel axis cs:0,0} |- {axis cs:standing,\eHoverBat}) --
+    ({rel axis cs:1,0} |- {axis cs:standing,\eHoverBat});
+  \node[lbl, text=cG!80!black, anchor=north west] at (rel axis cs:0.02,0.97)
+    {dashed: hover sizing, \eHoverBat\ g};
+\nextgroupplot[ylabel={charge left with \eHoverBat\ g [\si{\percent}]}, ymin=0, ymax=14,
+  title={hover-sized battery, flown}]
+  \addplot[fill=cB!65, draw=cB] table[x=mission, y=soc] {results/fig/e_coupled.dat};
+  \draw[cD, dashed, line width=0.8pt]
+    ({rel axis cs:0,0} |- {axis cs:standing,\eReservePct}) --
+    ({rel axis cs:1,0} |- {axis cs:standing,\eReservePct})
+    node[pos=0.98, below left, lbl, text=cD] {reserve \eReservePct\,\%};
+\end{groupplot}
+\end{tikzpicture}

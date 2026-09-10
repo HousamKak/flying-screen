@@ -1,0 +1,40 @@
+\input{results/fig/c_geom}%
+% Section through the reference room: the rotor wake strikes the floor,
+% spreads, rises along the walls and returns across the ceiling into the
+% rotor inflow, so the inflow stops being quiescent after t_ex.
+\begin{tikzpicture}[scale=2.3, >={Stealth[length=1.6mm]}, font=\footnotesize]
+  \pgfmathsetmacro{\W}{\cRoomL}
+  \pgfmathsetmacro{\H}{\cCeiling}
+  \pgfmathsetmacro{\xm}{2.1}
+  \pgfmathsetmacro{\zr}{\cZrotor}
+  \draw[line width=0.9pt] (0,0) rectangle (\W,\H);
+  \fill[pattern=north east lines, pattern color=cG] (0,-0.08) rectangle (\W,0);
+  % the machine and the user
+  \draw[cA, line width=1.6pt] (\xm-0.5,\zr) -- (\xm+0.5,\zr);
+  \fill[cE!40] (\xm-0.01,\zr+0.03) rectangle (\xm+0.01,\zr+0.23);
+  \draw[black!70, line width=0.8pt] (\xm+1.2,0) -- (\xm+1.2,1.25);
+  \fill[black!70] (\xm+1.2,1.4) circle (0.1);
+  \node[anchor=west] at (\xm+1.3,1.4) {user};
+  % downwash column
+  \foreach \dx in {-0.35,0,0.35}
+    \draw[cA, line width=0.9pt, ->] (\xm+\dx,\zr-0.03) -- (\xm+0.85*\dx,0.25);
+  % recirculating streamlines
+  \draw[cA!80, line width=0.7pt, ->] (\xm-0.3,0.22) .. controls (\xm-1.2,0.05) and (0.15,0.05) .. (0.12,0.8)
+     .. controls (0.1,\H-0.2) and (0.8,\H-0.1) .. (\xm-1.0,\H-0.2)
+     .. controls (\xm-0.6,\H-0.3) and (\xm-0.4,\zr+0.5) .. (\xm-0.3,\zr+0.06);
+  \draw[cA!80, line width=0.7pt, ->] (\xm+0.3,0.22) .. controls (\xm+1.2,0.05) and (\W-0.15,0.05) .. (\W-0.12,0.8)
+     .. controls (\W-0.1,\H-0.2) and (\W-0.9,\H-0.1) .. (\xm+1.1,\H-0.2)
+     .. controls (\xm+0.6,\H-0.3) and (\xm+0.4,\zr+0.5) .. (\xm+0.3,\zr+0.06);
+  \draw[cA!55, line width=0.6pt, ->] (\xm-0.2,0.35) .. controls (\xm-0.8,0.25) and (0.6,0.35) .. (0.55,1.0)
+     .. controls (0.55,\H-0.5) and (\xm-0.9,\H-0.55) .. (\xm-0.15,\zr+0.1);
+  \draw[cA!55, line width=0.6pt, ->] (\xm+0.2,0.35) .. controls (\xm+0.8,0.25) and (\W-0.6,0.35) .. (\W-0.55,1.0)
+     .. controls (\W-0.55,\H-0.5) and (\xm+0.9,\H-0.55) .. (\xm+0.15,\zr+0.1);
+  % labels
+  \node[anchor=north, align=center] at (0.5*\W,-0.12)
+    {$\dot V=A\vind\approx\SI{2.3}{\metre\cubed\per\second}$,\quad
+     $t_{\mathrm{ex}}=V_{\mathrm{room}}/\dot V\approx\SI{21}{\second}$,\quad
+     mean return velocity $\dot V/(\text{floor area})\approx\SI{0.1}{\metre\per\second}$};
+  \draw[dim, black] (0,\H+0.12) -- (\W,\H+0.12) node[midway, above] {\SI{\cRoomL}{\metre}};
+  \draw[dim, black] (\W+0.12,0) -- (\W+0.12,\H) node[midway, right] {\SI{\cCeiling}{\metre}};
+  \node[cA, anchor=south] at (\xm,\zr+0.25) {machine};
+\end{tikzpicture}

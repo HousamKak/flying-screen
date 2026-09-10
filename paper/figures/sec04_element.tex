@@ -1,0 +1,85 @@
+% Blade element theory. (a) the rotor seen from above: two blades of chord c,
+% the annulus at radius r of width dr and the element it cuts from a blade.
+% (b) section A-A seen from the blade tip: velocity triangle, angles and the
+% resolution of lift and drag into thrust and in-plane force.
+\begin{tikzpicture}[
+  declare function={yt(\s) = 0.6*(0.2969*sqrt(\s) - 0.1260*\s
+                     - 0.3516*\s*\s + 0.2843*\s*\s*\s - 0.1015*\s*\s*\s*\s);}]
+  % ------------------------------------------------------------ panel (a)
+  \begin{scope}
+    \draw[cG, dashed] (0,0) circle (1.9);
+    \fill[cB!10, even odd rule] (0,0) circle (1.36) circle (1.14);
+    \draw[cB!60, line width=0.3pt] (0,0) circle (1.36) (0,0) circle (1.14);
+    \foreach \s in {1,-1}{
+      \draw[cA, fill=cA!12, line width=0.7pt]
+          ({\s*0.26},-0.315) rectangle ({\s*1.9},0.315);
+    }
+    \fill[cB!70] (1.14,-0.315) rectangle (1.36,0.315);
+    \fill[black!65] (0,0) circle (0.26);
+    % section marks A-A
+    \draw[line width=0.9pt] (1.25,0.45) -- (1.25,0.68);
+    \node[lbl, anchor=east] at (1.2,0.66) {A};
+    \draw[line width=0.9pt] (1.25,-0.45) -- (1.25,-0.68);
+    \node[lbl, anchor=east] at (1.2,-0.66) {A};
+    % dimensions
+    \draw[dim] (0,-1.05) -- node[lbl, below, fill=white, inner sep=1pt] {$r$} (1.25,-1.05);
+    \draw[dim] (1.14,1.02) -- (1.36,1.02);
+    \node[lbl, above] at (1.25,1.06) {$\dd r$};
+    \draw[dim] (1.72,-0.315) -- node[lbl, right] {$c$} (1.72,0.315);
+    \draw[dim] (0,0) -- node[lbl, above left, inner sep=1pt] {$R$} (125:1.9);
+    % rotation, clockwise seen from above
+    \draw[vec, cA] (80:2.2) arc (80:35:2.2) node[right, lbl] {$\Omega$};
+    \node[font=\small] at (0,-2.5) {(a) rotor seen from above};
+  \end{scope}
+  % ------------------------------------------------------------ panel (b)
+  \begin{scope}[xshift=8.3cm, yshift=-0.2cm]
+    \def\ph{12} \def\th{20}
+    % plane of rotation
+    \draw[construct] (-4.2,0) -- (3.6,0) node[right, lbl, align=left] {plane of\\rotation};
+    % aerofoil, quarter chord at the origin, leading edge left, nose up by theta
+    \begin{scope}[rotate=-\th]
+      \draw[cA, fill=cA!15, line width=0.8pt]
+        plot[domain=0:180, samples=70] ({3.0*((1-cos(\x))/2-0.25)}, { 3.0*yt((1-cos(\x))/2)})
+        -- plot[domain=180:0, samples=70] ({3.0*((1-cos(\x))/2-0.25)}, {-3.0*yt((1-cos(\x))/2)})
+        -- cycle;
+      \draw[cG, dash dot, line width=0.4pt] (-3.5,0) -- (2.6,0);
+    \end{scope}
+    \node[lbl, cG, anchor=north] at ({-3.6*cos(\th)},{3.6*sin(\th)-0.02}) {chord};
+    % direction of the resultant wind through the section
+    \draw[construct] ({-3.6*cos(\ph)},{3.6*sin(\ph)}) -- (0,0);
+    % angles on the upstream side
+    \draw[cG] (180:1.55) arc (180:{180-\ph}:1.55);
+    \node[lbl] at ({180-\ph/2}:1.82) {$\phi$};
+    \draw[cG] ({180-\ph}:2.3) arc ({180-\ph}:{180-\th}:2.3);
+    \node[lbl] at ({180-(\ph+\th)/2}:2.58) {$\alpha$};
+    \draw[cG] (180:3.05) arc (180:{180-\th}:3.05);
+    \node[lbl] at ({180-\th/2+1}:3.35) {$\theta$};
+    % velocity triangle, drawn apart
+    \begin{scope}[shift={(-4.1,1.95)}]
+      \pgfmathsetmacro{\tp}{2.2*tan(\ph)}
+      \draw[vec, cB] (0,0) -- node[lbl, above] {$U_T = \Omega r$} (2.2,0);
+      \draw[vec, cB] (2.2,0) -- node[lbl, right] {$U_P = \vind$} (2.2,-\tp);
+      \draw[vec, black, line width=1.0pt] (0,0) -- node[lbl, below left, inner sep=1pt] {$U$} (2.2,-\tp);
+      \draw[cG] (0.75,0) arc (0:-\ph:0.75);
+      \node[lbl] at (-6:1.0) {$\phi$};
+    \end{scope}
+    % forces at the quarter chord
+    \pgfmathsetmacro{\Lx}{2.4*sin(\ph)} \pgfmathsetmacro{\Ly}{2.4*cos(\ph)}
+    \pgfmathsetmacro{\Dx}{0.75*cos(\ph)} \pgfmathsetmacro{\Dy}{-0.75*sin(\ph)}
+    \coordinate (F) at ({\Lx+\Dx},{\Ly+\Dy});
+    \draw[construct] (\Lx,\Ly) -- (F) -- (\Dx,\Dy);
+    \draw[construct] (F) -- (0,{\Ly+\Dy});
+    \draw[construct] (F) -- ({\Lx+\Dx},0);
+    \draw[vec, cA, line width=1.0pt] (0,0) -- (\Lx,\Ly) node[above right, lbl, inner sep=1pt] {$\dd L$};
+    \draw[vec, cD, line width=1.0pt] (0,0) -- (\Dx,\Dy);
+    \node[lbl, cD, anchor=north west, inner sep=1pt] at (\Dx,\Dy) {$\dd D$};
+    \draw[vec, black] (0,0) -- (F);
+    \draw[vec, cC!70!black, line width=1.1pt] (0,0) -- (0,{\Ly+\Dy})
+        node[left, lbl] {$\dd T$};
+    \draw[vec, cC!70!black, line width=1.1pt] (0,0) -- ({\Lx+\Dx},0);
+    \node[lbl, cC!60!black, anchor=south west, inner sep=1pt] at ({\Lx+\Dx},0.02) {$\dd Q/r$};
+    % blade motion
+    \draw[vec, cG] (-0.6,-1.2) -- (-2.2,-1.2) node[left, lbl] {blade motion};
+    \node[font=\small] at (-0.4,-2.3) {(b) section A-A, seen from the tip};
+  \end{scope}
+\end{tikzpicture}

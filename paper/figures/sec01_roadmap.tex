@@ -1,0 +1,56 @@
+% How the sections feed each other. Three bands for the three parts.
+\begin{tikzpicture}[
+  sec/.style={draw, rounded corners=2pt, align=center, font=\scriptsize,
+              minimum width=2.05cm, minimum height=2.5em, fill=white,
+              inner sep=2pt, line width=0.7pt},
+  dep/.style={flow, cG, line width=0.6pt},
+  main/.style={flow, black, line width=0.8pt},
+  band/.style={rounded corners=4pt, line width=0.4pt},
+  bandlabel/.style={font=\footnotesize\bfseries, anchor=north}]
+  % Part I: existence (two columns)
+  \node[sec, draw=cA] (s3)  at (0, 0)    {\S\ref{sec:momentum}\\momentum theory};
+  \node[sec, draw=cA] (s4)  at (0,-1.25) {\S\ref{sec:blade}\\blade elements};
+  \node[sec, draw=cA] (s5)  at (0,-2.5)  {\S\ref{sec:closure}\\mass closure};
+  \node[sec, draw=cA] (s6)  at (0,-3.75) {\S\ref{sec:fold}\\the fold};
+  \node[sec, draw=cA] (s7)  at (0,-5.0)  {\S\ref{sec:scaling}\\scaling laws};
+  \node[sec, draw=cE] (s10) at (2.95,-1.25) {\S\ref{sec:nearfield}\\near field};
+  \node[sec, draw=cE] (s8)  at (2.95,-2.5)  {\S\ref{sec:components}\\components};
+  \node[sec, draw=cE] (s9)  at (2.95,-3.75) {\S\ref{sec:acoustics}\\acoustics};
+  % Part II: flight
+  \node[sec, draw=cB] (s11) at (6.15,-1.25) {\S\ref{sec:dynamics}\\flight dynamics};
+  \node[sec, draw=cB] (s12) at (6.15,-2.5)  {\S\ref{sec:control}\\control};
+  % Part III: coupling and computation
+  \node[sec] (s13) at (9.45, 0)    {\S\ref{sec:codesign}\\co-design};
+  \node[sec] (s14) at (9.45,-1.25) {\S\ref{sec:engine}\\the engine};
+  \node[sec] (s15) at (9.45,-2.5)  {\S\ref{sec:numerics}\\numerics};
+  \node[sec] (s16) at (9.45,-3.75) {\S\ref{sec:verification}\\verification};
+  \node[sec] (s17) at (9.45,-5.0)  {\S\ref{sec:results}\\design study};
+  \node[sec] (s18) at (9.45,-6.25) {\S\ref{sec:limitations}\\limitations};
+  % bands, labelled underneath so the top is free for the long arrow
+  \begin{scope}[on background layer]
+    \node[band, fill=cA!6, draw=cA!40, fit=(s3)(s7)(s10)(s9),
+          inner xsep=7pt, inner ysep=8pt] (bI) {};
+    \node[band, fill=cB!7, draw=cB!40, fit=(s11)(s12),
+          inner xsep=7pt, inner ysep=8pt] (bII) {};
+    \node[band, fill=black!4, draw=black!25, fit=(s13)(s18),
+          inner xsep=7pt, inner ysep=8pt] (bIII) {};
+  \end{scope}
+  \node[bandlabel] at (bI.south)   {Part I: existence};
+  \node[bandlabel] at (bII.south)  {Part II: flight};
+  \node[bandlabel] at (bIII.south) {Part III: coupling};
+  % main chains
+  \foreach \a/\b in {s3/s4, s4/s5, s5/s6, s6/s7, s11/s12,
+                     s13/s14, s14/s15, s15/s16, s16/s17, s17/s18}
+    \draw[main] (\a) -- (\b);
+  % supporting models
+  \draw[dep] (s10) -- node[lbl, above, font=\scriptsize] {$\kappa$} (s4);
+  \draw[dep] (s8)  -- node[lbl, above, font=\scriptsize] {$\mstr,\mprop$} (s5);
+  \draw[dep] (s8.east) -- node[lbl, below right, font=\scriptsize, inner sep=1pt,
+      pos=0.5] {$J$, $k_T$, $k_Q$} (s11.west);
+  \draw[dep] (s9.south) |- node[lbl, pos=0.78, below, font=\scriptsize]
+      {noise constraint} (s17.west);
+  % the two layers meet in the co-design problem
+  \draw[main, cA] (s5.west) -- ++(-0.5,0) |- ($(s13.north)+(0,0.6)$)
+      -- (s13.north);
+  \draw[main, cB] (s12.east) -- ++(0.8,0) |- (s13.west);
+\end{tikzpicture}

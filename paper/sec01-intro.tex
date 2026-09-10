@@ -28,7 +28,22 @@ the gross mass. A second cycle runs through the dynamics,
 \end{equation}
 because the power actually consumed depends on what the controller does, which
 depends on the inertia, which depends on the mass distribution, which depends
-on the battery.
+on the battery. \Cref{fig:cycles} draws both cycles. They share the arc from
+energy to battery to gross mass, which is why neither can be closed without the
+other.
+
+\begin{figure}[hbp]
+\centering
+\input{figures/sec01_cycles}
+\caption{The two coupling cycles of the problem. The algebraic cycle
+\labelcref{eq:cycle} (blue) runs through hover thrust and momentum theory; the
+dynamic cycle \labelcref{eq:cycle2} (orange) runs through the plant, the
+controller and the instantaneous rotor power. Both close through the same spine
+(black): energy sets the battery mass, and the battery is part of the gross
+mass, which in turn sets the thrust and the inertia. Every edge carries the
+relation that implements it.}
+\label{fig:cycles}
+\end{figure}
 
 Neither cycle is a mere iteration to be carried out until convergence. The
 first has, under a fixed rotor geometry, a genuine bifurcation: past a
@@ -39,6 +54,20 @@ than a spreadsheet.
 \subsection{What this paper does}
 
 We construct the problem in three layers and then solve them together.
+\Cref{fig:roadmap} shows how the sections depend on one another.
+
+\begin{figure}[tbp]
+\centering
+\input{figures/sec01_roadmap}
+\caption{Dependencies between the sections. Part~I establishes when a design
+exists; the component models (purple) replace its lumped constants and supply
+the corrections of \cref{sec:nearfield}. Part~II describes how the machine
+flies. The two parts meet in the co-design problem of \cref{sec:codesign},
+which takes the gross mass from the closure (blue arrow) and the flight power
+from the controller (orange arrow); the rest of Part~III solves, verifies and
+applies it.}
+\label{fig:roadmap}
+\end{figure}
 
 \paragraph{Layer one: algebra.} Momentum theory over an actuator disk
 (\cref{sec:momentum}) gives hover power as a function of thrust and disk area.

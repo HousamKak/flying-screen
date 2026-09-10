@@ -1816,6 +1816,13 @@
     "ok": true,
     "violations": [],
     "feasible": true,
+    "N": 4.0,
+    "x": {
+     "D_rotor": 0.49845580570296605,
+     "ct_sigma_design": 0.12,
+     "blade_AR": 3.0,
+     "n_blades": 2
+    },
     "m": 1.7468695950004602,
     "P": 106.63677832057472,
     "span": 1.2738710624385834,
@@ -1856,6 +1863,13 @@
     "ok": true,
     "violations": [],
     "feasible": true,
+    "N": 6.0,
+    "x": {
+     "D_rotor": 0.3835572362767165,
+     "ct_sigma_design": 0.12,
+     "blade_AR": 3.812123851287409,
+     "n_blades": 3
+    },
     "m": 1.934963504786823,
     "P": 128.68862611441386,
     "span": 1.227383156085493,
@@ -2312,5 +2326,14 @@
     "kappa_total": 1.15
    }
   }
+ },
+ "figures": {
+  "generators": [
+   "gen_a",
+   "gen_b",
+   "gen_c",
+   "gen_d",
+   "gen_e"
+  ]
  }
 }

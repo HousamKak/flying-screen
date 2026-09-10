@@ -1,0 +1,35 @@
+% Roots of F(m) = M0 against M0 for the worked example, drawn as the
+% parametric curve (F(m), m). Square-root law near the fold:
+% m = m* +- sqrt(2 (M0max - M0) / K), K = q(q-1) beta m*^(q-2) = 0.091143,
+% so 2/K = 21.944.
+\begin{tikzpicture}
+\begin{axis}[paperplot, height=6.4cm,
+  xlabel={effective fixed load $\Mzero$ [\si{\kilo\gram}]},
+  ylabel={closure root $m$ [\si{\kilo\gram}]},
+  xmin=0, xmax=0.92, ymin=0, ymax=8.2, clip=false,
+  legend style={at={(0.5,1.03)}, anchor=south}, legend columns=3]
+  \fill[cD!7] (axis cs:0.7411,0) rectangle (axis cs:0.92,8.2);
+  \addplot[cA, domain=0:3.4923, samples=160, variable=\t]
+    ({0.6366*\t - 0.2271*\t^1.5}, {\t});
+  \addlegendentry{light root $m_-$, attracting}
+  \addplot[cB, dashed, domain=3.4923:7.8578, samples=160, variable=\t]
+    ({0.6366*\t - 0.2271*\t^1.5}, {\t});
+  \addlegendentry{heavy root $m_+$, repelling}
+  \addplot[cG, dotted, line width=1.1pt, domain=0.52:0.7411, samples=80]
+    {3.4923 + sqrt(21.944*(0.7411 - x))};
+  \addlegendentry{$m^*\pm\sqrt{2(\Mmax-\Mzero)/K}$}
+  \addplot[cG, dotted, line width=1.1pt, domain=0.52:0.7411, samples=80,
+    forget plot] {3.4923 - sqrt(21.944*(0.7411 - x))};
+  \addplot[only marks, mark=*, mark size=2.2pt, black, forget plot]
+    coordinates {(0.7411,3.4923)};
+  \node[lbl, anchor=west] at (axis cs:0.748,3.4923) {fold $(\Mmax,m^*)$};
+  \node[lbl, cD, align=center] at (axis cs:0.83,6.8) {no\\closed\\design};
+  % a feasible load and its two roots
+  \draw[construct] (axis cs:0.45,0) -- (axis cs:0.45,6.1571);
+  \addplot[only marks, mark=o, mark size=2.0pt, cA, forget plot]
+    coordinates {(0.45,1.1426)};
+  \addplot[only marks, mark=o, mark size=2.0pt, cB, forget plot]
+    coordinates {(0.45,6.1571)};
+  \node[lbl, anchor=south west] at (axis cs:0.45,0.05) {$\Mzero=0.45$};
+\end{axis}
+\end{tikzpicture}

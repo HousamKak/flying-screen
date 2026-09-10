@@ -5,7 +5,8 @@ __pycache__/
 .venv/
 venv/
 
-# LaTeX build artefacts (the built PDF is kept)
+# LaTeX build artefacts (the published copy, "The Flying Screen.pdf", is kept)
+paper/main.pdf
 paper/*.aux
 paper/*.bbl
 paper/*.blg

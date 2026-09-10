@@ -1,0 +1,29 @@
+\input{results/fig/c_geom}%
+% Fractional reduction in induced power from ground and ceiling effect,
+% 1 - 1/k = k_s (R/4z)^2, against distance over radius: a slope of -2 on
+% log axes, with the design's two distances marked and the spread of k_c.
+\begin{tikzpicture}
+  \begin{loglogaxis}[paperplot, height=5.6cm,
+      xlabel={distance to the surface over rotor radius, $z/R$},
+      ylabel={induced power reduction [\si{\percent}]},
+      xmin=0.5, xmax=12, ymin=0.03, ymax=60,
+      xtick={0.5,1,2,5,10}, xticklabels={0.5,1,2,5,10},
+      ytick={0.1,1,10}, yticklabels={0.1,1,10},
+      legend pos=north east]
+    \addplot[name path=hi, draw=none, domain=0.5:12, samples=40, forget plot]
+      {100*6/(16*x^2)};
+    \addplot[name path=lo, draw=none, domain=0.5:12, samples=40, forget plot]
+      {100*0.5/(16*x^2)};
+    \addplot[cE!18, forget plot] fill between[of=hi and lo];
+    \addplot[cB, domain=0.5:12, samples=40] {100/(16*x^2)};
+    \addlegendentry{ground, $(R/4z)^{2}$}
+    \addplot[cE, domain=0.5:12, samples=40] {100*\cKc/(16*x^2)};
+    \addlegendentry{ceiling, $k_c(R/4z_c)^{2}$, $k_c=\cKc$}
+    \addlegendimage{area legend, fill=cE!18, draw=none}
+    \addlegendentry{ceiling, $k_c\in[0.5,6]$}
+    \addplot[only marks, mark=*, mark size=2.2pt, cB] coordinates {(\cZoverR,\cGroundPct)};
+    \node[lbl, cB, anchor=north east] at (axis cs:\cZoverR,\cGroundPct) {floor, \SI{\cGroundPct}{\percent}};
+    \addplot[only marks, mark=*, mark size=2.2pt, cE] coordinates {(\cZcOverR,\cCeilPct)};
+    \node[lbl, cE, anchor=south west] at (axis cs:\cZcOverR,\cCeilPct) {ceiling, \SI{\cCeilPct}{\percent}};
+  \end{loglogaxis}
+\end{tikzpicture}

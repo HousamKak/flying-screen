@@ -1,0 +1,42 @@
+% The frequency ladder of the cascade: each loop is a factor of about three
+% or more slower than the one it relies on, and the sampling rate is two
+% orders of magnitude above the fastest loop.
+\input{results/fig/d_macros}
+\begin{tikzpicture}
+  \begin{axis}[
+      width=\linewidth, height=4.6cm, xmode=log,
+      xmin=1, xmax=2000, ymin=-1.9, ymax=2.2,
+      axis y line=none, axis x line*=bottom,
+      xlabel={angular frequency [\si{\radian\per\second}]},
+      tick label style={font=\footnotesize}, label style={font=\small},
+      clip=false]
+    \draw[cG] (axis cs:1,0) -- (axis cs:2000,0);
+    \addplot[only marks, mark=*, mark size=2.4pt, cA] coordinates
+      {(\fdWpos,0) (\fdWatt,0)};
+    \addplot[only marks, mark=square*, mark size=2.2pt, cB] coordinates
+      {(\fdWgov,0)};
+    \addplot[only marks, mark=triangle*, mark size=2.8pt, cE] coordinates
+      {(\fdWmot,0) (\fdWarm,0)};
+    \addplot[only marks, mark=diamond*, mark size=2.8pt, cG] coordinates
+      {(\fdWnyq,0)};
+    \node[lbl, anchor=north, align=center] at (axis cs:\fdWpos,-0.3)
+      {position\\ $\sqrt{K_p}=\fdWpos$};
+    \node[lbl, anchor=south, align=center, cB] at (axis cs:\fdWgov,0.3)
+      {governor\\ $\sqrt{k_p}=4$};
+    \node[lbl, anchor=north, align=center] at (axis cs:\fdWatt,-0.3)
+      {attitude\\ $\sqrt{K_R}=\fdWatt$};
+    \node[lbl, anchor=south, align=center, cE] at (axis cs:\fdWmot,0.3)
+      {motor\\ $1/\tau_m=\fdWmot$};
+    \node[lbl, anchor=north, align=center, cE] at (axis cs:\fdWarm,-0.3)
+      {first arm bending\\ mode, $2\pi f_1=\fdWarm$};
+    \node[lbl, anchor=south, align=center, cG] at (axis cs:\fdWnyq,0.3)
+      {sampling\\ $\pi/h=\fdWnyq$};
+    \draw[dim] (axis cs:\fdWpos,1.55) -- (axis cs:\fdWatt,1.55)
+      node[midway, above, font=\scriptsize] {$\times\fdRatioPA$};
+    \draw[dim] (axis cs:\fdWatt,1.55) -- (axis cs:\fdWmot,1.55)
+      node[midway, above, font=\scriptsize] {$\times\fdRatioAM$};
+    \draw[construct] (axis cs:\fdWpos,0.1) -- (axis cs:\fdWpos,1.55);
+    \draw[construct] (axis cs:\fdWatt,0.1) -- (axis cs:\fdWatt,1.55);
+    \draw[construct] (axis cs:\fdWmot,1.2) -- (axis cs:\fdWmot,1.55);
+  \end{axis}
+\end{tikzpicture}

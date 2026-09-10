@@ -1,0 +1,58 @@
+% The six motions of the person, and where they put the display. Grey is the
+% person, blue is the ideal vehicle position that holds the display at the
+% standoff in front of their eyes, dashed arrows join the two.
+\begin{tikzpicture}
+\begin{groupplot}[
+  group style={group size=3 by 2, horizontal sep=1.55cm, vertical sep=1.55cm},
+  paperplot, width=0.325\linewidth, height=0.31\linewidth,
+  title style={font=\small, yshift=-2pt},
+  every axis plot/.append style={line width=0.9pt},
+  xlabel style={font=\footnotesize}, ylabel style={font=\footnotesize},
+  legend style={font=\scriptsize},
+  topview/.style={axis equal image, xmin=-2.3, xmax=2.3, ymin=-2.3, ymax=2.3,
+    xlabel={$x$ [\si{\metre}]}, ylabel={$y$ [\si{\metre}]}},
+  timeaxis/.style={xmin=0, xmax=16, xlabel={$t$ [\si{\second}]}},
+  person/.style={cG!60, line width=2.4pt},
+  standoff/.style={construct, -{Stealth[length=1.3mm]}, each nth point=40,
+    quiver={u=\thisrow{dx}, v=\thisrow{dy}}},
+  stations/.style={only marks, mark=*, mark size=1.1pt, cG!80!black, each nth point=40}]
+% row 1: time histories
+\nextgroupplot[title={standing: postural sway}, timeaxis,
+  ylabel={sway [\si{\centi\metre}]}, ymin=-4, ymax=4,
+  legend style={at={(0.97,0.03)}, anchor=south east}]
+  \addplot[cG!80!black] table[x=t, y expr=100*\thisrow{x}] {results/fig/e_human_standing.dat};
+  \addplot[cB] table[x=t, y expr=100*\thisrow{y}] {results/fig/e_human_standing.dat};
+  \legend{$x$, $y$}
+\nextgroupplot[title={pacing}, timeaxis, ylabel={$x$ [\si{\metre}]}, ymin=-2, ymax=3,
+  legend style={at={(0.03,0.97)}, anchor=north west}]
+  \addplot[person] table[x=t, y=x] {results/fig/e_human_pacing.dat};
+  \addplot[cA] table[x=t, y=rx] {results/fig/e_human_pacing.dat};
+  \legend{person, vehicle}
+\nextgroupplot[title={sit to stand}, timeaxis, ylabel={height change [\si{\metre}]},
+  ymin=-0.55, ymax=0.1, legend style={at={(0.03,0.03)}, anchor=south west}]
+  \addplot[person] table[x=t, y=z] {results/fig/e_human_sit_stand.dat};
+  \addplot[cA, dashed] table[x=t, y=rzrel] {results/fig/e_human_sit_stand.dat};
+  \legend{person, vehicle}
+% row 2: top views and the acceleration each motion demands
+\nextgroupplot[title={turning around}, topview]
+  \addplot[person] table[x=x, y=y] {results/fig/e_human_turnaround.dat};
+  \addplot[cA] table[x=rx, y=ry] {results/fig/e_human_turnaround.dat};
+  \addplot[standoff] table[x=x, y=y] {results/fig/e_human_turnaround.dat};
+  \addplot[stations] table[x=x, y=y] {results/fig/e_human_turnaround.dat};
+\nextgroupplot[title={walking a loop, jogging}, topview]
+  \addplot[person] table[x=x, y=y] {results/fig/e_human_walk_loop.dat};
+  \addplot[cA] table[x=rx, y=ry] {results/fig/e_human_walk_loop.dat};
+  \addplot[standoff] table[x=x, y=y] {results/fig/e_human_walk_loop.dat};
+  \addplot[stations] table[x=x, y=y] {results/fig/e_human_walk_loop.dat};
+\nextgroupplot[title={acceleration demanded}, timeaxis, ymode=log,
+  ymin=0.003, ymax=100, ytick={0.01,0.1,1,10,100},
+  ylabel={$\|\ddt{\vect r}_{\mathrm{raw}}\|$ [\si{\metre\per\second\squared}]}]
+  \addplot[cB] table[x=t, y=acc] {results/fig/e_human_turnaround.dat};
+  \addplot[cA] table[x=t, y=acc] {results/fig/e_human_jogging.dat};
+  \addplot[cC] table[x=t, y=acc] {results/fig/e_human_pacing.dat};
+  \addplot[cD, dashed, domain=0:16, samples=2] {2.5};
+  \node[lbl, text=cB, anchor=south] at (axis cs:2.4,22) {turning};
+  \node[lbl, text=cA, anchor=south west] at (axis cs:6.4,5.5) {jogging};
+  \node[lbl, text=cC!70!black, anchor=north] at (axis cs:9.4,0.35) {pacing};
+\end{groupplot}
+\end{tikzpicture}

@@ -1,0 +1,28 @@
+% Configuration error Psi and the attitude error e_R against the rotation
+% angle theta between R and R_d: Psi = 1 - cos theta, |e_R| = sin theta.
+\begin{tikzpicture}
+  \begin{axis}[paperplot, height=5.2cm,
+      xmin=0, xmax=3.1416, ymin=0, ymax=2.25,
+      xtick={0, 0.7854, 1.5708, 2.3562, 3.1416},
+      xticklabels={$0$, $\pi/4$, $\pi/2$, $3\pi/4$, $\pi$},
+      xlabel={rotation angle $\theta$ of $R_d\transp R$ about any axis $\vect u$},
+      ylabel={dimensionless},
+      legend pos=north west, domain=0:3.1416, samples=120]
+    \addplot[name path=psi, cA] {1 - cos(deg(x))};
+    \addlegendentry{$\Psi = \tfrac12\tr(I-R_d\transp R) = 1-\cos\theta$}
+    \addplot[name path=er, cB] {sin(deg(x))};
+    \addlegendentry{$\|\vect e_R\| = \sin\theta$}
+    \path[name path=axisbot] (axis cs:0,0) -- (axis cs:3.1416,0);
+    \addplot[cB!12] fill between[of=er and axisbot, soft clip={domain=1.5708:3.1416}];
+    \draw[construct] (axis cs:1.5708,0) -- (axis cs:1.5708,2.25);
+    \draw[construct, cD] (axis cs:0,2) -- (axis cs:3.1416,2);
+    \node[lbl, cD, anchor=south east, align=right] at (axis cs:3.05,2.0)
+      {$\Psi=2$: excluded by \cref{eq:roa}};
+    \fill[cD] (axis cs:3.1416,0) circle (2.2pt);
+    \fill[cD] (axis cs:3.1416,2) circle (2.2pt);
+    \node[lbl, align=center, anchor=south] at (axis cs:2.2,0.08)
+      {restoring term $K_R\vect e_R$\\ weakens past $\pi/2$};
+    \draw[lbl, cD, -{Stealth[length=1.6mm]}] (axis cs:2.8,0.95) -- (axis cs:3.09,0.07)
+      node[pos=0, above left=-2pt, align=center] {critical set:\\ $\vect e_R=0$, $\Psi=2$};
+  \end{axis}
+\end{tikzpicture}

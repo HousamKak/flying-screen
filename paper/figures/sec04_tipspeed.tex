@@ -1,0 +1,32 @@
+% One rotor of the design at its hover thrust, fixed geometry, tip speed
+% swept with automatic tip speed off (engine data, gen_a.py).
+\input{results/fig/a_macros}
+\begin{tikzpicture}
+\begin{axis}[paperplot, xmin=18, xmax=80, ymin=0, ymax=80,
+    xlabel={tip speed $\Vtip$ [\si{\metre\per\second}]},
+    ylabel={power per rotor [\si{\watt}]},
+    legend style={at={(0.3,0.97)}, anchor=north west}]
+  \fill[cD!10] (axis cs:18,0) rectangle (axis cs:\aVstall,80);
+  \node[lbl, cD, rotate=90, anchor=center] at (axis cs:{(18+\aVstall)/2},50)
+      {stall: $\Ct/\sigma > \aCtMax$};
+  \draw[cA, dashed, line width=0.6pt] (axis cs:\aVdesign,0) -- (axis cs:\aVdesign,80);
+  \addplot[black] table[x=vtip, y=Pshaft] {results/fig/a_tipspeed.dat};
+  \addlegendentry{shaft, $\Pind + \Pprof$}
+  \addplot[cA, dashed] table[x=vtip, y=Pind] {results/fig/a_tipspeed.dat};
+  \addlegendentry{induced, $\kappa T\vind$}
+  \addplot[cB] table[x=vtip, y=Pprof] {results/fig/a_tipspeed.dat};
+  \addlegendentry{profile, $\tfrac18\rho A\Vtip^3\sigma\Cdz(\mathrm{Re})$}
+  \addplot[cG, dotted, line width=1.2pt] table[x=vtip, y=Pideal] {results/fig/a_tipspeed.dat};
+  \addlegendentry{ideal, $T\vind$}
+  \addplot[only marks, mark=*, mark size=2.2pt, cD, forget plot]
+      coordinates {(\aVstall,\aPstall)};
+  \addplot[only marks, mark=*, mark size=2.2pt, cA, forget plot]
+      coordinates {(\aVdesign,\aPdesign)};
+  \node[lbl, cD, anchor=south west, fill=white, inner sep=1.2pt] (st)
+      at (axis cs:18.6,6.5) {stall boundary};
+  \draw[cD, line width=0.4pt] (st.north east) -- (axis cs:\aVstall,{\aPstall-0.7});
+  \node[lbl, anchor=south west, fill=white, inner sep=1.2pt] (ds)
+      at (axis cs:32,31) {design, $\Ct/\sigma = \aCtDesign$};
+  \draw[cA, line width=0.4pt] (ds.south west) -- (axis cs:{\aVdesign+0.3},{\aPdesign+0.7});
+\end{axis}
+\end{tikzpicture}

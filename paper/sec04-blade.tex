@@ -40,6 +40,25 @@ solidity is the ratio of blade planform area to disk area,
 \end{equation}
 \end{definition}
 
+\Cref{fig:element} fixes the notation of blade element theory.
+
+\begin{figure}[tbp]
+\centering
+\input{figures/sec04_element}
+\caption{Blade element notation. (a) A two-bladed rotor of radius $R$ and chord
+$c$, so $\sigma = N_bc/(\pi R)$; the annulus at radius $r$ of width $\dd r$
+cuts an element from each blade. (b) The element in section. It meets the air
+at $U_T = \Omega r$ in the plane of rotation and $U_P = \vind$ through it, so
+the resultant $U$ is inclined at the inflow angle $\phi = \arctan(U_P/U_T)$
+and the angle of attack is $\alpha = \theta - \phi$ for a pitch $\theta$. Lift
+$\dd L$ is normal to $U$ and drag $\dd D$ along it. Resolved on the rotor axes
+they give the thrust $\dd T = \dd L\cos\phi - \dd D\sin\phi$ and the in-plane
+force $\dd Q/r = \dd L\sin\phi + \dd D\cos\phi$. \Cref{prop:profile} keeps
+the drag part of the second in the limit $\phi\to0$, where
+$\dd P = \Omega r\,\dd D$.}
+\label{fig:element}
+\end{figure}
+
 \begin{proposition}[Profile power of a rotor in hover]
 \label{prop:profile}
 Let each blade section have drag coefficient $\Cdz$, taken constant along the
@@ -124,14 +143,35 @@ $\Pprof \propto \Vtip \propto \sigma^{-1/2}$.
 \end{corollary}
 
 \begin{proof}
-Immediate from \cref{eq:ctsigma} at fixed $T$, $\rho A$ and $\Ct/\sigma$, and
-from $\Pprof = (\Cdz/8) T\Vtip/(\Ct/\sigma)$.
+Immediate from \cref{eq:ctsigma} with $T$, $\rho A$ and $\Ct/\sigma$ held
+fixed, together with
+\[
+  \Pprof = \frac{\Cdz}{8}\,\frac{T\,\Vtip}{\Ct/\sigma} . \qedhere
+\]
 \end{proof}
 
 \Cref{cor:designrule} is not obvious and is used heavily later: a fatter,
 slower blade is better on \emph{both} counts, quieter by
 \cref{sec:acoustics} and cheaper in profile power, until the assumptions break.
 They break in two places, and both are enforced as constraints.
+\Cref{fig:designrule} shows both effects at the design's thrust and the two
+limits that stop them.
+
+\begin{figure}[tbp]
+\centering
+\input{figures/sec04_designrule}
+\caption{The design rule of \cref{cor:designrule} at the thrust per rotor of
+the design, $T = \SI{\aThover}{\newton}$, with its induced factor
+$\kappa = \aKappa$ and $\Cdz = \rCdzero$ held fixed. Left: at fixed blade
+loading the figure of merit \cref{eq:fmclosed} rises with solidity, because
+the profile term falls as $\sigma^{-1/2}$. Right: the tip speed that carries
+the thrust falls as $\sigma^{-1/2}$, \cref{eq:ctsigma}, which is what makes
+the rotor quiet (\cref{sec:acoustics}). Both gains stop at the cascade limit
+$\sigma = 0.25$ of \cref{as:sigma} and at the stall limit $\Ct/\sigma = 0.14$
+of \cref{as:stall}. The design ($\bullet$) sits at $\sigma = \rSolidity$ and
+$\Ct/\sigma = \rCtSigma$; helicopter rotors occupy the grey band.}
+\label{fig:designrule}
+\end{figure}
 
 \subsection{Two limits on solidity and blade loading}
 
@@ -182,6 +222,23 @@ lunch: it would drive the tip speed arbitrarily low. We therefore use
 an empirical power law of the standard form for attached turbulent flow, capped
 to keep it from diverging. This is the crudest submodel in the paper and is
 flagged as such; its only job is to prevent an unphysical optimum.
+\Cref{fig:tipspeed} shows the resulting trade for one rotor of the design.
+
+\begin{figure}[tbp]
+\centering
+\input{figures/sec04_tipspeed}
+\caption{One rotor of the design at its hover thrust, with the geometry fixed
+and the tip speed varied (engine data). The induced power $\kappa T\vind$ does
+not depend on tip speed; the profile power grows as $\Vtip^3\Cdz(\mathrm{Re})$,
+slightly slower than $\Vtip^3$ at low speed because $\Cdz$ falls as the
+Reynolds number rises, \cref{eq:recorrection}. The shaft power is therefore
+least at the lowest tip speed the blade-loading limit admits, on the stall
+boundary $\Ct/\sigma = \aCtMax$ at \SI{\aVstall}{\metre\per\second}. The
+design runs at $\Ct/\sigma = \aCtDesign$ and \SI{\aVdesign}{\metre\per\second},
+and pays for its stall margin with the difference between
+\SI{\aPdesign}{\watt} and \SI{\aPstall}{\watt} of shaft power per rotor.}
+\label{fig:tipspeed}
+\end{figure}
 
 \subsection{Electrical power}
 

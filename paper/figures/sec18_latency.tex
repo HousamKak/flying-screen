@@ -1,0 +1,33 @@
+% Not to scale: the offset between head and estimate is exaggerated
+% against the keep-out radius so that both can be read.
+\begin{tikzpicture}[x=1.6cm, y=1.6cm]
+\def\Rk{1.8}    % keep-out radius
+\def\Off{0.55}  % |c-dot| tau: how far the head has moved since it was seen
+\def\Ep{0.34}   % tracking margin epsilon
+\fill[cA!5] (0,0) circle (\Rk);
+\draw[cA, line width=0.8pt] (0,0) circle (\Rk);
+\draw[cA, densely dotted] (0,0) circle (\Rk-\Ep);
+\draw[cD, dashed, line width=0.8pt] (\Off,0) circle (\Rk);
+\fill[cA] (0,0) circle (1.6pt);
+\node[lbl, text=cA, anchor=east] at (-0.06,0.10) {$\hat{\vect c}=\vect c(t-\tau)$};
+\fill[cD] (\Off,0) circle (1.6pt);
+\node[lbl, text=cD, anchor=south] at (\Off,0.08) {$\vect c(t)$};
+\draw[vec] (\Off,0.42) -- ++(0.55,0) node[right, lbl] {$\dt{\vect c}$};
+% the vehicle, held by the governor at distance rho - eps from the estimate
+\coordinate (v) at (\Rk-\Ep,0);
+\fill[cB] (v) circle (2pt);
+\node[lbl, text=cB!80!black, anchor=north west] at ($(v)+(0.04,-0.04)$) {vehicle};
+% dimensions
+\draw[dim] (0,-0.62) -- (\Off,-0.62) node[midway, below, lbl] {$\|\dt{\vect c}\|\tau$};
+\draw[dim] (\Rk-\Ep,-0.62) -- (\Rk,-0.62) node[midway, below, lbl] {$\varepsilon$};
+\draw[construct] (\Rk,0) -- (\Rk,-0.66);
+\draw[construct] (\Rk-\Ep,-0.2) -- (\Rk-\Ep,-0.66);
+\draw[construct] (\Off,-0.06) -- (\Off,-0.66);
+\draw[construct] (0,-0.06) -- (0,-0.66);
+\draw[dim] (0,-1.12) -- (\Rk,-1.12) node[midway, below, lbl] {$\varrho=d_{\mathrm{safe}}+\mathcal{R}+\varepsilon$};
+\draw[construct] (0,-0.66) -- (0,-1.16);
+\draw[construct] (\Rk,-0.66) -- (\Rk,-1.16);
+% labels on the two spheres
+\node[lbl, text=cA, anchor=south east] at (125:\Rk) {sphere about the estimate};
+\node[lbl, text=cD, anchor=south west] at ($(\Off,0)+(55:\Rk)$) {sphere about the head};
+\end{tikzpicture}

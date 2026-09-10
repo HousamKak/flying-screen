@@ -1,0 +1,33 @@
+% Attainable torque sets at thrust mg and zero yaw moment, computed from the
+% engine by one linear program per direction (the support function).
+\input{results/fig/d_macros}
+\begin{tikzpicture}
+  \begin{axis}[paperplot, width=0.62\linewidth, height=0.62\linewidth,
+      axis equal image,
+      xmin=-8, xmax=8, ymin=-8, ymax=8,
+      xlabel={$\tau_x$ (roll) [\si{\newton\metre}]},
+      ylabel={$\tau_y$ (pitch) [\si{\newton\metre}]},
+      legend style={at={(0.5,1.02)}, anchor=south, legend columns=2},
+    ]
+    \addplot[cA, fill=cA!14] table[x=tx, y=ty] {results/fig/d_attain_quad.dat};
+    \addlegendentry{quadrotor, the design}
+    \addplot[cB, dashed, line width=1.1pt] table[x=tx, y=ty] {results/fig/d_attain_hex.dat};
+    \addlegendentry{hexacopter, same payload and rotors}
+    \addplot[only marks, mark=square*, mark size=1.9pt, cB, forget plot]
+      coordinates {(\fdHexRoll,0) (-\fdHexRoll,0) (0,\fdHexPitch) (0,-\fdHexPitch)};
+    % authority of the quadrotor on each axis
+    \addplot[only marks, mark=*, mark size=2.2pt, cA, forget plot]
+      coordinates {(\fdQuadRoll,0) (-\fdQuadRoll,0) (0,\fdQuadPitch) (0,-\fdQuadPitch)};
+    \node[lbl, cA, anchor=south west] at (axis cs:\fdQuadRoll,0.2)
+      {$\tau^{\max}_{\mathrm{roll}}$};
+    \node[lbl, cA, anchor=south west] at (axis cs:0.2,\fdQuadPitch)
+      {$\tau^{\max}_{\mathrm{pitch}}$};
+    % the earlier estimate with the factor 1/N
+    \addplot[only marks, mark=x, mark size=3.2pt, cD, line width=1pt, forget plot]
+      coordinates {(\fdQuadOld,0) (-\fdQuadOld,0) (0,\fdQuadOld) (0,-\fdQuadOld)};
+    \node[lbl, cD, anchor=north west, align=left] at (axis cs:0.15,-\fdQuadOld)
+      {earlier estimate\\ with $1/N$: \SI{\fdQuadOld}{\newton\metre}};
+    \draw[construct] (axis cs:-8,0) -- (axis cs:8,0);
+    \draw[construct] (axis cs:0,-8) -- (axis cs:0,8);
+  \end{axis}
+\end{tikzpicture}

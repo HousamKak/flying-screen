@@ -1,0 +1,26 @@
+% Generalised closure eq:closure-q: demand M0 + beta_q m^q for several
+% disk-area exponents p, all anchored to the same rotor at m0 = 2 kg, against
+% the supply alpha m. Worked-example alpha, beta; M0 = 0.5 kg.
+\begin{tikzpicture}[declare function={dem(\m,\q) = 0.5 + 0.2271*2^(1.5-\q)*\m^\q;}]
+\begin{axis}[paperplot, height=6.2cm, xmin=0, xmax=12, ymin=0, ymax=9,
+    domain=0:12, samples=150,
+    xlabel={gross mass $m$ [\si{\kilo\gram}]},
+    ylabel={mass [\si{\kilo\gram}]},
+    legend pos=north west]
+  \addplot[black, line width=1.3pt] {0.6366*x};
+  \addlegendentry{supply $\alpha m$}
+  \addplot[cB]        {dem(x,1.625)};
+  \addlegendentry{$p=-\tfrac14$, $q=\tfrac{13}{8}$}
+  \addplot[cA]        {dem(x,1.5)};
+  \addlegendentry{$p=0$, $q=\tfrac32$}
+  \addplot[cA!55]     {dem(x,1.25)};
+  \addlegendentry{$p=\tfrac12$, $q=\tfrac54$}
+  \addplot[cC!70!black, dashed] {dem(x,1.0)};
+  \addlegendentry{$p=1$, $q=1$}
+  \addplot[cE!70, dotted, line width=1.3pt] {dem(x,0.75)};
+  \addlegendentry{$p=\tfrac32$, $q=\tfrac34$}
+  \addplot[only marks, mark=*, mark size=2pt, black, forget plot]
+      coordinates {(2,{dem(2,1.5)})};
+  \node[lbl, anchor=north west] at (axis cs:2.15,{dem(2,1.5)-0.1}) {common anchor $m_0$};
+\end{axis}
+\end{tikzpicture}

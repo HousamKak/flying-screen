@@ -1,0 +1,33 @@
+\input{results/fig/c_geom}%
+% The source model at the design's thrust per rotor: 60 dB per decade of tip
+% speed, with the design and a camera-drone tip speed marked.
+\begin{tikzpicture}
+  \begin{semilogxaxis}[paperplot, height=5.6cm,
+      xlabel={tip speed $\Vtip$ [\si{\metre\per\second}]},
+      ylabel={$L_p(\SI{1}{\metre})$ [\si{\decibel A}]},
+      xmin=10, xmax=150, ymin=25, ymax=95,
+      xtick={10,20,50,100,150}, xticklabels={10,20,50,100,150},
+      legend pos=north west]
+    \addplot[cA, domain=10:150, samples=60]
+      {\cAnchor + 60*log10(x/100) + 10*log10(\cTrotor/5) + 10*log10(4)};
+    \addlegendentry{\cref{eq:splmodel}, $T_{\mathrm{rotor}}=\SI{\cTrotor}{\newton}$, $N=4$}
+    % comfort bands
+    \draw[cC, dashed, line width=0.6pt] (axis cs:10,45) -- (axis cs:150,45);
+    \node[lbl, cC, anchor=south east] at (axis cs:150,45) {quiet office};
+    \draw[cD, dashed, line width=0.6pt] (axis cs:10,60) -- (axis cs:150,60);
+    \node[lbl, cD, anchor=south east] at (axis cs:150,60) {speech};
+    % halving the tip speed
+    \pgfmathsetmacro{\Ldes}{\cAnchor + 60*log10(\cVtip/100) + 10*log10(\cTrotor/5) + 10*log10(4)}
+    \pgfmathsetmacro{\Vtwo}{2*\cVtip}
+    \pgfmathsetmacro{\Ltwo}{\Ldes + 60*log10(2)}
+    \draw[cG, line width=0.5pt] (axis cs:\cVtip,\Ldes) -- (axis cs:\Vtwo,\Ldes) -- (axis cs:\Vtwo,\Ltwo);
+    \node[lbl, cG, anchor=west] at (axis cs:\Vtwo,0.5*\Ldes+0.5*\Ltwo) {\SI{18.1}{\decibel}};
+    \node[lbl, cG, anchor=north] at (axis cs:1.41*\cVtip,\Ldes) {$\times2$};
+    \addplot[only marks, mark=*, mark size=2.3pt, cA] coordinates {(\cVtip,\Ldes)};
+    \node[lbl, cA, anchor=north west] at (axis cs:\cVtip,\Ldes-1) {design};
+    \pgfmathsetmacro{\Ldrone}{\cAnchor + 60*log10(68/100) + 10*log10(\cTrotor/5) + 10*log10(4)}
+    \addplot[only marks, mark=square*, mark size=2.2pt, cB] coordinates {(68,\Ldrone)};
+    \node[lbl, cB, anchor=south east, align=right] at (axis cs:66,\Ldrone+1)
+      {camera drone,\\same thrust};
+  \end{semilogxaxis}
+\end{tikzpicture}

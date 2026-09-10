@@ -1,0 +1,21 @@
+% A source on a reflecting floor radiates into a hemisphere of area 2 pi r^2,
+% which is the Q = 2 of eq:lwlp and the source of the 8 dB between a declared
+% sound power and a pressure at one metre.
+\begin{tikzpicture}[>={Stealth[length=1.8mm]}, font=\footnotesize]
+  \fill[pattern=north east lines, pattern color=cG] (-3.2,-0.25) rectangle (3.2,0);
+  \draw[line width=0.8pt] (-3.2,0) -- (3.2,0);
+  \node[anchor=north east, cG] at (3.2,-0.28) {reflecting plane};
+  \foreach \r/\op in {1.0/70, 1.8/50, 2.6/32}
+    \draw[cA!\op!white, line width=0.9pt] (\r,0) arc (0:180:\r);
+  \foreach \ang in {20,55,90,125,160}
+    \draw[vec, cA] (\ang:0.22) -- (\ang:0.82);
+  \fill[cD] (0,0) circle (0.07);
+  \node[anchor=north east, cD] at (-0.1,-0.28) {source of power $W$};
+  \draw[dim, black] (0,0) -- (35:2.6) node[pos=0.66, above left=-2pt] {$r$};
+  \node[anchor=south, cA] at (0,2.62) {wavefront, area $2\pi r^{2}$};
+  \node[anchor=west, align=left] at (3.2,1.55)
+    {$I=\dfrac{W}{2\pi r^{2}}=\dfrac{QW}{4\pi r^{2}},\quad Q=2$\\[6pt]
+     $L_p(r)=L_W+10\log_{10}\dfrac{Q}{4\pi r^{2}}$\\[6pt]
+     $L_p(\SI{1}{\metre})=L_W-10\log_{10}2\pi$\\[2pt]
+     $\phantom{L_p(\SI{1}{\metre})}=L_W-\SI{7.98}{\decibel}$};
+\end{tikzpicture}

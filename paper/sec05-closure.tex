@@ -19,7 +19,22 @@ the battery pack.
 once the three terms on the right that depend on $m$ are made explicit. The
 essential point is that they depend on $m$ in different ways, and lumping them
 together, as one is tempted to do by writing a single ``structural fraction'',
-destroys the structure of the problem.
+destroys the structure of the problem. \Cref{fig:budget} shows the budget of
+the design of \cref{sec:results} with the dependence of each group on $m$ that
+the rest of this section derives.
+
+\begin{figure}[tbp]
+\centering
+\input{figures/sec05_budget}
+\caption{The mass budget \cref{eq:budget} of the design of \cref{sec:results},
+to scale, from the component models of \cref{sec:components}; masses in grams.
+The four groups enter the closure differently. The fixed load does not depend
+on $m$; structure and propulsion grow in proportion to it
+(\cref{mod:fs,mod:sm}); the battery grows with the hover power, as $m^{3/2}$
+at fixed rotor area (\cref{mod:battery,cor:hover}). Only the last is
+nonlinear, and it is the one that makes \cref{eq:closure} fold.}
+\label{fig:budget}
+\end{figure}
 
 \subsection{Propulsion mass: sized by peak thrust}
 
@@ -168,6 +183,23 @@ $\Mzero = \SI{0.762}{\kilo\gram}$. \Cref{sec:fold} shows that this
 configuration has no solution.
 \end{example}
 
+\Cref{fig:closuregraph} reads \cref{eq:closure} as supply against demand.
+
+\begin{figure}[tbp]
+\centering
+\input{figures/sec05_closure}
+\caption{\Cref{eq:closure} as a balance between the mass left after structure
+and propulsion, $\alpha m$, and the mass the fixed load and the battery demand,
+$\Mzero + \beta m^{3/2}$, with the coefficients of the worked example. A
+design exists where the two meet. For $\Mzero = 0.40$ they meet twice, at a
+light root $m_-$ and a heavy root $m_+$, with a surplus between them. At
+$\Mzero = \Mmax = 0.741$ the demand curve is tangent to the line at
+$m^* = 3.49$. Above it, as for $\Mzero = 1.00$ and for the worked example's
+$\Mzero = 0.762$, they never meet and no mass closes the budget.
+\Cref{sec:fold} proves this trichotomy.}
+\label{fig:closuregraph}
+\end{figure}
+
 \subsection{Generalised disk-area scaling}
 
 \Cref{cor:hover} assumed the disk area fixed while mass varies. That is an
@@ -214,6 +246,23 @@ Three cases matter and are treated in \cref{sec:fold,sec:scaling}:
   \item $p>1$: rotors grow faster than mass, $q<1$, the nonlinearity is
         sublinear and inverts its role entirely.
 \end{itemize}
+\Cref{fig:plaw} shows the family.
+
+\begin{figure}[tbp]
+\centering
+\input{figures/sec05_plaw}
+\caption{The generalised closure \cref{eq:closure-q} for five disk-area
+exponents, all anchored to the same rotor at $m_0 = \SI{2}{\kilo\gram}$ so
+that the demand curves $\Mzero + \beta_q m^q$ pass through one point, with the
+worked-example $\alpha$, $\beta$ and $\Mzero = \SI{0.5}{\kilo\gram}$. For
+$q > 1$ the demand is convex and eventually overtakes the supply line, so a
+second root and a fold exist; the smaller $q - 1$, the farther out they lie,
+and for $q = \tfrac54$ they are beyond the plotted range. At $q = 1$ (constant
+disk loading, \cref{cor:constdl}) the demand is a line, and a root exists
+exactly when its slope is below $\alpha$. For $q < 1$ the demand is concave and
+is overtaken by the supply for good.}
+\label{fig:plaw}
+\end{figure}
 
 \begin{corollary}[Constant disk loading]
 \label{cor:constdl}

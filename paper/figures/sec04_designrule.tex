@@ -1,0 +1,41 @@
+% Cor. design rule: at fixed blade loading Ct/sigma the figure of merit
+% rises and the tip speed falls as solidity grows, eq:fmclosed and
+% eq:ctsigma, at the design's hover thrust per rotor and induced factor.
+\input{results/fig/a_macros}
+\begin{tikzpicture}[
+  declare function={
+    FMc(\s,\c) = 1/(\aKappa + (\rCdzero/(8*\c))*sqrt(2/(\s*\c)));
+    Ar = pi*(\rDiam/2000)^2;
+    Vt(\s,\c) = sqrt(\aThover/(\aRho*Ar*\s*\c));}]
+\begin{groupplot}[group style={group size=2 by 1, horizontal sep=1.55cm},
+    halfplot, xmin=0.03, xmax=0.35, domain=0.03:0.35, samples=80,
+    xlabel={solidity $\sigma$}]
+  \nextgroupplot[ylabel={figure of merit $\FM$}, ymin=0.3, ymax=0.8,
+                 legend columns=2,
+                 legend style={font=\scriptsize, at={(0.02,0.03)}, anchor=south west}]
+    \fill[cG!12] (axis cs:0.05,0.3) rectangle (axis cs:0.12,0.8);
+    \node[lbl, cG, anchor=north] at (axis cs:0.085,0.795) {helicopters};
+    \fill[cD!10] (axis cs:0.25,0.3) rectangle (axis cs:0.35,0.8);
+    \node[lbl, cD, rotate=90, anchor=center] at (axis cs:0.30,0.5) {cascade, $\sigma > 0.25$};
+    \addplot[cA!40] {FMc(x,0.08)}; \addlegendentry{$\Ct/\sigma = 0.08$}
+    \addplot[cA!65] {FMc(x,0.10)}; \addlegendentry{$0.10$}
+    \addplot[cA]    {FMc(x,0.12)}; \addlegendentry{$0.12$, design}
+    \addplot[cB, dashed] {FMc(x,0.14)}; \addlegendentry{$0.14$, stall}
+    \addplot[only marks, mark=*, mark size=2pt, cA, forget plot]
+        coordinates {(\aSigma,{FMc(\aSigma,0.12)})};
+  \nextgroupplot[ylabel={tip speed $\Vtip$ [\si{\metre\per\second}]},
+                 ymin=10, ymax=95]
+    \fill[cD!10] (axis cs:0.25,10) rectangle (axis cs:0.35,95);
+    \addplot[cA!40] {Vt(x,0.08)};
+    \addplot[cA!65] {Vt(x,0.10)};
+    \addplot[cA]    {Vt(x,0.12)};
+    \addplot[cB, dashed] {Vt(x,0.14)};
+    \addplot[only marks, mark=*, mark size=2pt, cA]
+        coordinates {(\aSigma,{Vt(\aSigma,0.12)})};
+    \node[lbl, anchor=south west, fill=white, inner sep=1pt]
+        at (axis cs:\aSigma,{Vt(\aSigma,0.12)+2})
+        {design, \SI{\rVtip}{\metre\per\second}};
+    \node[lbl, cG, anchor=north east, fill=white, inner sep=1pt]
+        at (axis cs:0.34,93) {$\Vtip\propto\sigma^{-1/2}$};
+\end{groupplot}
+\end{tikzpicture}

@@ -1,0 +1,44 @@
+% Free-body diagram in forward flight, side view with b2 into the page:
+% thrust along b3, weight at the centre of mass, screen drag applied at the
+% offset d_s, and the moment that drag produces about the centre of mass.
+\begin{tikzpicture}[>={Stealth[length=2mm]}, font=\footnotesize]
+  \def\th{14}
+  % inertial axes
+  \draw[vec, black!60] (-3.9,-2.3) -- (-3.2,-2.3) node[right] {$\vect e_1$};
+  \draw[vec, black!60] (-3.9,-2.3) -- (-3.9,-1.6) node[above] {$\vect e_3$};
+  % the tilted body
+  \begin{scope}[rotate=-\th]
+    \draw[line width=1.8pt, black!55] (-1.7,0) -- (1.7,0);
+    \foreach \x in {-1.7,1.7} {
+      \fill[cA!20] (\x,0.05) ellipse (0.75 and 0.06);
+      \draw[cA, line width=0.9pt] (\x,0.05) ellipse (0.75 and 0.06);
+      \draw[vec, cA, line width=1.1pt] (\x,0.12) -- (\x,1.35);
+    }
+    \node[cA, anchor=south] at (1.7,1.35) {$T_1+T_4$};
+    \node[cA, anchor=south] at (-1.7,1.35) {$T_2+T_3$};
+    \filldraw[fill=gray!35, draw=black!70] (-0.22,-0.1) rectangle (0.22,0.1);
+    % screen above the centre of mass
+    \filldraw[fill=cE!25, draw=cE, line width=0.8pt] (-0.05,0.55) rectangle (0.05,1.55);
+    \draw[vec, cE] (0.07,1.35) -- (0.65,1.35) node[above] {$\vect n$};
+    \draw[vec, black] (0,0.12) -- (0,0.47);
+    \node[anchor=west] at (0.05,0.3) {$\vect d_s$};
+    \draw[vec, black!70] (2.7,-0.3) -- (3.4,-0.3) node[right] {$\vect b_1$};
+    \draw[vec, black!70] (2.7,-0.3) -- (2.7,0.4) node[above] {$\vect b_3$};
+    \coordinate (scr) at (0,1.05);
+  \end{scope}
+  % centre of mass and weight
+  \fill[black] (0,0) -- (0.1,0) arc (0:90:0.1) -- cycle;
+  \fill[black] (0,0) -- (-0.1,0) arc (180:270:0.1) -- cycle;
+  \draw[black, line width=0.4pt] (0,0) circle (0.1);
+  \draw[vec, black, line width=1.1pt] (0,-0.12) -- (0,-1.45) node[below] {$-m g\,\vect e_3$};
+  % screen drag, rearward
+  \draw[vec, cD, line width=1.1pt] (scr) -- ++(-1.3,0) node[left] {$\vect F_{\mathrm{screen}}$};
+  % moment about the centre of mass: counterclockwise here, against the tilt
+  \draw[cD, line width=0.9pt, ->] (-150:0.75) arc (-150:-40:0.75);
+  \node[cD, anchor=east, align=right] at (-0.85,-0.6)
+    {$\vect\tau_{\mathrm{screen}}=\vect d_s\times\vect F_{\mathrm{screen}}$\\opposes the tilt};
+  % motion and tilt angle
+  \draw[vec, cC, line width=1.1pt] (1.5,-2.0) -- (2.7,-2.0) node[right] {$\vect v$};
+  \draw[construct] (0,0) -- (0,2.0);
+  \draw[cG, ->] (0,1.75) arc (90:90-\th:1.75) node[midway, above] {$\theta$};
+\end{tikzpicture}

@@ -1,0 +1,59 @@
+% The cascade of the engine's controller, from the user to the rigid body.
+\begin{tikzpicture}[
+    font=\footnotesize,
+    box/.style={block, text width=1.95cm, minimum height=3.2em, inner sep=2pt},
+    ctl/.style={box, fill=cA!7},
+    phys/.style={box, fill=cB!10},
+    sig/.style={font=\scriptsize, midway},
+  ]
+  % top row: from the user to the thrust command
+  \node[phys] (user) at (0,0)      {user\\ $\vect c(t),\ \psi_h(t)$};
+  \node[box]  (raw)  at (2.95,0)   {ideal display\\ trajectory};
+  \node[ctl]  (gov)  at (5.9,0)    {reference\\ governor};
+  \node[ctl]  (pos)  at (8.85,0)   {position loop\\ \labelcref{eq:poscmd}};
+  \node[ctl]  (des)  at (11.8,0)   {desired attitude\\ \labelcref{eq:Rd,eq:omegad}};
+  % bottom row: from the attitude loop back to the plant
+  \node[ctl]  (att)  at (11.8,-2.6) {attitude loop\\ \labelcref{eq:leeused}};
+  \node[ctl]  (mix)  at (8.85,-2.6) {mixer $\mat M^{+}$,\\ saturation};
+  \node[phys] (mot)  at (5.9,-2.6)  {motors, lag\\ \labelcref{eq:motorlag}};
+  \node[phys] (body) at (2.95,-2.6) {rigid body,\\ rotors, drag};
+  \node[ctl]  (gim)  at (0,-2.6)    {gimbal PD,\\ screen upright};
+
+  \draw[flow] (user) -- node[sig, above] {$\vect r_h$} (raw);
+  \draw[flow] (raw)  -- node[sig, above] {$\vect r_{\mathrm{raw}}$} (gov);
+  \draw[flow] (gov)  -- node[sig, above, align=center] {$\vect r_g,\vect v_g$\\ $\vect a_g,\vect j_g$} (pos);
+  \draw[flow] (pos)  -- node[sig, above] {$\vect F_c$} (des);
+  \draw[flow] (des)  -- node[sig, right, align=left] {$R_d$\\ $\vect\omega_d$} (att);
+  \draw[flow] (att)  -- node[sig, above] {$\vect\tau$} (mix);
+  \draw[flow] (mix)  -- node[sig, above] {$\Omega^{\mathrm{cmd}}$} (mot);
+  \draw[flow] (mot)  -- node[sig, above] {$\Omega$} (body);
+  % thrust magnitude goes to the mixer directly
+  \draw[flow] ($(des.south)+(-0.7,0)$) -- ++(0,-0.62)
+        -| node[sig, pos=0.25, above] {$T_c=\|\vect F_c\|$} ($(mix.north)+(0.55,0)$);
+  % head position enters the keep-out constraint
+  \draw[flow, cD] (user.north) -- ++(0,0.55)
+        -| node[sig, pos=0.25, above] {head $\vect c,\dt{\vect c},\ddt{\vect c}$: keep-out \labelcref{eq:barrier}} (gov.north);
+  % heading reference
+  \draw[flow] ($(gov.north)+(0.65,0)$) -- ++(0,0.28)
+        -| node[sig, pos=0.25, above] {$\psi_g,\ \dt\psi_g,\ \ddt\psi_g$} (des.north);
+  % feedback of translational state
+  \draw[flow, cE] ($(body.north)+(0.4,0)$) -- ++(0,0.5)
+        -| node[sig, pos=0.2, below] {$\vect r,\ \vect v$} ($(pos.south)+(-0.45,0)$);
+  % feedback of rotational state
+  \draw[flow, cE] (body.south) -- ++(0,-0.8)
+        -| node[sig, pos=0.25, below] {$R,\ \vect\omega$} (att.south);
+  \draw[flow, cE] (body.west) -- node[sig, above] {$R$} (gim.east);
+  \draw[flow] (gim.south) -- ++(0,-0.5)
+        -| node[sig, pos=0.3, below] {$\vect\tau_g$} ($(body.south)+(-0.65,0)$);
+
+  % the sampled controller
+  \begin{scope}[on background layer]
+    \node[draw=cA, dashed, rounded corners=3pt, inner xsep=6pt, inner ysep=9pt,
+          fit=(gov)(pos)(des)(att)(mix)] (ctlbox) {};
+  \end{scope}
+  \node[font=\scriptsize, anchor=north west, align=left] at (-1.05,-4.3)
+       {\tikz\fill[cA!7,draw=black] (0,0) rectangle (0.3,0.18); computed\quad
+        \tikz\fill[cB!10,draw=black] (0,0) rectangle (0.3,0.18); physical\quad
+        \tikz\draw[cA, dashed] (0,0) rectangle (0.3,0.18); controller, sampled at
+        $1/h=\SI{250}{\hertz}$, output held between samples};
+\end{tikzpicture}

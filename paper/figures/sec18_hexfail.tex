@@ -1,0 +1,61 @@
+﻿\begin{tikzpicture}[x=1.9cm, y=1.9cm]
+% one rotor, with its spin sense: s=+1 counterclockwise about +b3
+\tikzset{
+  rotor/.pic={
+    \draw[cB, fill=cB!8, line width=0.6pt] (0,0) circle (0.30);
+    \fill (0,0) circle (0.9pt);
+  },
+  ccw/.style={-{Stealth[length=1.4mm]}, cB!70!black, line width=0.6pt},
+  dead/.style={cD, line width=1.4pt},
+}
+% ---- quadrotor, one rotor lost --------------------------------------------
+\begin{scope}
+  \foreach \i/\s in {0/1,1/-1,2/1,3/-1} {
+    \pgfmathsetmacro\ang{90*\i+45}
+    \coordinate (q\i) at (\ang:1);
+    \draw[line width=1.4pt, cG!70!black] (0,0) -- (q\i);
+    \pic at (q\i) {rotor};
+    \ifnum\s=1
+      \draw[ccw] ($(q\i)+(-60:0.19)$) arc[start angle=-60, end angle=200, radius=0.19];
+    \else
+      \draw[ccw] ($(q\i)+(240:0.19)$) arc[start angle=240, end angle=-20, radius=0.19];
+    \fi
+    \pgfmathtruncatemacro\n{\i+1}
+    \node[lbl] at ($(q\i)+(\ang:0.44)$) {\n};
+  }
+  \draw[dead] ($(q0)+(-0.26,-0.26)$) -- ($(q0)+(0.26,0.26)$);
+  \draw[dead] ($(q0)+(-0.26,0.26)$) -- ($(q0)+(0.26,-0.26)$);
+  \fill[cG!30] (-0.1,-0.1) rectangle (0.1,0.1);
+  \draw[vec, cA] (-1.45,-1.25) -- (-1.0,-1.25) node[right, lbl] {$\vect b_1$};
+  \draw[vec, cA] (-1.45,-1.25) -- (-1.45,-0.8) node[above, lbl] {$\vect b_2$};
+  \node[font=\small, align=center] at (0,-1.95)
+    {quadrotor, rotor 1 lost\\ \footnotesize 3 inputs, 4 wrench components};
+\end{scope}
+% ---- hexacopter, an opposite pair lost ---------------------------------------
+\begin{scope}[shift={(3.4,0)}]
+  \foreach \i/\s in {0/1,1/-1,2/1,3/-1,4/1,5/-1} {
+    \pgfmathsetmacro\ang{60*\i+30}
+    \coordinate (x\i) at (\ang:1);
+    \draw[line width=1.4pt, cG!70!black] (0,0) -- (x\i);
+    \pic at (x\i) {rotor};
+    \ifnum\s=1
+      \draw[ccw] ($(x\i)+(-60:0.19)$) arc[start angle=-60, end angle=200, radius=0.19];
+    \else
+      \draw[ccw] ($(x\i)+(240:0.19)$) arc[start angle=240, end angle=-20, radius=0.19];
+    \fi
+    \pgfmathtruncatemacro\n{\i+1}
+    \node[lbl] at ($(x\i)+(\ang:0.44)$) {\n};
+  }
+  \foreach \i in {0,3} {
+    \draw[dead] ($(x\i)+(-0.26,-0.26)$) -- ($(x\i)+(0.26,0.26)$);
+    \draw[dead] ($(x\i)+(-0.26,0.26)$) -- ($(x\i)+(0.26,-0.26)$);
+  }
+  \draw[construct] (x0) -- (x3);
+  \fill[cG!30] (-0.1,-0.1) rectangle (0.1,0.1);
+  \draw[vec, cA] (-1.45,-1.25) -- (-1.0,-1.25) node[right, lbl] {$\vect b_1$};
+  \draw[vec, cA] (-1.45,-1.25) -- (-1.45,-0.8) node[above, lbl] {$\vect b_2$};
+  \node[font=\small, align=center] at (0,-1.95)
+    {hexacopter, rotors 1 and 4 lost\\ \footnotesize
+     $\rank\mat M = 3$: $\ \tau_x-\sqrt3\,\tau_y-\tfrac{k_T L}{k_Q}\tau_z=0$};
+\end{scope}
+\end{tikzpicture}

@@ -59,6 +59,20 @@ needed to carry a given thrust, this determines the entire shape of the
 machine: large, fat-bladed, slowly turning rotors.
 \end{observation}
 
+\begin{figure}[tbp]
+\centering
+\input{figures/sec09_sixth}
+\caption{The source model \cref{eq:splmodel} at the design's thrust per rotor.
+On a logarithmic tip-speed axis the level is a straight line of
+\SI{60}{\decibel} per decade, so halving the tip speed buys \SI{18.1}{\decibel}
+wherever one starts. The design turns at \SI{\cVtip}{\metre\per\second};
+carrying the same thrust at a camera drone's tip speed would cost about
+\SI{24}{\decibel}, the difference between a quiet office and a raised voice.}
+\label{fig:sixth}
+\end{figure}
+
+\Cref{fig:sixth} draws \cref{eq:splmodel} at the design's thrust.
+
 \subsection{Sound power against sound pressure}
 
 \begin{definition}
@@ -92,6 +106,20 @@ that $10\log_{10}(I/I_0) = L_p$ with $I_0 = p_0^2/(\rho c_0)$ to within
 \SI{0.1}{\decibel} at standard conditions. Taking logarithms gives
 \cref{eq:lwlp}; substituting $Q=2$, $r=1$ gives \cref{eq:eightdb}.
 \end{proof}
+
+\Cref{fig:hemisphere} is the geometry behind $Q=2$.
+
+\begin{figure}[tbp]
+\centering
+\input{figures/sec09_hemisphere}
+\caption{Sound power against sound pressure, \cref{prop:lwlp}. A source on a
+reflecting plane spreads its power $W$ over hemispherical wavefronts of area
+$2\pi r^2$, which is the directivity $Q=2$ of \cref{eq:lwlp}. At one metre that
+area is $2\pi\,\si{\metre\squared}$, and $10\log_{10}2\pi=\SI{7.98}{\decibel}$
+is the whole difference between a declared sound power level and the pressure
+level a listener at one metre hears.}
+\label{fig:hemisphere}
+\end{figure}
 
 \begin{remark}[A trap worth naming]
 European regulation 2019/945 requires manufacturers of unmanned aircraft to
@@ -155,19 +183,33 @@ own ear.
 For an ordinary furnished room, $\bar\alpha\approx0.20$ and $r_c$ is under a
 metre, which is smaller than the standoff at which such a machine is useful.
 The user therefore sits close to the boundary between the two regimes and
-receives both contributions.
+receives both contributions (\cref{fig:room}).
+
+\begin{figure}[tbp]
+\centering
+\input{figures/sec09_room}
+\caption{\Cref{eq:roomlevel} for the design in the reference
+$\cRoomL\times\cRoomW\times\SI{\cCeiling}{\metre}$ room with
+$\bar\alpha=\cAlphaRoom$. The direct field falls by \SI{6}{\decibel} per
+doubling of distance, the reverberant field does not fall at all, and the two
+are equal at the critical distance $r_c=\SI{\cRc}{\metre}$ of
+\cref{eq:critdist}. The user at \SI{\cStandoff}{\metre} is just past it and
+hears \SI{\cSplEar}{\decibel A}, \SI{2.8}{\decibel} above the free-field figure
+at one metre; the rest of the room settles at the reverberant level of about
+\SI{\cSplFar}{\decibel A}.}
+\label{fig:room}
+\end{figure}
 
 \subsection{Weighting and tonal content}
 
 The A-weighting of IEC 61672 is
-\begin{equation}
-  R_A(f) = \frac{12194^2 f^4}
+\begin{align}
+  R_A(f) &= \frac{12194^2 f^4}
     {\big(f^2+20.6^2\big)\sqrt{\big(f^2+107.7^2\big)\big(f^2+737.9^2\big)}
-     \big(f^2+12194^2\big)},
-  \quad
-  A(f) = 20\log_{10}R_A(f) + 2.00 .
+     \big(f^2+12194^2\big)}, \nonumber\\
+  A(f) &= 20\log_{10}R_A(f) + 2.00 .
   \label{eq:aweight}
-\end{equation}
+\end{align}
 
 The blade passage frequency is
 \begin{equation}
@@ -180,7 +222,7 @@ The blade passage frequency is
 \emph{annoying} rather than merely loud is tonal content at
 $f_{\mathrm{BPF}}$ and its harmonics. For the designs of \cref{sec:results},
 $f_{\mathrm{BPF}}\approx\SI{\rBpf}{\hertz}$, which \cref{eq:aweight} discounts by
-about \SI{38}{\decibel}. That is a genuine perceptual benefit of turning slowly
+about \SI{38}{\decibel} (\cref{fig:aweight}). That is a genuine perceptual benefit of turning slowly
 and it is also a warning: the acoustic energy has not gone anywhere. It has
 moved to low frequency, where rooms absorb poorly, where Sabine's diffuse-field
 assumption fails because the modal density is low, and where humans report a
@@ -200,3 +242,16 @@ is of order \SI{200}{\hertz} for a domestic room, which is precisely where the
 first several blade harmonics lie. \Cref{prop:room} is therefore being applied
 slightly outside its domain of validity for exactly the components that matter
 most perceptually. This is stated as a limitation rather than repaired.
+
+\begin{figure}[tbp]
+\centering
+\input{figures/sec09_aweight}
+\caption{The A-weighting \cref{eq:aweight} with the design's blade passage
+frequency and its first five harmonics. The fundamental at
+\SI{\cBpf}{\hertz} is weighted down by \SI{37.5}{\decibel}, and every harmonic
+up to the sixth lies in the shaded band below the Schroeder frequency
+\cref{eq:schroeder}, where the diffuse-field model of \cref{prop:room} does not
+hold. The A-weighted broadband figure is therefore least informative about
+exactly the tonal components a listener notices.}
+\label{fig:aweight}
+\end{figure}

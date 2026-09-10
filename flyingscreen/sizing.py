@@ -156,7 +156,11 @@ def solve_power_closure(alpha: float, beta: float, M0: float, q: float) -> Closu
             reason="alpha <= 0: structure plus propulsion already consume the whole mass budget")
 
     def F(m: float) -> float:
-        return alpha * m - beta * m ** q
+        # m^q written as m * m^(q-1) so that a huge m with q close to one
+        # does not overflow before the difference is formed.
+        if m <= 0.0:
+            return 0.0
+        return m * (alpha - beta * math.exp((q - 1.0) * math.log(m)))
 
     # ---- linear case ------------------------------------------------------
     if abs(q - 1.0) < 1e-12:
@@ -173,11 +177,31 @@ def solve_power_closure(alpha: float, beta: float, M0: float, q: float) -> Closu
 
     # ---- folding case, q > 1 ---------------------------------------------
     if q > 1.0:
-        m_star = (alpha / (q * beta)) ** (1.0 / (q - 1.0))
+        # m* = (alpha / (q beta))^(1/(q-1)) in log space: as q -> 1+ the
+        # exponent grows without bound and the fold recedes to infinity,
+        # which is the p -> 1- limit of the endurance-wall proposition.
+        log_m_star = math.log(alpha / (q * beta)) / (q - 1.0)
+        if log_m_star > _LOG_M_CAP:
+            # F is increasing up to the (unrepresentable) fold, and there
+            # F(m) is close to alpha m, so the light root is near M0/alpha.
+            # Bracket it from there outward: bisecting [1e-12, 1e250] in
+            # linear space cannot resolve a root of order one.
+            hi = 2.0 * M0 / alpha
+            while F(hi) - M0 <= 0.0 and math.log(hi) < _LOG_M_CAP:
+                hi *= 2.0
+            m_light = _brentq(lambda m: F(m) - M0, 1e-12, hi)
+            return ClosureResult(True, m_light=m_light, m_heavy=None,
+                                 m_star=math.inf, M0_max=math.inf, margin=math.inf,
+                                 utilisation=0.0, has_fold=True,
+                                 reason="the fold lies beyond %.0e kg" % math.exp(_LOG_M_CAP))
+        # The mirror case: with alpha < q beta the fold mass underflows as
+        # q -> 1+, the critical load is zero, and no design exists.
+        m_star = math.exp(log_m_star)
         M0_max = F(m_star)
         if M0 > M0_max:
             return ClosureResult(False, m_star=m_star, M0_max=M0_max,
-                                 margin=M0_max - M0, utilisation=M0 / M0_max,
+                                 margin=M0_max - M0,
+                                 utilisation=M0 / M0_max if M0_max > 0.0 else math.inf,
                                  has_fold=True,
                                  reason="no equilibrium mass exists: fixed load exceeds the fold")
         m_light = _brentq(lambda m: F(m) - M0, 1e-12, m_star)
@@ -192,17 +216,27 @@ def solve_power_closure(alpha: float, beta: float, M0: float, q: float) -> Closu
                              utilisation=M0 / M0_max, has_fold=True)
 
     # ---- q < 1: monotone increasing beyond the minimum --------------------
-    m_min = (q * beta / alpha) ** (1.0 / (1.0 - q))
+    log_m_min = math.log(q * beta / alpha) / (1.0 - q)
+    if log_m_min >= _LOG_M_CAP:
+        # A root exists for every load when q < 1, but here it lies beyond
+        # any mass the solver represents. Say so rather than overflow.
+        return ClosureResult(True, m_light=math.inf, has_fold=False,
+                             reason="the root lies beyond %.0e kg" % math.exp(_LOG_M_CAP))
+    m_min = math.exp(log_m_min)
     lo = m_min
     hi = max(m_min * 2.0, 1.0)
-    for _ in range(300):
-        if F(hi) - M0 > 0.0:
-            break
+    while F(hi) - M0 <= 0.0:
+        if math.log(hi) >= _LOG_M_CAP:
+            return ClosureResult(True, m_light=math.inf, has_fold=False,
+                                 reason="the root lies beyond %.0e kg" % math.exp(_LOG_M_CAP))
         hi *= 1.7
-    else:
-        return ClosureResult(False, has_fold=False, reason="no root found below 1e300 kg")
     m = _brentq(lambda mm: F(mm) - M0, lo, hi)
     return ClosureResult(True, m_light=m, has_fold=False)
+
+
+# Largest mass the closed-form solvers work with, as a logarithm. Masses
+# beyond it are reported as infinite rather than overflowing.
+_LOG_M_CAP = math.log(1e250)
 
 
 def _brentq(f, a: float, b: float, tol: float = 1e-12, maxiter: int = 200) -> float:
@@ -428,8 +462,9 @@ def closure_curve(p: Dict[str, float], model: str = "fixed_area",
         alpha, beta_q, q = c.alpha, c.beta_q, c.q
 
     res = solve_power_closure(alpha, beta_q, c.M0, q)
-    if q > 1.0 and alpha > 0.0 and beta_q > 0.0:
-        m_star = (alpha / (q * beta_q)) ** (1.0 / (q - 1.0))
+    if q > 1.0 and alpha > 0.0 and beta_q > 0.0 and res.m_star is not None \
+            and math.isfinite(res.m_star):
+        m_star = res.m_star
         top = m_star * 2.4 if m_max is None else m_max
     else:
         base = res.m_light if res.m_light else max(c.M0 / max(alpha, 1e-6), 1.0)

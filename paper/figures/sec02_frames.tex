@@ -1,0 +1,74 @@
+% Frames and geometry. Oblique view from the user's side: body x (b1) points
+% toward the user along the screen normal, z (b3) up. Drawing unit 0.2 m,
+% dimensions of the design of the design study; the user is not to scale.
+\begin{tikzpicture}[x={(-0.57cm,-0.47cm)}, y={(0.82cm,-0.33cm)},
+                    z={(0cm,0.82cm)}, scale=1.15, line join=round]
+  \def\L{1.36}      % rotor hub offset along each body axis, 0.272 m
+  \def\Rr{1.23}     % rotor radius, 0.246 m
+  \def\Sw{0.86}     % half screen width, 0.1725 m
+  \def\Sb{0.18}     % screen lower edge above the rotor plane
+  \def\St{1.15}     % screen upper edge
+  \def\Sc{0.665}    % screen centre height
+  % ---------------- rear rotors (x < 0), drawn first ----------------------
+  \begin{scope}[canvas is xy plane at z=0]
+    \draw[cA, fill=cA!7] (-\L, \L) circle (\Rr);
+    \draw[cA, fill=cA!7] (-\L,-\L) circle (\Rr);
+    \draw[cA, -{Stealth[length=1.8mm]}] ([shift={(-\L,\L)}]150:0.75) arc (150:60:0.75);
+    \draw[cA, -{Stealth[length=1.8mm]}] ([shift={(-\L,-\L)}]200:0.75) arc (200:290:0.75);
+    \draw[line width=1.6pt, black!70] (0,0) -- (-\L, \L);
+    \draw[line width=1.6pt, black!70] (0,0) -- (-\L,-\L);
+    \fill[black!70] (-\L, \L) circle (0.09);
+    \fill[black!70] (-\L,-\L) circle (0.09);
+  \end{scope}
+  \node[lbl] at (-\L-0.2, \L+\Rr+0.3, 0) {2};
+  \node[lbl] at (-\L-0.2,-\L-\Rr-0.3, 0) {3};
+  % ---------------- body z axis, behind the translucent screen ------------
+  \draw[vec, cA] (0,0,0) -- (0,0,2.45) node[above, lbl] {$\vect b_3$};
+  \node[lbl, cA] at (0,0.42,2.05) {$\mathcal B$};
+  % ---------------- the display --------------------------------------------
+  \draw[fill=cB!18, fill opacity=0.9, draw=cB, line width=0.8pt]
+      (0,-\Sw,\Sb) -- (0,\Sw,\Sb) -- (0,\Sw,\St) -- (0,-\Sw,\St) -- cycle;
+  \node[lbl, cB!80!black, anchor=south west, inner sep=1pt] at (0,0.35,\St) {display};
+  % gimbal hinge on the lower edge, post down to the hub
+  \draw[line width=1.8pt, black!75] (0,-0.32,\Sb) -- (0,0.32,\Sb);
+  \draw[line width=0.8pt, black!75] (0,0,0.02) -- (0,0,\Sb);
+  \draw[cG, line width=0.4pt] (0,-0.32,\Sb) -- (0,-1.5,0.62)
+      node[left, lbl, black, inner sep=1pt] {gimbal};
+  % ---------------- hub and front rotors ----------------------------------
+  \begin{scope}[canvas is xy plane at z=0]
+    \draw[line width=1.6pt, black!70] (0,0) -- (\L, \L);
+    \draw[line width=1.6pt, black!70] (0,0) -- (\L,-\L);
+    \fill[black!80] (0,0) circle (0.2);
+    \draw[cA, fill=cA!7, fill opacity=0.92] (\L, \L) circle (\Rr);
+    \draw[cA, fill=cA!7, fill opacity=0.92] (\L,-\L) circle (\Rr);
+    \fill[black!70] (\L, \L) circle (0.09);
+    \fill[black!70] (\L,-\L) circle (0.09);
+    \draw[cA, -{Stealth[length=1.8mm]}] ([shift={(\L,\L)}]-60:0.75) arc (-60:30:0.75);
+    \draw[cA, -{Stealth[length=1.8mm]}] ([shift={(\L,-\L)}]20:0.75) arc (20:-70:0.75);
+    % arm angle psi_1 = 45 degrees from b1
+    \draw[cG] (0.9,0) arc (0:45:0.9);
+  \end{scope}
+  \node[lbl, cG] at (1.18,0.45,0) {$\psi_1$};
+  \node[lbl] at ( \L+0.2, \L+\Rr+0.3, 0) {1};
+  \node[lbl] at ( \L+0.2,-\L-\Rr-0.3, 0) {4};
+  % ---------------- body x and y axes --------------------------------------
+  \draw[vec, cA] (0,0,0) -- (3.3,0,0) node[below left, lbl, inner sep=1pt] {$\vect b_1$};
+  \draw[vec, cA] (0,0,0) -- (0,3.0,0) node[right, lbl] {$\vect b_2$};
+  % gravity
+  \draw[vec, cD] (0,0,-0.12) -- (0,0,-1.35) node[left, lbl] {$-mg\,\vect e_3$};
+  % ---------------- the user ----------------------------------------------
+  \coordinate (eye) at (5.4,0,\Sc);
+  \draw[construct] (eye) -- (0,0,\Sc);
+  \node[lbl, cG, above] at (3.5,0,\Sc) {$d$};
+  \node[circle, draw=black!70, fill=black!5, minimum size=0.95cm, line width=0.7pt]
+      (head) at (eye) {};
+  \fill[black!70] ($(eye)+(0.14,0.05)$) circle (0.8pt);
+  \node[lbl, below=1pt of head, align=center] {user\\(not to scale)};
+  % ---------------- inertial frame and position ----------------------------
+  \coordinate (I) at (-1.5,4.7,-2.3);
+  \draw[vec, black!70] (I) -- ++(1.1,0,0) node[below left, lbl, inner sep=1pt] {$\vect e_1$};
+  \draw[vec, black!70] (I) -- ++(0,1.1,0) node[right, lbl] {$\vect e_2$};
+  \draw[vec, black!70] (I) -- ++(0,0,1.1) node[above, lbl] {$\vect e_3$};
+  \node[lbl, below right, inner sep=2pt] at (I) {$\mathcal I$};
+  \draw[vec, cG, dashed] (I) -- (-0.05,0.14,-0.05) node[pos=0.5, below right, lbl, inner sep=1pt] {$\vect r$};
+\end{tikzpicture}

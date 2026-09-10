@@ -1,0 +1,27 @@
+% (a) The counterexample S(m) = 4 / (1 + exp(-4 (m - 3))), m_fix + mu = 1:
+% m = 1 + S(m) at 1.0013, 3 and 4.9987; S'(3) = 4 > 1. (b) The component
+% models of the design at the design battery (gen_b.inner): slope 0.13 to 0.23.
+\begin{tikzpicture}
+\begin{groupplot}[group style={group size=2 by 1, horizontal sep=1.6cm},
+  halfplot, height=6.0cm, width=0.46\linewidth]
+\nextgroupplot[xlabel={$m$}, ylabel={$\mfix+S(m)+\mu$},
+  xmin=0, xmax=6, ymin=0, ymax=6, domain=0:6, samples=200,
+  title={(a) monotone, bounded, three roots}]
+  \addplot[cG, line width=0.6pt] {x};
+  \addplot[cB] {1 + 4/(1 + exp(-4*(x - 3)))};
+  \addplot[only marks, mark=*, mark size=2pt, cB]
+    coordinates {(1.0013,1.0013) (3,3) (4.9987,4.9987)};
+  \node[lbl, anchor=north west] at (axis cs:1.05,0.95) {$1.001$};
+  \node[lbl, anchor=north west] at (axis cs:3.05,2.9) {$3$: $S'=4>1$};
+  \node[lbl, anchor=north west] at (axis cs:5.02,4.9) {$4.999$};
+\nextgroupplot[xlabel={$m$ [\si{\kilo\gram}]},
+  ylabel={$\mfix+S(m)+\mu$ [\si{\kilo\gram}]},
+  xmin=0.4, xmax=3.2, ymin=0.4, ymax=3.2, domain=0.4:3.2,
+  title={(b) component models: $0.13\le S'\le0.23$}]
+  \addplot[cG, line width=0.6pt] {x};
+  \addplot[cA] table[x=m, y=phi] {results/fig/b_inner.dat};
+  \addplot[only marks, mark=*, mark size=2pt, cA] table[x=m, y=phi]
+    {results/fig/b_inner_fp.dat};
+  \node[lbl, anchor=north west] at (axis cs:1.75,1.68) {$\mathcal G(\mu)$};
+\end{groupplot}
+\end{tikzpicture}

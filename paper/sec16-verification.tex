@@ -67,7 +67,7 @@ inverting \cref{eq:splmodel} gives $C$ for each aircraft.
 \caption{Calibration of the acoustic anchor. Hover rotor speeds are
 manufacturer figures; tip speed and thrust per rotor follow from geometry and
 mass. The four aircraft span a factor of $3.6$ in mass and agree on $C$ to
-\SI{1.4}{\decibel}.}
+\SI{1.5}{\decibel}.}
 \label{tab:acoustic}
 \begin{tabular}{@{}lrrrrrr@{}}
 \toprule
@@ -83,10 +83,23 @@ DJI Mavic 2 Pro & \SI{0.907}{\kilo\gram} & \SI{2.22}{\newton} & \SI{67.9}{\metre
 \end{tabular}
 \end{table}
 
-\Cref{tab:acoustic} gives $C = 82.9$ with a spread of \SI{1.4}{\decibel}. The
+\Cref{tab:acoustic} gives $C = 82.9$ with a spread of \SI{1.5}{\decibel}. The
 consistency across a $3.6\times$ mass range is strong evidence that the
 functional form \cref{eq:splmodel} is right, and that the original anchor was
-\SI{14}{\decibel} optimistic.
+\SI{14}{\decibel} optimistic. \Cref{fig:acoustic} shows the four values against
+the one first assigned.
+
+\begin{figure}[tbp]
+\centering
+\input{figures/sec16_acoustic}
+\caption{The acoustic anchor $C$ recovered from the declared sound power of
+four aircraft through \cref{eq:eightdb,eq:splmodel}, against aircraft mass.
+The four values lie in the narrow band shaded across a factor of $3.6$ in
+mass, about the mean $C=82.9$. The value first assigned by judgement, $C=68$,
+lies below every one of them by the length of the arrow, an error larger than
+the effect of any design choice in \cref{sec:results}.}
+\label{fig:acoustic}
+\end{figure}
 
 \begin{finding}
 Fourteen decibels is not a refinement. It is the difference between a machine
@@ -131,7 +144,19 @@ pessimistic constant the motor mass penalty overwhelmed the induced-power
 benefit of a larger rotor, and the optimum diameter sat on the lower bound of
 the search box. After recalibration a genuine interior optimum appears, which
 is the physically expected behaviour, and the test suite now asserts its
-existence.
+existence. \Cref{fig:motorcal} shows the calibrated law against the catalogue.
+
+\begin{figure}[tbp]
+\centering
+\input{figures/sec16_motor}
+\caption{The calibrated motor-mass model \cref{eq:motormass} against catalogue
+motors, on logarithmic axes on which the model is a straight line of slope
+$1/(1+e)=0.77$. The red connectors are the model errors of \cref{tab:motor}:
+small at the size of motor this design uses (the green point, the design's
+\SI{61}{\gram} motor at its torque for maximum thrust) and conservative at the
+large end.}
+\label{fig:motorcal}
+\end{figure}
 
 \subsection{Errors found by the model itself}
 

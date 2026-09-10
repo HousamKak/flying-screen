@@ -1,0 +1,24 @@
+% Critical slowing down for the worked example. (a) the linear rate
+% Phi'(m_-) = 1 - F'(m_-) against the utilisation M0 / M0max; (b) the number
+% of plain iterations from m_0 = 0 to a relative error of 1e-6 against the
+% distance to the fold 1 - M0/M0max. Near the fold F'(m_-) ~ sqrt(2 K M0max g)
+% with g = 1 - M0/M0max, so the count grows like g^(-1/2).
+\begin{tikzpicture}
+\begin{groupplot}[group style={group size=2 by 1, horizontal sep=1.6cm},
+  halfplot, height=5.6cm, width=0.46\linewidth]
+\nextgroupplot[xlabel={utilisation $\Mzero/\Mmax$},
+  ylabel={rate $\Phi'(m_-)=1-F'(m_-)$}, xmin=0, xmax=1, ymin=0.35, ymax=1.02,
+  title={(a) contraction factor}]
+  \addplot[cA] table[x=ratio, y=rate] {results/fig/b_slowdown.dat};
+  \draw[cD, dashed] (axis cs:0,1) -- (axis cs:1,1);
+  \node[lbl, cD, anchor=north west] at (axis cs:0.03,0.995) {no contraction at the fold};
+\nextgroupplot[xmode=log, ymode=log,
+  xlabel={distance to the fold $1-\Mzero/\Mmax$},
+  ylabel={iterations to $10^{-6}$}, xmin=1e-5, xmax=1, ymin=10, ymax=3e4,
+  title={(b) cost of convergence}, x dir=reverse]
+  \addplot[cA, mark=*, mark size=0.9pt] table[x=gap, y=iters] {results/fig/b_slowdown.dat};
+  \addplot[cG, dashed, domain=1e-5:0.3, samples=20] {37.6*x^(-0.5)};
+  \node[lbl, cG, anchor=north west] at (axis cs:0.9,2e4)
+    {dashed: $\propto(1-\Mzero/\Mmax)^{-1/2}$};
+\end{groupplot}
+\end{tikzpicture}

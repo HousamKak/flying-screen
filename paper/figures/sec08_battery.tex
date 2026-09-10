@@ -1,0 +1,26 @@
+\input{results/fig/c_geom}%
+% The two battery requirements of eq:batmax along the closed design as the
+% session length varies: power-limited short sessions, energy-limited long.
+\begin{tikzpicture}
+  \begin{axis}[paperplot, height=5.6cm,
+      xlabel={session length $t_f$ [\si{\minute}]},
+      ylabel={mass [\si{\kilo\gram}]},
+      xmin=0, xmax=70, ymin=0, ymax=3.8,
+      legend pos=north west]
+    \fill[cB!10] (axis cs:0,0) rectangle (axis cs:\cTfCross,3.8);
+    \node[lbl, cB, align=center] at (axis cs:0.5*\cTfCross,0.95)
+      {power-limited};
+    \node[lbl, cA, align=center] at (axis cs:48,3.55) {energy-limited};
+    \addplot[cG, dashed] table[x=tf, y=m] {results/fig/c_battery.dat};
+    \addlegendentry{gross mass $m$}
+    \addplot[black!25, line width=4pt] table[x=tf, y=mbat] {results/fig/c_battery.dat};
+    \addlegendentry{battery, $\max\{\cdot\}$}
+    \addplot[cA] table[x=tf, y=menergy] {results/fig/c_battery.dat};
+    \addlegendentry{energy, $E_{\mathrm{mission}}/\eb(1-\varsigma)$}
+    \addplot[cB] table[x=tf, y=mpower] {results/fig/c_battery.dat};
+    \addlegendentry{power, $\Pelec^{\max}/p_b$}
+    \draw[construct] (axis cs:\cTf,0) -- (axis cs:\cTf,3.8);
+    \addplot[only marks, mark=*, mark size=2pt, cA] coordinates {(\cTf,\cMbat)};
+    \node[lbl, anchor=south east] at (axis cs:\cTf-0.5,0.42) {design session};
+  \end{axis}
+\end{tikzpicture}

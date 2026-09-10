@@ -1,0 +1,37 @@
+% F(m) = alpha m - beta m^{3/2} for the worked example of sec05
+% (alpha = 0.6366, beta = 0.2271): m* = 3.4923, M0max = 0.7411, F = 0 at
+% m = (alpha/beta)^2 = 7.858. Roots at M0 = 0.45: 1.1426 and 6.1571.
+\begin{tikzpicture}
+\begin{axis}[paperplot, height=6.2cm,
+  xlabel={gross mass $m$ [\si{\kilo\gram}]},
+  ylabel={$F(m)=\alpha m-\beta m^{3/2}$ [\si{\kilo\gram}]},
+  xmin=0, xmax=8.4, ymin=-0.42, ymax=1.12, domain=0:8.4, samples=220,
+  clip=false]
+  \addplot[cA, name path=F] {0.6366*x - 0.2271*x^1.5};
+  \addplot[cC, dashed, name path=L1] {0.45};
+  \addplot[cB, dashed] {0.7411};
+  \addplot[cD, dashed] {0.95};
+  \addplot[cC!22, draw=none] fill between[of=F and L1,
+    soft clip={domain=1.1426:6.1571}];
+  % the roots and the fold
+  \draw[construct] (axis cs:1.1426,0.45) -- (axis cs:1.1426,-0.42);
+  \draw[construct] (axis cs:3.4923,0.7411) -- (axis cs:3.4923,-0.42);
+  \draw[construct] (axis cs:6.1571,0.45) -- (axis cs:6.1571,-0.42);
+  \addplot[only marks, mark=*, mark size=1.8pt, cA]
+    coordinates {(1.1426,0.45) (6.1571,0.45)};
+  \addplot[only marks, mark=*, mark size=2.0pt, cB]
+    coordinates {(3.4923,0.7411)};
+  \node[lbl, anchor=south west] at (axis cs:1.1426,-0.40) {$m_-$};
+  \node[lbl, anchor=south west] at (axis cs:3.4923,-0.40) {$m^*$};
+  \node[lbl, anchor=south west] at (axis cs:6.1571,-0.40) {$m_+$};
+  % the three loads
+  \node[lbl, anchor=south west, cD] at (axis cs:5.0,0.95)
+    {$\Mzero>\Mmax$: no root};
+  \node[lbl, anchor=south west, cB] at (axis cs:5.0,0.7411)
+    {$\Mzero=\Mmax$: one double root};
+  \node[lbl, anchor=south west, cC!70!black, align=left] at (axis cs:6.35,0.46)
+    {$\Mzero<\Mmax$:\\two roots};
+  \node[lbl, cC!60!black] at (axis cs:3.5,0.58) {$F(m)>\Mzero$};
+  \node[lbl, anchor=west, cA] at (axis cs:7.9,0.05) {$F$};
+\end{axis}
+\end{tikzpicture}

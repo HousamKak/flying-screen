@@ -94,7 +94,8 @@ def simulate_flight(p: Dict[str, float], m: float, m_bat: Optional[float] = None
                     dt: float = 0.004, sample_hz: float = 25.0,
                     settle: float = 3.0, seed: int = 12345,
                     veh: Optional[Vehicle] = None,
-                    governor: Optional[Dict[str, float]] = None) -> SimResult:
+                    governor: Optional[Dict[str, float]] = None,
+                    substeps: int = 1) -> SimResult:
     """
     Integrate a window of the mission with RK4 at fixed step.
 
@@ -265,12 +266,18 @@ def simulate_flight(p: Dict[str, float], m: float, m_bat: Optional[float] = None
                                   math.degrees(yaw)])
 
         # -- advance to t + dt with the command held -----------------------
+        # The controller is sampled once per dt; `substeps` RK4 steps of
+        # dt / substeps integrate the plant under that held command, which
+        # refines the integration without changing the sampled-data loop.
         u_om, u_g = out.Om_cmd, out.tau_g
-        k1 = rhs(t, x, u_om, u_g)
-        k2 = rhs(t + 0.5 * dt, x + 0.5 * dt * k1, u_om, u_g)
-        k3 = rhs(t + 0.5 * dt, x + 0.5 * dt * k2, u_om, u_g)
-        k4 = rhs(t + dt, x + dt * k3, u_om, u_g)
-        x = normalize_quat(x + (dt / 6.0) * (k1 + 2.0 * k2 + 2.0 * k3 + k4))
+        h = dt / max(int(substeps), 1)
+        for j in range(max(int(substeps), 1)):
+            tj = t + j * h
+            k1 = rhs(tj, x, u_om, u_g)
+            k2 = rhs(tj + 0.5 * h, x + 0.5 * h * k1, u_om, u_g)
+            k3 = rhs(tj + 0.5 * h, x + 0.5 * h * k2, u_om, u_g)
+            k4 = rhs(tj + h, x + h * k3, u_om, u_g)
+            x = normalize_quat(x + (h / 6.0) * (k1 + 2.0 * k2 + 2.0 * k3 + k4))
         if not np.all(np.isfinite(x)):
             return SimResult(ok=False, reason="integration diverged: the controller "
                                               "lost the vehicle at t = %.2f s" % t)
@@ -317,6 +324,7 @@ def simulate_flight(p: Dict[str, float], m: float, m_bat: Optional[float] = None
         endurance_est=veh.E_max / max(P_mean, 1e-9),
         overhead=P_mean / max(P_hover_ref, 1e-9),
         config=dict(mission=mission_kind, t_window=t_window, dt=dt, settle=settle,
+                    substeps=max(int(substeps), 1),
                     seed=seed, sample_hz=sample_hz, governor=gov_cfg,
                     integrator="RK4, fixed step, zero-order-hold control",
                     power_model="hover-calibrated k_P Omega^3, no inflow correction"),

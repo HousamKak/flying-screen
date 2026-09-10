@@ -1,0 +1,34 @@
+% The closure eq:closure as supply against demand, worked-example
+% coefficients alpha = 0.6366, beta = 0.2271. The design exists where the
+% line alpha m meets the curve M0 + beta m^{3/2}.
+\begin{tikzpicture}
+\begin{axis}[paperplot, height=6.2cm, xmin=0, xmax=9, ymin=0, ymax=6.2,
+    domain=0:9, samples=200,
+    xlabel={gross mass $m$ [\si{\kilo\gram}]},
+    ylabel={mass [\si{\kilo\gram}]},
+    legend pos=north west]
+  \addplot[cA, line width=1.3pt, name path=S] {0.6366*x};
+  \addlegendentry{supply $\alpha m$}
+  \addplot[cB, name path=D] {0.2271*x^1.5 + 0.40};
+  \addlegendentry{demand, $\Mzero = 0.40$}
+  \addplot[cB!70, dashed] {0.2271*x^1.5 + 0.741};
+  \addlegendentry{demand, $\Mzero = \Mmax$}
+  \addplot[cD, dotted, line width=1.3pt] {0.2271*x^1.5 + 1.00};
+  \addlegendentry{demand, $\Mzero = 1.00$}
+  \addplot[cC!22, forget plot] fill between[of=S and D, soft clip={domain=0.9682:6.388}];
+  % roots and the tangency
+  \addplot[only marks, mark=*, mark size=2.2pt, cA, forget plot]
+      coordinates {(0.9682,0.6163) (6.388,4.0666)};
+  \addplot[only marks, mark=o, mark size=2.4pt, cB, line width=0.9pt, forget plot]
+      coordinates {(3.492,2.2232)};
+  \draw[construct] (axis cs:3.492,0) -- (axis cs:3.492,2.2232);
+  \draw[construct] (axis cs:0.9682,0) -- (axis cs:0.9682,0.6163);
+  \draw[construct] (axis cs:6.388,0) -- (axis cs:6.388,4.0666);
+  \node[lbl, anchor=south west, inner sep=1.5pt] at (axis cs:0.9682,0.05) {$m_-$};
+  \node[lbl, anchor=south west, inner sep=1.5pt] at (axis cs:3.492,0.05) {$m^*$};
+  \node[lbl, anchor=south west, inner sep=1.5pt] at (axis cs:6.388,0.05) {$m_+$};
+  \node[lbl, cC!55!black, anchor=west, align=left, fill=white, inner sep=1.2pt] (sp)
+      at (axis cs:4.3,0.95) {surplus: $\alpha m > \Mzero + \beta m^{3/2}$};
+  \draw[cC!55!black, line width=0.4pt] (sp.west) -- (axis cs:3.0,1.62);
+\end{axis}
+\end{tikzpicture}
