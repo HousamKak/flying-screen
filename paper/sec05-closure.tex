@@ -1,0 +1,249 @@
+﻿\section{The mass closure}
+\label{sec:closure}
+
+\subsection{Decomposition}
+
+\begin{definition}[Mass budget]
+The gross mass is partitioned as
+\begin{equation}
+  m = \mfix + \mstr + \mprop + \mbat ,
+  \label{eq:budget}
+\end{equation}
+where $\mfix$ is the payload and avionics that do not scale with aircraft size
+(display, driver electronics, computer, camera, gimbal), $\mstr$ is the
+structure, $\mprop$ is motors, speed controllers and propellers, and $\mbat$ is
+the battery pack.
+\end{definition}
+
+\Cref{eq:budget} is an identity. It becomes an equation, and a nontrivial one,
+once the three terms on the right that depend on $m$ are made explicit. The
+essential point is that they depend on $m$ in different ways, and lumping them
+together, as one is tempted to do by writing a single ``structural fraction'',
+destroys the structure of the problem.
+
+\subsection{Propulsion mass: sized by peak thrust}
+
+\begin{definition}[Thrust margin]
+The propulsion system is sized so that the maximum total thrust is
+\begin{equation}
+  T_{\max} = \lambda\, m g, \qquad \lambda > 1 .
+  \label{eq:lambda}
+\end{equation}
+$\lambda$ is the ratio of maximum thrust to weight; $\lambda = 2$ means the
+vehicle hovers at half throttle.
+\end{definition}
+
+\begin{model}[Specific thrust]
+\label{mod:sm}
+Let $S_m \coloneqq T_{\max}/\mprop$ be the specific thrust of the complete
+propulsion system, in \si{\newton\per\kilo\gram}. Then
+\begin{equation}
+  \mprop = \frac{T_{\max}}{S_m} = \frac{\lambda g}{S_m}\, m
+         \eqqcolon \gamma_m\, m .
+  \label{eq:mprop}
+\end{equation}
+\end{model}
+
+Propulsion mass is therefore \emph{linear} in gross mass. This is worth
+emphasising because it is the coupling most people worry about first, and it is
+benign: it consumes a fixed fraction of the mass budget and produces a runaway
+only in the degenerate case $\gamma_m \ge 1$.
+
+\Cref{mod:sm} is a lumped model. \Cref{sec:components} replaces it with motor
+mass derived from the torque the rotor demands, at which point $S_m$ becomes an
+output; the engine reports both so the assumption can be audited.
+
+\subsection{Structural mass}
+
+\begin{model}[Structural fraction]
+\label{mod:fs}
+\begin{equation}
+  \mstr = f_s\, m, \qquad f_s \in (0,1) .
+  \label{eq:mstr}
+\end{equation}
+\end{model}
+
+This is the weakest model in the algebraic layer. It is not a law; it is an
+observation that across a class of similar vehicles the structure tends to a
+roughly constant fraction of gross mass, typically $f_s \in [0.15,0.25]$. It is
+retained because it keeps the closure in closed form, which is what makes
+\cref{sec:fold} possible. \Cref{sec:components} derives $\mstr$ from beam theory
+instead and the two are compared in \cref{sec:results}.
+
+\subsection{Battery mass: sized by mission energy}
+
+\begin{model}[Battery]
+\label{mod:battery}
+Let $\eb$ be the specific energy of the pack in \si{\joule\per\kilo\gram} that
+the mission may use: the cell value reduced by the depth of discharge and by the
+landing reserve $\varsigma$, so $\eb = e_{\mathrm{cell}}\,\mathrm{DoD}\,(1-\varsigma)$.
+Where the reserve must be visible, as in \cref{sec:codesign}, it is written out
+and $\eb$ denotes the value before the reserve is removed. For a mission of
+duration $t_f$ flown at total electrical power $P_{\mathrm{tot}}$,
+\begin{equation}
+  \mbat = \frac{E_{\mathrm{mission}}}{\eb}
+        = \frac{1}{\eb}\int_0^{t_f} P\big(x(t),u(t)\big)\dd t
+  \;\xrightarrow[\text{hover}]{}\;
+  \frac{P_{\mathrm{tot}}\,t_f}{\eb} .
+  \label{eq:mbat}
+\end{equation}
+\end{model}
+
+The integral form is the honest one and is what \cref{sec:codesign} uses; the
+right-hand form is its evaluation under the assumption that the whole mission is
+spent hovering, and is what makes the algebra tractable. The ratio between them
+is measured in \cref{sec:results} and is between $1.00$ and $1.10$ depending on
+the mission, which retrospectively justifies the substitution for sizing
+purposes but not for endurance claims.
+
+\subsection{The master equation}
+
+Substituting \cref{eq:mprop,eq:mstr,eq:mbat,eq:ptot} into \cref{eq:budget}:
+\begin{equation}
+  m = \mfix + f_s m + \gamma_m m
+      + \frac{t_f}{\eb}\left[
+        \frac{(mg)^{3/2}}{\FM\,\eta\,\sqrt{2\rho A}} + \Paux \right] .
+  \label{eq:closure-raw}
+\end{equation}
+Collecting terms gives the central equation of the algebraic layer.
+
+\begin{definition}[Closure coefficients]
+\label{def:coeffs}
+\begin{align}
+  \alpha &\coloneqq 1 - f_s - \frac{\lambda g}{S_m}
+          = 1 - f_s - \gamma_m
+          &&\text{(thrust coupling, dimensionless)}, \label{eq:alpha}\\
+  \beta  &\coloneqq \frac{t_f\, g^{3/2}}{\eb\,\FM\,\eta\,\sqrt{2\rho A}}
+          &&\text{(energy coupling, \si{\kilo\gram^{-1/2}})}, \label{eq:beta}\\
+  \Mzero &\coloneqq \mfix + \frac{\Paux\, t_f}{\eb}
+          &&\text{(effective fixed load, \si{\kilo\gram})} . \label{eq:M0}
+\end{align}
+\end{definition}
+
+\begin{theorem}[The closure equation]
+\label{thm:closure}
+Under \cref{mod:disk,mod:kappa,mod:sm,mod:fs,mod:battery} with fixed disk area,
+the gross mass of a feasible design satisfies
+\begin{equation}
+  \boxed{\;\alpha\, m - \beta\, m^{3/2} = \Mzero\;}
+  \label{eq:closure}
+\end{equation}
+and conversely any positive root of \cref{eq:closure} determines a mass budget
+consistent with \cref{eq:budget}.
+\end{theorem}
+
+\begin{proof}
+Rearranging \cref{eq:closure-raw},
+\[
+  m\left(1 - f_s - \gamma_m\right)
+  - \frac{t_f g^{3/2}}{\eb \FM \eta \sqrt{2\rho A}}\, m^{3/2}
+  = \mfix + \frac{\Paux t_f}{\eb},
+\]
+where the $m^{3/2}$ term arises because
+$(mg)^{3/2} = g^{3/2} m^{3/2}$. Identifying the three groups with
+\cref{eq:alpha,eq:beta,eq:M0} gives \cref{eq:closure}. The converse holds
+because every step is an equivalence for $m>0$.
+\end{proof}
+
+\begin{remark}[Reading the coefficients]
+$\alpha$ is the fraction of gross mass left over after structure and propulsion
+have taken their cut; it is a pure number, must be positive for any design to
+exist, and is easy to keep positive. $\beta$ carries the mission: it is
+proportional to endurance and inversely proportional to specific energy,
+figure of merit, electrical efficiency and the square root of disk area. It
+multiplies the nonlinear term, and it is where the design dies. $\Mzero$ is
+what must be carried: note that the auxiliary power appears here, not in
+$\beta$, because it is independent of aircraft mass, so a display that consumes
+power converts directly into fixed load through the battery needed to run it.
+\end{remark}
+
+\begin{example}
+For a 13.3-inch panel with $\mfix = \SI{0.762}{\kilo\gram}$,
+$f_s = 0.20$, $\lambda = 2$, $S_m = \SI{120}{\newton\per\kilo\gram}$,
+$\FM = 0.65$, $\eta = 0.75$, $\eb = \SI{900}{\kilo\joule\per\kilo\gram}$,
+$t_f = \SI{3600}{\second}$ and four \SI{0.40}{\metre} rotors
+($A = \SI{0.503}{\metre\squared}$), \cref{def:coeffs} gives
+$\alpha = 0.6366$, $\beta = \SI{0.2271}{\kilo\gram^{-1/2}}$,
+$\Mzero = \SI{0.762}{\kilo\gram}$. \Cref{sec:fold} shows that this
+configuration has no solution.
+\end{example}
+
+\subsection{Generalised disk-area scaling}
+
+\Cref{cor:hover} assumed the disk area fixed while mass varies. That is an
+assumption about the design family, not a law. Suppose instead the rotors are
+allowed to grow with the aircraft,
+\begin{equation}
+  A(m) = A_0 \left(\frac{m}{m_0}\right)^{p} ,
+  \label{eq:areascaling}
+\end{equation}
+anchored so that $A(m_0) = A_0$ reproduces a stated rotor at a stated mass.
+
+\begin{proposition}[Generalised power law]
+\label{prop:plaw}
+Under \cref{eq:areascaling} the hover propulsive power obeys
+\begin{equation}
+  \Pelec \propto m^{q}, \qquad q = \frac{3-p}{2} ,
+  \label{eq:qexp}
+\end{equation}
+and the closure becomes
+\begin{equation}
+  \alpha m - \beta_q m^{q} = \Mzero,
+  \qquad
+  \beta_q = \frac{t_f\,g^{3/2}\,m_0^{p/2}}
+                 {\eb\,\FM\,\eta\,\sqrt{2\rho A_0}} .
+  \label{eq:closure-q}
+\end{equation}
+\end{proposition}
+
+\begin{proof}
+Substituting \cref{eq:areascaling} into \cref{eq:pelec} with $T=mg$,
+\[
+  \Pelec = \frac{(mg)^{3/2}}{\FM\eta\sqrt{2\rho A_0}}
+           \left(\frac{m}{m_0}\right)^{-p/2}
+         = \frac{g^{3/2} m_0^{p/2}}{\FM\eta\sqrt{2\rho A_0}}\; m^{(3-p)/2}.
+\]
+Multiplying by $t_f/\eb$ and inserting into \cref{eq:budget} as before gives
+\cref{eq:closure-q}.
+\end{proof}
+
+Three cases matter and are treated in \cref{sec:fold,sec:scaling}:
+\begin{itemize}[nosep]
+  \item $p=0$: rotors fixed, $q=3/2$, the case of \cref{thm:closure};
+  \item $p=1$: constant disk loading, $q=1$, the closure becomes linear;
+  \item $p>1$: rotors grow faster than mass, $q<1$, the nonlinearity is
+        sublinear and inverts its role entirely.
+\end{itemize}
+
+\begin{corollary}[Constant disk loading]
+\label{cor:constdl}
+If the rotors are sized to hold $\mathrm{DL} = mg/A$ constant, then by
+\cref{eq:dl} the propulsive power is exactly linear in mass,
+$\Pelec = c_P m$ with
+\begin{equation}
+  c_P = \frac{g}{\FM\,\eta}\sqrt{\frac{\mathrm{DL}}{2\rho}} ,
+  \label{eq:cP}
+\end{equation}
+the battery mass fraction is $\gamma_b = c_P t_f/\eb$, and the closure
+collapses to
+\begin{equation}
+  m = \frac{\Mzero}{1 - f_s - \gamma_m - \gamma_b} ,
+  \label{eq:constdl}
+\end{equation}
+which has a positive solution if and only if
+\begin{equation}
+  f_s + \gamma_m + \gamma_b < 1 .
+  \label{eq:constdlfeas}
+\end{equation}
+\end{corollary}
+
+\begin{proof}
+Immediate from \cref{eq:dl} with $T=mg$ and \cref{eq:closure-q} at $q=1$,
+$\beta_1 = \gamma_b$.
+\end{proof}
+
+The contrast between \cref{eq:closure} and \cref{eq:constdl} is the central
+structural fact of the sizing problem, and it is the subject of the next
+section. In the first, feasibility fails discontinuously at a fold. In the
+second, mass diverges continuously as the fractions approach unity. They are
+different kinds of impossibility.

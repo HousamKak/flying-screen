@@ -1,0 +1,191 @@
+﻿\section{Limitations}
+\label{sec:limitations}
+
+Every result in \cref{sec:results} is the output of a model. This section
+states where the model is known to be inadequate, ordered by how much it would
+change the conclusions.
+
+\subsection{Recirculation}
+
+\Cref{mod:disk} assumes quiescent inflow. By the exchange-time calculation of
+\cref{eq:exchange} the machine passes a room's volume of air through its disks
+every \SI{21}{\second}, so within a minute of a thirty-minute session the
+assumption is false. The correction is not a coefficient; it requires solving
+the room flow with a moving boundary. Two consequences are unquantified: the
+degradation of rotor performance in its own recirculated wake, and the
+persistent room-scale draught of order \SI{0.1}{\metre\per\second}. This is the
+largest open item.
+
+\subsection{Rotor aerodynamics and the flight power model}
+
+The rotor model is momentum theory plus a single profile term plus three
+near-field corrections. There is no blade element momentum theory, so the
+radial distribution of inflow and loading is not resolved and the effects of
+twist and taper enter only through lumped constants. There is no wake model, no
+blade-vortex interaction, and no unsteady inflow: by \cref{as:quasisteady} the
+inflow responds instantaneously, whereas its true time constant is of order
+$R/\vind\approx\SI{0.1}{\second}$, comparable with the attitude loop. The
+descent regime is excluded entirely, as noted after \cref{eq:axial}.
+
+The flight simulation compounds this. Its power law \cref{eq:edot} is
+calibrated at hover and has no inflow term, so it returns the same power for
+a rotor at a given speed whether the vehicle is hovering or translating. The
+axial correction derived in \cref{sec:momentum} is therefore not in the
+mission energies of \cref{tab:flight,tab:coupled}. Those tables close the
+energy balance around a near-hover approximation of the power; that is a
+computational coupling, and it is exercised honestly, but it is not a
+validation of manoeuvring energy. The figures are appropriate for indoor
+following at walking speed and vertical rates of a few tenths of a metre per
+second, and are not to be read as predictions for take-off, descent or
+aggressive flight. Coupling an axial and oblique inflow model consistently to
+both thrust and power is the next step, and it must be done to both at once:
+a climb term in the power alone, against a hover-calibrated thrust, would be
+inconsistent.
+
+\subsection{Acoustics}
+
+Three separate weaknesses. The source term \cref{eq:splmodel} is a broadband
+scaling law fitted to four aircraft of one manufacturer; the exponents are
+theoretically motivated but the anchor is empirical and the aircraft are all
+conventional two-blade designs, so extrapolation to $\sigma=\rSolidity$
+paddle blades is an extrapolation. The room model \cref{eq:roomlevel} uses a
+single frequency-averaged absorption coefficient and assumes a diffuse field,
+which fails below the Schroeder frequency \cref{eq:schroeder}, i.e.\ around
+\SI{200}{\hertz}, which is exactly where the first blade harmonics lie. And
+tonal content is computed but not summed into the reported level, so a design
+with a strong \SI{\rBpf}{\hertz} fundamental and audible beating between rotors
+could be unacceptable at a level the model calls fine. A measured prototype is
+the only way to settle this.
+
+\subsection{Uncertainty}
+
+Every result is a single point estimate. The quantities that carry the most
+uncertainty are the figure of merit of a low-Reynolds paddle rotor, the motor
+mass constant, the screen drag coefficients, the electrical efficiency, the
+cell specific energy at the discharge rate used, and above all the acoustic
+anchor, whose calibration spread alone is \SI{1.4}{\decibel}. No propagation
+of these uncertainties through the closure was performed, so the paper does
+not show that the design ranking of \cref{tab:displays,tab:clearance} is
+robust to them, nor that the candidate satisfies its constraints across their
+plausible ranges. The margins reported are margins of a nominal model. A
+proper treatment samples the parameter ranges, re-closes the design at each
+sample, and reports the fraction of samples for which each constraint holds.
+
+\subsection{Structures}
+
+\Cref{mod:arm} covers bending stress, tip deflection and the first bending
+mode of an idealised cantilever. It does not cover buckling, joints, bonded
+interfaces, fatigue, or crash loads. For a machine intended to operate beside a
+person, crash and containment analysis is not optional in practice, and none is
+performed here. Guard rings are modelled only as a mass; their ability to
+actually arrest a blade is asserted, not computed.
+
+\subsection{Failure modes}
+
+The controller of \cref{sec:control} has no failure mode: the allocation
+\cref{eq:allocprob} assumes every rotor is available, and after the loss of one
+the quadrotor described here falls. That is a statement about this controller
+and not about quadrotors. Mueller and D'Andrea~\cite{mueller2014} show that a
+quadrotor can be controlled after the loss of one, two or even three
+propellers in a relaxed-hover mode in which the vehicle spins continuously
+about a tilted axis. That capability is not implemented here, and a
+continuously spinning \SI{1.7}{\kilo\gram} machine at arm's length from a
+person is not thereby shown to be acceptable.
+
+A hexacopter is not the answer either, or not simply. With the engine's
+alternating-spin regular layout, removing one rotor and its opposite leaves an
+allocation matrix of rank \rHexRank\ (\cref{sec:verification}): the four
+remaining rotors cannot produce thrust, roll, pitch and yaw independently, so
+the standard allocation loses a wrench direction, and lift arithmetic alone
+would call for $\lambda\ge1.5$ to hover on four rotors of six, not the
+$\lambda\ge2$ an earlier draft stated. Re-optimised under the same limits as
+the quadrotor, the hexacopter (six rotors of \SI{\rHexD}{\milli\metre}) comes
+out at \SI{\rHexGross}{\kilo\gram}, \SI{\rHexPower}{\watt} and
+\SI{\rHexEar}{\decibel A} at the ear against \SI{\rQuadGross}{\kilo\gram},
+\SI{\rQuadPower}{\watt} and \SI{\rQuadEar}{\decibel A} for the quadrotor
+(\cref{tab:hex}), and its authority is lower on every axis:
+$\rHexRoll/\rHexPitch/\rHexYaw$ against
+$\rQuadRoll/\rQuadPitch/\rQuadYaw\ \si{\radian\per\second\squared}$. Its
+weakest axis in angular acceleration is roll, not pitch: the roll torque
+authority is the smaller of the two (\cref{tab:hex}, last column), because
+with two rotors on the pitch axis the yaw constraint couples into the roll
+differential, and the display slab makes $J_{xx}$ exceed $J_{yy}$. The row sums
+$\sum_i|\mat M_{j+1,i}|$, which an earlier draft used and which predict pitch
+as the weak axis, mislead here (\cref{app:proofs}). The failure case therefore
+needs a different answer than more rotors, and none is offered here.
+
+\begin{table}[t]
+\centering
+\caption{Quadrotor and hexacopter re-optimised under the same limits as
+\cref{tab:displays}. Authorities by \cref{eq:authority}; the last column is
+the ratio of roll to pitch torque authority.}
+\label{tab:hex}
+\footnotesize\setlength{\tabcolsep}{4pt}
+\begin{tabular}{@{}lrrrrrrrrr@{}}
+\toprule
+Layout & $D$ & Gross & Power & At ear & Span & $\alpha_{\mathrm{roll}}$ & $\alpha_{\mathrm{pitch}}$ & $\alpha_{\mathrm{yaw}}$ & $\tau_{\mathrm{roll}}/\tau_{\mathrm{pitch}}$\\
+\midrule
+\inputrows{results/tab_hex_rows}
+\end{tabular}
+\end{table}
+
+\subsection{Dynamic clearance}
+
+\Cref{prop:governor} is a conditional guarantee, and each of its conditions
+is a limitation. It is enforced at update instants on the governed reference,
+not in continuous time and not on the vehicle. It transfers to the vehicle only
+through the hypothesis $\sup_t\|\vect r-\vect r_g\|\le\varepsilon$, which
+\cref{tab:flight} checks for the missions flown and which nothing proves for
+missions not flown. It lapses whenever the caps and the keep-out cannot be
+satisfied together, which the engine reports as a violation rather than
+hides; on the reported runs this did not occur, but only because a mission
+whose ideal position lies inside the sphere is started on the sphere rather
+than inside it, a choice that removes the conflict from the start-up and not
+from the product. And it protects a sphere of radius $\mathcal{R}$ about the
+centre of mass; the rotor clearance reported alongside it is the physical
+quantity, and the difference between the two is the conservatism of the
+envelope, not a margin the design has earned.
+
+\subsection{Estimation and autonomy}
+
+\Cref{as:estimation} gives the controller exact knowledge of the state and of
+the user's position. Real vision-based human tracking has latency, dropouts,
+and occlusion, and the reference governor of \cref{mod:governor} is precisely
+where those errors would surface: a keep-out sphere centred on an estimated
+head position is only as safe as the estimate, and a latency of
+\SI{100}{\milli\second} at a walking speed of \SI{1.4}{\metre\per\second} is
+\SI{14}{\centi\metre} of sphere in the wrong place, more than the whole
+tracking margin $\varepsilon$. No estimator is modelled and no sensor noise is
+injected.
+
+\subsection{Mission energy and the operating policy}
+
+The windowed extrapolation $E_{\mathrm{mission}}=\bar P t_f$ of
+\cref{sec:numerics} is exact only for a mission periodic within the window. For
+a session with distinct phases it is an approximation of unquantified error,
+and the battery of \cref{tab:coupled} is sized for the worst single phase
+repeated for the whole session, which is a policy rather than a law. Reported
+endurance figures also assume constant $\eb$; real cells lose capacity at high
+discharge and low temperature, and the internal-resistance voltage sag that
+would reduce available thrust at low state of charge is not modelled.
+
+\subsection{Numerics}
+
+The convergence check that matters for a sampled-data simulation, holding the
+controller rate fixed and refining the integration substeps, was not run
+(\cref{sec:numerics}). The differential evolution of \cref{eq:outerprog} is
+stochastic and offers no optimality certificate: the reported designs are the
+best found, not the best that exists, and the exterior penalty of
+\cref{eq:penalty} means a returned point may violate a constraint slightly,
+which \cref{tab:displays} reports as such. Runs are seeded for
+reproducibility, which makes results repeatable without making them global.
+
+\subsection{Scope}
+
+Nothing was built. The paper computes what a set of models implies, and the
+models were calibrated against published data for aircraft that are not this
+aircraft. The most valuable next step is not a better model but a measured
+rotor: a single \SI{\rDiam}{\milli\metre} two-blade paddle propeller on a
+thrust stand in an anechoic space would settle \cref{tab:acoustic},
+\cref{prop:fmblade} and \cref{eq:recorrection} simultaneously, and those three
+carry most of the uncertainty in the result.

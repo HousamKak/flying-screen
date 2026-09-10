@@ -1,0 +1,220 @@
+﻿\section{Numerical methods}
+\label{sec:numerics}
+
+\subsection{Solving the closure}
+
+\Cref{eq:closure-q} could be solved by radicals at $q=3/2$ or by Newton's
+method in general. Neither is used, for reasons that are structural rather than
+matters of taste.
+
+Newton's method applied to $F(m)-\Mzero$ has a critical defect here: by
+\cref{lem:concave}, $F'(m^*)=0$, so the Newton step is unbounded near the fold,
+which is precisely the region of interest. Worse, from a starting point on the
+wrong side it converges to $m_+$, the unstable branch, without any indication
+that it has done so.
+
+The engine instead exploits the shape established in \cref{lem:concave}:
+
+\begin{enumerate}[nosep]
+  \item Compute $m^*$ and $\Mmax$ in closed form from
+        \cref{eq:mstar,eq:Mmax}. Feasibility is decided \emph{analytically} by
+        comparing $\Mzero$ with $\Mmax$, never by whether an iteration
+        converged.
+  \item If feasible, bracket $m_-$ on $(0,m^*]$, where $F$ is a strictly
+        increasing bijection, and bisect. Bracket $m_+$ on $[m^*,\infty)$ by
+        geometric expansion and bisect.
+\end{enumerate}
+
+Bisection converges linearly with rate $1/2$ and requires
+$\lceil\log_2((b-a)/\epsilon)\rceil$ evaluations, about $40$ for double
+precision. It is slower than Newton and it cannot fail. Given that a single
+evaluation of $F$ costs microseconds, and given that the failure modes of
+Newton here are silent rather than loud, this is the correct trade.
+
+\begin{remark}[Feasibility is analytic, not numerical]
+This is the single most important implementation decision in the sizing layer,
+and it follows from the critical slowing-down remark after
+\cref{thm:iteration}. A solver that reports non-convergence after $K$ iterations
+cannot distinguish a near-feasible design from an infeasible one, because
+$\mathrm{rate} = 1-F'(m_-)\to1$ as $\Mzero\uparrow\Mmax$. Deciding feasibility
+by $\Mzero\lessgtr\Mmax$ removes the ambiguity entirely.
+\end{remark}
+
+For the component closure \cref{eq:fpclosure} no closed form exists, and the
+shape of $\mathcal{F}$ is observed rather than proved (\cref{sec:components}),
+so the search cannot borrow the analytic feasibility test. The engine samples
+$\mathcal{F}$ on a geometric grid of ratio $1.35$ from \SI{e-3}{\kilo\gram}
+upward, stopping at the first non-negative sample. Every sampled local maximum
+is then refined by bounded minimisation of $-\mathcal{F}$ in $\ln m$, because a
+positive stretch of $\mathcal{F}$ narrower than one grid interval can sit
+between two negative samples. The first bracket with a sign change, in
+increasing mass, is closed by Brent's method to a relative tolerance of
+$10^{-12}$, which selects the light branch. The search reports one of four
+outcomes: a root, a near-tangent root resolved only to residual tolerance, a
+non-finite residual, or an exhausted search. The last is reported as a failure
+of a bounded search and is never described as infeasibility. The case that
+motivated the refinement is kept as a regression test: the design of
+\cref{sec:results} at $t_f=\SI{4280.0502}{\second}$ has a positive island of
+width \SI{5}{\percent} in mass, with roots at \SI{4.5678}{\kilo\gram} and
+\SI{4.6173}{\kilo\gram}, which the grid alone straddled and reported as no
+mass closing.
+
+\subsection{The battery loop with the simulator inside it}
+
+\Cref{eq:fixedpoint} is solved by iteration, but naive iteration converges only
+at the linear rate $\mathcal{H}'(\mu)$ of \cref{prop:contraction}, which near
+the fold approaches unity. Since each evaluation of $\mathcal{H}$ costs a full
+trajectory simulation, this is expensive.
+
+The engine applies a secant step to the residual
+$\mathrm{gap}(\mu) = \mathcal{H}(\mu)-\mu$:
+\begin{equation}
+  \mu_{k+1} = \mu_k - \mathrm{gap}(\mu_k)\,
+    \frac{\mu_k-\mu_{k-1}}{\mathrm{gap}(\mu_k)-\mathrm{gap}(\mu_{k-1})} ,
+  \label{eq:secant}
+\end{equation}
+which uses only quantities already computed and therefore costs no additional
+simulations.
+
+\begin{proposition}[Convergence order]
+\label{prop:secant}
+If $\mathrm{gap}\in C^2$ near a simple root $\mu^\star$ with
+$\mathrm{gap}'(\mu^\star)\ne0$, the secant iteration \cref{eq:secant} converges
+locally with order $\varphi=(1+\sqrt5)/2\approx1.618$, against order $1$ for
+the fixed-point iteration.
+\end{proposition}
+
+\begin{proof}
+Classical; see Ortega and Rheinboldt~\cite[\S8.2]{ortega1970}. The error
+satisfies $|\epsilon_{k+1}|\approx C|\epsilon_k||\epsilon_{k-1}|$, whose
+characteristic exponent is the golden ratio.
+\end{proof}
+
+The step is guarded: it is accepted only when it moves in the same direction as
+the gap and by no more than six times its magnitude, otherwise the plain
+fixed-point step is taken. Because $\mathcal{H}$ takes the larger of an
+energy and a power requirement (\cref{eq:outermap}) it has a kink where the
+two exchange, and \cref{prop:secant} does not apply across it; the guard is
+what keeps the iteration sane there. When the gap is within tolerance the
+battery is rounded up to the last requirement and the design is flown once
+more, and the loop reports convergence only if that flight requires no more
+battery than it carries. On every mission of \cref{sec:results} this took
+three updates and two verification flights, five simulations in all, against
+eight or more for plain iteration.
+
+\subsection{Trajectory integration}
+
+\Cref{eq:ode} is integrated with classical fourth-order Runge--Kutta at fixed
+step. Fixed step rather than adaptive, because the cost must be predictable for
+an interactive tool and because the controller is evaluated once per step,
+making the scheme effectively a sampled-data system whose sample rate should
+not wander.
+
+Local truncation error is $O(h^5)$ and global error $O(h^4)$. The step is
+chosen from the fastest closed-loop mode. With $\tau_m=\SI{45}{\milli\second}$,
+$K_R\approx\SI{41}{\per\second\squared}$ and hence
+$\omega_n=\sqrt{K_R}\approx\SI{6.4}{\radian\per\second}$, the fastest pole is
+the motor at $1/\tau_m\approx\SI{22}{\radian\per\second}$; at
+$h=\SI{4}{\milli\second}$ the product $h\lambda\approx0.09$ sits deep inside the
+RK4 stability region, whose real-axis extent is $|h\lambda|\le2.79$.
+
+The quaternion is renormalised after each step, $q\leftarrow q/\|q\|$. This
+does not cost the order. The exact flow preserves $\|q\|=1$, so the RK4 step
+returns $\tilde q$ with $\|\tilde q\| = 1+O(h^5)$; the map
+$\tilde q\mapsto\tilde q/\|\tilde q\|$ is smooth near $\mathbb{S}^3$ with
+$\tilde q/\|\tilde q\| = \tilde q + O(\|\tilde q\|-1)$, so the projection
+perturbs each step by $O(h^5)$, the same order as the local truncation error,
+and the global order $O(h^4)$ is retained.
+
+Two different things are being integrated and the distinction matters. The
+controller is evaluated once per step and its output held, so RK4 integrates
+the plant under a piecewise-constant input at fourth order. The closed loop is
+therefore a sampled-data system at \SI{250}{\hertz}, which is what a digital
+autopilot is; the $O(h)$ difference between it and a continuous-feedback
+idealisation is a property of the system being simulated, not an integration
+error. A convergence check with the controller rate held fixed and the
+integration substeps refined was not run and is listed in
+\cref{sec:limitations}.
+
+\begin{remark}[Windowed mission energy]
+Integrating a full \SI{1800}{\second} mission at $h=\SI{4}{\milli\second}$ would
+require $4.5\times10^5$ steps per evaluation, which is incompatible with the
+outer loop. The engine instead integrates a representative window of
+\SIrange{12}{20}{\second}, measures the mean electrical power after a settling
+interval, and extrapolates:
+$E_{\mathrm{mission}} = \bar P\,t_f$. This is exact for a periodic mission whose
+window spans a whole number of periods and is otherwise an approximation whose
+error is the difference between the window mean and the mission mean. It is
+recorded as a limitation.
+\end{remark}
+
+\begin{remark}[Initial conditions]
+The initial state is taken to be the reference position \emph{and the reference
+velocity}. Starting at rest beside a person already walking is not a gentler
+initial condition but a worse one: on a curved path the display sits in the
+person's path, so they close on it while it accelerates. This artefact
+contaminated every mission statistic until it was found; see
+\cref{sec:verification}.
+\end{remark}
+
+\subsection{Linearisation}
+
+$\mat A$ and $\mat B$ are formed by central differences,
+\begin{equation}
+  \mat A_{:,j} \approx \frac{f(x_0+h\vect e_j)-f(x_0-h\vect e_j)}{2h},
+  \qquad h = \varepsilon\max\{1,|x_{0,j}|\},
+  \label{eq:fd}
+\end{equation}
+with $\varepsilon=10^{-6}$. Central differences have truncation error $O(h^2)$
+against $O(h)$ for one-sided, and the total error is minimised near
+$h\sim\epsilon_{\mathrm{mach}}^{1/3}\approx6\times10^{-6}$, so the choice is
+near-optimal. Controllability is assessed by the reachable-subspace iteration
+of \cref{sec:control} with a singular-value tolerance of $10^{-9}$ on the
+norm-scaled matrices, and requires full rank.
+
+\subsection{The outer optimisation}
+
+\Cref{eq:outerprog} is solved by differential evolution~\cite{storn1997}, a
+population-based stochastic method, with constraints handled by an exterior
+quadratic penalty
+\begin{equation}
+  \tilde{\mathcal{J}}(p) = \mathcal{J}(p)
+    + \varpi\sum_j \left(\frac{\max\{0,g_j(p)\}}{s_j}\right)^{2} ,
+  \label{eq:penalty}
+\end{equation}
+with per-constraint scales $s_j$ chosen so that a violation of engineering
+significance contributes order unity.
+
+Three properties of the problem dictate this choice. The objective is
+non-convex and its landscape contains large regions where the closure has no
+solution at all, so gradient methods have nowhere to start. Several design
+variables are integer (rotor count, blade count), so smoothness fails. And an
+evaluation of the algebraic objective costs milliseconds, so a population of a
+few hundred is affordable.
+
+The penalty is exterior rather than a barrier precisely because the infeasible
+region must remain traversable: a barrier method cannot cross from one feasible
+island to another through infeasible territory, and here the islands are
+separated by the fold.
+
+\subsection{Numerical hygiene}
+
+Three details are worth recording because each caused a visible defect.
+
+\emph{Non-finite values in transport.} \texttt{NaN} and $\pm\infty$ are not
+representable in JSON. Infeasible cells in a sweep, and quantities such as
+$\Mmax$ when no fold exists, are genuinely undefined rather than zero. The API
+maps every non-finite float to \texttt{null} and the front end renders it as a
+dash, so an undefined quantity is never silently displayed as $0$.
+
+\emph{Solidity and Reynolds guards.} Without \cref{as:sigma} and
+\cref{eq:recorrection} the optimiser drives solidity to $0.55$ and tip speed
+toward zero, exploiting the fact that \cref{prop:profile} has no notion of
+blade interference and \cref{prop:fmblade} none of Reynolds number. Both
+constraints exist to keep the optimiser inside the domain where the model is a
+model of something.
+
+\emph{Boundary comparisons.} Constraints active exactly at their bound were
+being reported as violations because of floating-point comparison. All
+constraint checks carry a relative tolerance of $2\times10^{-3}$, chosen so
+that a design sitting on a bound reads as satisfying it.

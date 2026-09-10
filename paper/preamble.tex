@@ -1,0 +1,109 @@
+% ---------------------------------------------------------------------------
+% Packages
+% ---------------------------------------------------------------------------
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{lmodern}
+\usepackage[english]{babel}
+\usepackage[a4paper,margin=1.05in]{geometry}
+
+\usepackage{amsmath,amssymb,amsthm,mathtools}
+\usepackage{bm}
+\usepackage{booktabs}
+\usepackage{longtable}
+\usepackage{array}
+\usepackage{multirow}
+\usepackage{graphicx}
+\usepackage{tikz}
+\usetikzlibrary{arrows.meta,positioning,calc,decorations.pathmorphing,patterns}
+\usepackage{pgfplots}
+\pgfplotsset{compat=1.18}
+\usepackage{caption}
+\usepackage{subcaption}
+\usepackage{enumitem}
+\usepackage{microtype}
+\usepackage[hidelinks]{hyperref}
+\usepackage{cleveref}
+\usepackage{siunitx}
+\sisetup{per-mode=symbol, range-phrase={ to }, range-units=single}
+
+% ---------------------------------------------------------------------------
+% Theorem environments
+% ---------------------------------------------------------------------------
+\theoremstyle{plain}
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{corollary}[theorem]{Corollary}
+
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{assumption}[theorem]{Assumption}
+\newtheorem{model}[theorem]{Model}
+\newtheorem{problem}[theorem]{Problem}
+\newtheorem{example}[theorem]{Example}
+
+\theoremstyle{remark}
+\newtheorem{remark}[theorem]{Remark}
+\newtheorem{observation}[theorem]{Observation}
+
+\Crefname{assumption}{Assumption}{Assumptions}
+\Crefname{model}{Model}{Models}
+
+% ---------------------------------------------------------------------------
+% Macros
+% ---------------------------------------------------------------------------
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\SOthree}{\mathrm{SO}(3)}
+\newcommand{\sothree}{\mathfrak{so}(3)}
+\newcommand{\SEthree}{\mathrm{SE}(3)}
+\newcommand{\dd}{\,\mathrm{d}}
+\newcommand{\dt}[1]{\dot{#1}}
+\newcommand{\ddt}[1]{\ddot{#1}}
+\newcommand{\vect}[1]{\bm{#1}}
+\newcommand{\mat}[1]{\bm{#1}}
+\newcommand{\transp}{^{\mathsf{T}}}
+\newcommand{\hatmap}[1]{\widehat{#1}}
+\newcommand{\veemap}[1]{{#1}^{\vee}}
+\newcommand{\tr}{\operatorname{tr}}
+\newcommand{\diag}{\operatorname{diag}}
+\newcommand{\rank}{\operatorname{rank}}
+\newcommand{\sgn}{\operatorname{sgn}}
+\DeclareMathOperator*{\argmin}{arg\,min}
+\DeclareMathOperator*{\argmax}{arg\,max}
+
+% physical symbols used throughout
+\newcommand{\Adisk}{A}                 % total actuator disk area
+\newcommand{\vind}{v_i}                % induced velocity
+\newcommand{\Pind}{P_{\mathrm{ind}}}
+\newcommand{\Pprof}{P_{\mathrm{prof}}}
+\newcommand{\Pideal}{P_{\mathrm{ideal}}}
+\newcommand{\Pshaft}{P_{\mathrm{sh}}}
+\newcommand{\Pelec}{P_{\mathrm{el}}}
+\newcommand{\Paux}{P_{\mathrm{aux}}}
+\newcommand{\mfix}{m_{\mathrm{fix}}}
+\newcommand{\mstr}{m_{\mathrm{str}}}
+\newcommand{\mprop}{m_{\mathrm{prop}}}
+\newcommand{\mbat}{m_{\mathrm{bat}}}
+\newcommand{\eb}{e_b}
+\newcommand{\FM}{\mathrm{FM}}
+\newcommand{\Ct}{C_T}
+\newcommand{\Cdz}{C_{d_0}}
+\newcommand{\Vtip}{V_{\mathrm{tip}}}
+\newcommand{\Mzero}{M_0}
+\newcommand{\Mmax}{M_0^{\max}}
+\newcommand{\ez}{\vect{e}_3}
+
+\newcommand{\code}[1]{\texttt{\small #1}}
+
+% Generated table rows are read inside tabular environments with the
+% primitive \input: LaTeX's wrapper opens a group there and breaks the row.
+\makeatletter
+\newcommand{\inputrows}[1]{\@@input #1\relax}
+\makeatother
+
+% A boxed "engineering conclusion" for statements that are results rather
+% than mathematics.
+\newenvironment{finding}
+  {\par\medskip\noindent\begin{minipage}{\linewidth}\rule{\linewidth}{0.4pt}\par\smallskip\itshape}
+  {\par\smallskip\rule{\linewidth}{0.4pt}\end{minipage}\par\medskip}

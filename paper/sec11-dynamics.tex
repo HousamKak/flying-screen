@@ -1,0 +1,312 @@
+﻿\section{Flight dynamics}
+\label{sec:dynamics}
+
+Once the machine exists its mass is fixed (\cref{as:mass}) and the problem
+becomes one of differential equations. This section derives them.
+
+\subsection{Configuration and kinematics}
+
+The configuration space is $\SEthree = \R^3\rtimes\SOthree$, with state
+$(\vect{r},R)$ and velocities $(\vect{v},\vect{\omega})$.
+
+\begin{proposition}[Attitude kinematics]
+\label{prop:kinematics}
+\begin{equation}
+  \dt{R} = R\,\hatmap{\vect{\omega}} .
+  \label{eq:Rdot}
+\end{equation}
+In terms of the unit quaternion $q=(q_0,\vect{q}_v)$ representing $R$,
+\begin{equation}
+  \dt{q} = \tfrac12\, q \otimes (0,\vect{\omega})
+         = \tfrac12
+           \begin{bmatrix}
+             -\vect{q}_v\transp \\
+             q_0 I + \hatmap{\vect{q}_v}
+           \end{bmatrix}\vect{\omega}
+         \eqqcolon \tfrac12\,\Omega(\vect{\omega})\,q .
+  \label{eq:qdot}
+\end{equation}
+\end{proposition}
+
+\begin{proof}
+Let $\vect{u}$ be a vector fixed in $\mathcal{B}$, so its inertial coordinates
+are $R\vect{u}$ and its inertial time derivative is
+$\vect{\omega}_{\mathcal I}\times R\vect{u}$ where
+$\vect{\omega}_{\mathcal I}=R\vect{\omega}$. Then
+$\dt{R}\vect{u} = \hatmap{(R\vect{\omega})}R\vect{u}$ for all $\vect{u}$, so
+$\dt{R} = \hatmap{(R\vect{\omega})}R = R\hatmap{\vect{\omega}}R\transp R
+= R\hatmap{\vect{\omega}}$ using \cref{eq:hatid}. \Cref{eq:qdot} follows by
+differentiating \cref{eq:quat2rot} and using quaternion multiplication;
+see~\cite[\S1.4]{markley2014}.
+\end{proof}
+
+\begin{remark}
+\Cref{eq:qdot} preserves $\|q\|$ exactly, since
+$q\transp\dt q = \tfrac12 q\transp\Omega q = 0$ by antisymmetry. Numerically,
+integration error accumulates and the engine renormalises after each step; see
+\cref{sec:numerics}.
+\end{remark}
+
+\subsection{Newton-Euler equations}
+
+\begin{theorem}[Equations of motion]
+\label{thm:newtoneuler}
+For a rigid body of mass $m$ and body-frame inertia tensor $J$ subject to a
+total external force $\vect{F}$ expressed in $\mathcal I$ and a total external
+moment $\vect{\tau}$ about the centre of mass expressed in $\mathcal B$,
+\begin{align}
+  \dt{\vect{r}} &= \vect{v}, \label{eq:rdot}\\
+  m\,\dt{\vect{v}} &= \vect{F}, \label{eq:vdot}\\
+  J\,\dt{\vect{\omega}} + \vect{\omega}\times J\vect{\omega}
+    &= \vect{\tau} . \label{eq:wdot}
+\end{align}
+\end{theorem}
+
+\begin{proof}
+\Cref{eq:rdot,eq:vdot} are Newton's second law in an inertial frame. For
+\cref{eq:wdot}, the angular momentum about the centre of mass expressed in
+$\mathcal I$ is $\vect{h}_{\mathcal I} = RJ\vect{\omega}$ and
+$\dt{\vect h}_{\mathcal I} = \vect{\tau}_{\mathcal I} = R\vect\tau$.
+Differentiating using \cref{eq:Rdot},
+\[
+  \dt{\vect h}_{\mathcal I}
+  = \dt R J\vect\omega + RJ\dt{\vect\omega}
+  = R\hatmap{\vect\omega}J\vect\omega + RJ\dt{\vect\omega}
+  = R\big(\vect\omega\times J\vect\omega + J\dt{\vect\omega}\big).
+\]
+Equating and cancelling $R$ gives \cref{eq:wdot}.
+\end{proof}
+
+The forces are
+\begin{equation}
+  \vect{F} = T\,R\ez - mg\,\ez + \vect{F}_{\mathrm{aero}}
+             + \vect{F}_{\mathrm{dist}} ,
+  \label{eq:forces}
+\end{equation}
+with $T$ the total rotor thrust along the body $\vect b_3$ axis.
+
+\subsection{Rotor wrench and the allocation map}
+
+\begin{model}[Quasi-steady rotor]
+\label{mod:rotorcoeff}
+Rotor $i$ turning at $\Omega_i$ produces thrust and reaction torque
+\begin{equation}
+  T_i = k_T\Omega_i^2, \qquad Q_i = k_Q\Omega_i^2 ,
+  \label{eq:ktkq}
+\end{equation}
+with $k_T,k_Q$ determined by \cref{sec:momentum,sec:blade} rather than fitted:
+$k_T = T/\Omega^2$ and $k_Q = \Pshaft/\Omega^3$ evaluated at the design point.
+\end{model}
+
+Let rotor $i$ sit at body position $\vect{d}_i = (x_i,y_i,0)$ and have spin
+sense $s_i\in\{+1,-1\}$. Its contribution to the body moment is
+$\vect{d}_i\times T_i\ez$ from thrust and $-s_iQ_i\ez$ from reaction torque, so
+\begin{equation}
+  \vect\tau = \sum_{i=1}^{N}
+    \begin{bmatrix} y_i\,k_T \\ -x_i\,k_T \\ -s_i\,k_Q \end{bmatrix}\Omega_i^2 ,
+  \qquad
+  T = \sum_{i=1}^{N} k_T\Omega_i^2 .
+  \label{eq:wrench}
+\end{equation}
+
+\begin{definition}[Allocation matrix]
+Collecting \cref{eq:wrench} with $\vect{u} = (\Omega_1^2,\dots,\Omega_N^2)$,
+\begin{equation}
+  \begin{bmatrix} T \\ \vect\tau \end{bmatrix}
+  = \mat{M}\,\vect{u},
+  \qquad
+  \mat{M} =
+  \begin{bmatrix}
+    k_T & \cdots & k_T\\
+    y_1 k_T & \cdots & y_N k_T\\
+    -x_1 k_T & \cdots & -x_N k_T\\
+    -s_1 k_Q & \cdots & -s_N k_Q
+  \end{bmatrix} \in \R^{4\times N} .
+  \label{eq:alloc}
+\end{equation}
+\end{definition}
+
+\begin{proposition}[Controllability of the wrench]
+\label{prop:alloc}
+The set of achievable wrenches is $\mat{M}\R_{\ge0}^N$. Full four-axis
+authority requires $\rank \mat M = 4$, which for hubs equispaced on a circle of
+radius $L$ with alternating spin senses holds whenever $N\ge4$ is even. For odd
+$N$, $\sum_i s_i\ne0$ and the hover trim $\Omega_i\equiv\Omega_h$ produces a
+nonzero yaw moment, so the vehicle cannot trim without unequal thrusts.
+\end{proposition}
+
+\begin{proof}
+The rank statement is a direct computation on \cref{eq:alloc}: the first row is
+constant, rows two and three span the $(y_i,-x_i)$ pattern which has rank two
+for $N\ge3$ equispaced hubs, and row four is independent of the others exactly
+when the $s_i$ are not all equal. For odd $N$ with alternating signs,
+$\sum_i s_i = \pm1$, so at equal $\Omega_i$ the yaw component of
+$\mat M\vect u$ is $\mp k_Q\Omega_h^2 \ne 0$.
+\end{proof}
+
+\begin{remark}
+\Cref{prop:alloc} is why the engine restricts $N$ to even values. A tricopter
+resolves the trim problem with a tilting motor, which is a different actuation
+model and is outside the scope of \cref{eq:alloc}.
+\end{remark}
+
+\subsection{Motor dynamics}
+
+Rotor speed does not follow command instantaneously. The simplest adequate
+model is first order,
+\begin{equation}
+  \tau_m\,\dt{\Omega}_i = \Omega_i^{\mathrm{cmd}} - \Omega_i ,
+  \label{eq:motorlag}
+\end{equation}
+with $\tau_m$ of order \SIrange{20}{60}{\milli\second}. The underlying
+electromechanical model is
+\begin{equation}
+  L\dt{\imath}_i = V_i - R_m \imath_i - k_e\Omega_i,
+  \qquad
+  J_r\dt{\Omega}_i = k_\tau \imath_i - k_Q\Omega_i^2 ,
+  \label{eq:bldc}
+\end{equation}
+whose electrical time constant $L/R_m$ is typically two orders of magnitude
+faster than the mechanical one, so that singular perturbation reduces
+\cref{eq:bldc} to a first-order system in $\Omega_i$; \cref{eq:motorlag} is its
+linearisation about the trim point. We use \cref{eq:motorlag} and record the
+simplification.
+
+\subsection{Battery state}
+
+\begin{equation}
+  \dt{E} = -P, \qquad
+  P = \frac{1}{\eta}\sum_{i=1}^{N} k_P\,\Omega_i^{3} + \Paux ,
+  \qquad
+  k_P = \frac{\Pshaft}{\Omega^3}\bigg|_{\text{design}} ,
+  \label{eq:edot}
+\end{equation}
+or in normalised form $\dt{s} = -P/E_{\max}$ with $s = E/E_{\max}$ the state of
+charge. The cubic dependence follows from $\Pshaft = Q\Omega$ with
+$Q\propto\Omega^2$. \Cref{eq:edot} is the coupling that makes control effort
+cost endurance, and it is what \cref{sec:codesign} closes.
+
+\Cref{eq:edot} is calibrated at hover and has no inflow term. At fixed rotor
+speed it returns the same power in hover and in axial translation, so it does
+not contain the climb correction of \cref{eq:axial}, which the component model
+of \cref{sec:momentum} does. It is a near-hover approximation, and so are the
+mission energies computed with it: they are appropriate for following a person
+indoors at walking speed and vertical rates of a few tenths of a metre per
+second, and they are not a model of climbs, descents or aggressive manoeuvres.
+Adding a climb term to the power alone, while thrust keeps its hover
+calibration, would make the two inconsistent; a consistent treatment couples an
+axial and oblique inflow model to both.
+
+\subsection{The screen as an aerodynamic surface}
+
+This is what distinguishes the vehicle from a camera drone. The display is a
+large flat plate, rigidly attached through a gimbal, and therefore both
+generates orientation-dependent drag and applies that drag at a point offset
+from the centre of mass.
+
+\begin{model}[Flat plate with orientation]
+\label{mod:screen}
+Let $\vect{n}$ be the outward normal of the screen in inertial coordinates and
+$\vect{v}_{\mathrm{rel}} = \vect{v} - \vect{v}_{\mathrm{air}}$. Decompose
+$\vect{v}_{\mathrm{rel}} = v_n\vect{n} + \vect{v}_t$ with
+$v_n = \vect{n}\transp\vect{v}_{\mathrm{rel}}$. Then
+\begin{equation}
+  \vect{F}_{\mathrm{screen}}
+  = -\tfrac12\rho A_s\Big[
+      C_{D,n}\,|v_n|\,v_n\,\vect{n}
+      + C_{D,t}\,\|\vect{v}_t\|\,\vect{v}_t \Big] ,
+  \label{eq:screendrag}
+\end{equation}
+with $C_{D,n}\approx1.17$ for a normal flat plate and $C_{D,t}\ll C_{D,n}$
+skin friction.
+\end{model}
+
+The moment about the centre of mass follows from the offset $\vect{d}_s$ of the
+screen's centre of pressure in body coordinates:
+\begin{equation}
+  \vect\tau_{\mathrm{screen}} = R\transp\big[(R\vect{d}_s)\times
+    \vect{F}_{\mathrm{screen}}\big] .
+  \label{eq:screenmoment}
+\end{equation}
+
+\begin{remark}[The sign of $\vect{d}_s$ matters]
+If the display is carried \emph{above} the rotor plane, $d_{s,3}>0$; if it
+hangs below, $d_{s,3}<0$. In forward flight the drag acts rearward, so a screen
+above the centre of mass produces a nose-up moment that opposes the forward
+tilt, a weathercock-stable arrangement, while a screen below produces a
+nose-down moment that reinforces it. The magnitude is identical; only the sign
+changes, and it changes the closed-loop behaviour measurably.
+\end{remark}
+
+\begin{remark}[Why the screen is nearly transparent to the rotors]
+The screen is vertical and the rotor inflow and wake are vertical, so the plate
+is edge-on to the rotor flow and blocks a projected area of order
+(thickness $\times$ width), some \SI{2e-3}{\metre\squared} against a disk area
+of \SI{0.76}{\metre\squared}. Placing it above or below the rotor plane is
+therefore almost free aerodynamically. What it changes is geometry relative to
+the user, which \cref{sec:results} shows to be the decisive consideration.
+\end{remark}
+
+\subsection{Gimbal}
+
+The display is carried on a gimbal whose job is to hold it upright while the
+airframe tilts to accelerate. Modelling the pitch and roll axes as
+independently actuated single-degree-of-freedom systems,
+\begin{equation}
+  J_g\ddt{\theta}_{g,j} + b_g\dt{\theta}_{g,j}
+    = \tau_{g,j} - \tau_{\mathrm{wind},j},
+  \qquad
+  |\tau_{g,j}| \le \tau_g^{\max},
+  \quad j\in\{\text{pitch},\text{roll}\} .
+  \label{eq:gimbal}
+\end{equation}
+The gimbal motor torque reacts on the airframe and is included in $\vect\tau$.
+
+\begin{definition}[Readability error]
+Let $\vect{u}_s$ be the unit vector along the top edge of the display in
+inertial coordinates. The readability error is
+\begin{equation}
+  \theta_{\mathrm{read}} = \arccos\big(\ez\transp\vect{u}_s\big) ,
+  \label{eq:readability}
+\end{equation}
+the angle between the top of the image and vertical.
+\end{definition}
+
+\begin{remark}
+\Cref{eq:readability} is deliberately not the angle between the screen normal
+and horizontal. Gimbal roll leaves the normal unchanged while rotating the
+image in its own plane, so a normal-based metric is blind to exactly the error a
+reader notices most. Measuring the up-vector captures both axes.
+\end{remark}
+
+\subsection{The complete system}
+
+Assembling, the state is
+\begin{equation}
+  x = \big(\vect{r},\ \vect{v},\ q,\ \vect{\omega},\
+        \Omega_1,\dots,\Omega_N,\ E,\
+        \vect\theta_g,\ \dt{\vect\theta}_g\big)
+  \in \R^{3}\times\R^{3}\times\mathbb{S}^{3}\times\R^{3}\times\R^{N}\times\R
+      \times\R^{2}\times\R^{2} ,
+  \label{eq:state}
+\end{equation}
+of dimension $18+N$, and the dynamics are
+\begin{equation}
+  \dt{x} = f(x,u,w;\,p),
+  \label{eq:ode}
+\end{equation}
+with control $u = (\Omega^{\mathrm{cmd}}_{1:N}, \vect\tau_g)$, disturbance $w$
+comprising wind and human motion, and design parameters $p$.
+
+Crucially, \cref{eq:ode} is not the whole problem. The parameters $p$ are
+themselves constrained by the algebraic closure of \cref{sec:closure}, giving a
+differential-algebraic system
+\begin{equation}
+  \dt{x} = f(x,u,w;p),
+  \qquad
+  0 = h(x,u,p) ,
+  \label{eq:dae}
+\end{equation}
+whose algebraic part contains \cref{eq:budget} with the mission energy computed
+from a solution of the differential part. \Cref{sec:codesign} makes this
+precise.

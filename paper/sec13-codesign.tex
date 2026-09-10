@@ -1,0 +1,253 @@
+﻿\section{The coupled co-design problem}
+\label{sec:codesign}
+
+\subsection{Statement}
+
+The algebraic layer of \cref{sec:closure} assumed the whole mission is spent
+hovering. The differential layer of \cref{sec:dynamics} assumed the mass was
+known. Neither is true independently. The honest statement couples them.
+
+\begin{problem}[Co-design]
+\label{prob:codesign}
+Find a design vector $p$ and a control law $u(\cdot)$ such that
+\begin{align}
+  \dt{x} &= f(x,u,w;p), \qquad x(0)=x_0(p), \label{eq:cd1}\\
+  m &= \mfix + \mstr(p) + \mprop(p) + \mbat, \label{eq:cd2}\\
+  \eb(1-\varsigma)\,\mbat &\ge \int_0^{t_f} P\big(x(t),u(t);p\big)\dd t ,
+  \qquad
+  p_b\,\mbat \ge \max_{t\in[0,t_f]} P\big(x(t),u(t);p\big), \label{eq:cd3}
+\end{align}
+where in this section $\eb$ denotes the usable specific energy before the
+landing reserve $\varsigma$ is removed and $p_b$ the pack's specific power,
+subject to the path constraints
+\begin{equation}
+  T(t)\le\lambda mg,\quad
+  \Omega_i(t)\le\Omega_{\max},\quad
+  \ell(t)\ge d_{\mathrm{safe}},\quad
+  \theta_{\mathrm{read}}(t)\le\theta_{\max},
+  \label{eq:cd4}
+\end{equation}
+with $\ell(t)$ the distance from the user's eye to the nearest rotor disk,
+minimising a scalar objective
+\begin{equation}
+  \mathcal{J}(p,u) = w_m m + w_P \bar P + w_N L_p + w_s\,\mathrm{span}
+                     + w_e\, e_{\mathrm{lag}} .
+  \label{eq:cd5}
+\end{equation}
+\end{problem}
+
+\Cref{eq:cd3} is the coupling. The right-hand side depends on the trajectory,
+which depends on the plant, which depends on $m$, which contains $\mbat$, which
+is the left-hand side. The first inequality keeps the reserve: starting from
+$E(0)=\eb\mbat$, the state of charge at $t_f$ is at least $\varsigma$. For a
+minimally sized continuous battery one of the two inequalities is an equality,
+\begin{equation}
+  \mbat = \max\left\{\frac{1}{\eb(1-\varsigma)}\int_0^{t_f}P\,\dd t,\;
+                     \frac{1}{p_b}\max_t P\right\} ;
+  \label{eq:batreq}
+\end{equation}
+a discrete pack, built from whole cells, need not satisfy either with equality.
+
+\subsection{Reduction to a fixed point}
+
+\Cref{eq:cd2,eq:cd3} can be reduced to a scalar fixed-point problem, which is
+what makes the system tractable.
+
+\begin{definition}[Inner and outer maps]
+For a given battery mass $\mu$, let
+\begin{equation}
+  \mathcal{G}(\mu) \coloneqq \text{the solution } m \text{ of }
+  m = \mfix + \mstr(m) + \mprop(m) + \mu
+  \label{eq:innermap}
+\end{equation}
+be the gross mass consistent with that battery, and let
+\begin{equation}
+  \mathcal{H}(\mu) \coloneqq
+  \max\left\{
+  \frac{1}{\eb(1-\varsigma)}\int_0^{t_f}
+    P\big(x(t;\mathcal{G}(\mu),\mu),u(t)\big)\dd t,\;
+  \frac{1}{p_b}\max_t P\big(x(t;\mathcal{G}(\mu),\mu),u(t)\big)\right\}
+  \label{eq:outermap}
+\end{equation}
+be the battery mass that the resulting mission demands, by \cref{eq:batreq}.
+\end{definition}
+
+\begin{proposition}[Well-posedness of the inner map]
+\label{prop:inner}
+Let $S(m)\coloneqq\mstr(m)+\mprop(m)$ map $[0,\infty)$ into $[0,\infty)$ (masses
+are non-negative) and satisfy the Lipschitz bound
+\begin{equation}
+  |S(m_2)-S(m_1)| \le L\,|m_2-m_1|
+  \quad\text{for all } m_1,m_2\ge0,
+  \qquad L<1 .
+  \label{eq:innercond}
+\end{equation}
+Then for every $\mu\ge0$, \cref{eq:innermap} has exactly one solution
+$\mathcal{G}(\mu)$, the iteration $m\leftarrow\mfix+S(m)+\mu$ converges to it
+from any start at rate $L$, and $\mathcal{G}$ is Lipschitz with constant
+$1/(1-L)$. If $S$ is non-decreasing, so is $\mathcal{G}$. If $S$ is
+differentiable,
+\begin{equation}
+  \mathcal{G}'(\mu) = \frac{1}{1-S'\big(\mathcal{G}(\mu)\big)} .
+  \label{eq:Gprime}
+\end{equation}
+\end{proposition}
+
+\begin{proof}
+The map $\Phi(m)=\mfix+S(m)+\mu$ sends $[0,\infty)$ into itself because
+$S\ge0$, and is a contraction with constant $L$ by \cref{eq:innercond}, so the
+Banach fixed-point
+theorem~\cite[Ch.~5]{ortega1970} gives existence, uniqueness and convergence of
+the iteration. For $\mu_1,\mu_2$ with solutions $m_1,m_2$,
+$m_2-m_1 = S(m_2)-S(m_1)+\mu_2-\mu_1$, so
+$|m_2-m_1|\le L|m_2-m_1|+|\mu_2-\mu_1|$, which is the Lipschitz bound. If $S$ is
+non-decreasing and $\mu_2>\mu_1$ but $m_2<m_1$, then
+$m_2-m_1-\big(S(m_2)-S(m_1)\big)\le-(1-L)(m_1-m_2)<0$, contradicting
+$m_2-m_1-\big(S(m_2)-S(m_1)\big)=\mu_2-\mu_1>0$. Finally
+$\Xi(m,\mu)=\Phi(m)-m$ has $\partial_m\Xi = S'-1\le L-1<0$, so the implicit
+function theorem applies and gives \cref{eq:Gprime}.
+\end{proof}
+
+\begin{remark}[Why a slope bound and not a growth bound]
+Continuity, monotonicity and $\limsup S(m)/m<1$ give existence but not
+uniqueness. The smooth, increasing, bounded
+$S(m)=4/[1+e^{-4(m-3)}]$ with $\mfix+\mu=1$ makes $m=1+S(m)$ hold at
+$m\approx1.0013$, $3$ and $4.9987$. The slope condition is what excludes this.
+For the lumped models $S'=f_s+\gamma_m$. For the component models of
+\cref{sec:components}, evaluated on the design of \cref{sec:results}, $S'$ lies
+between $0.13$ and $0.23$ over \SIrange{0.8}{50}{\kilo\gram}; the test suite
+asserts $0\le S'<0.9$ on that interval. That is a check on one design over a
+bounded interval, not a proof for every parameter set.
+\end{remark}
+
+\begin{theorem}[Existence of a closed design]
+\label{thm:codesignfixed}
+The system \cref{eq:cd2,eq:cd3} is equivalent to the scalar fixed-point equation
+\begin{equation}
+  \mu = \mathcal{H}(\mu) .
+  \label{eq:fixedpoint}
+\end{equation}
+If $\mathcal{H}$ is continuous and maps a compact interval $[0,\mu_{\max}]$ into
+itself, a solution exists by Brouwer's theorem. If in addition $\mathcal{H}$ is
+a contraction, $\mathrm{Lip}(\mathcal{H}) = L < 1$, the solution is unique and
+the iteration $\mu_{k+1}=\mathcal{H}(\mu_k)$ converges geometrically with rate
+$L$ from any starting point.
+\end{theorem}
+
+\begin{proof}
+Equivalence is by construction. The existence and uniqueness statements are
+Brouwer's fixed-point theorem and the Banach fixed-point theorem
+respectively~\cite[Ch.~5]{ortega1970}.
+\end{proof}
+
+\begin{proposition}[Contraction criterion]
+\label{prop:contraction}
+Suppose the mission power is well approximated by a mission-dependent multiple
+of the hover power, $\bar P = \varkappa\,P_{\mathrm{hover}}(m)$ with $\varkappa$
+independent of $m$, and that the energy term attains the maximum in
+\cref{eq:outermap} in a neighbourhood of $\mu$. Then
+\begin{equation}
+  \mathcal{H}'(\mu)
+  = \frac{\varkappa\,t_f}{\eb(1-\varsigma)}\,
+    \frac{\dd P_{\mathrm{hover}}}{\dd m}\,\mathcal{G}'(\mu),
+  \label{eq:Hprime}
+\end{equation}
+and in the fixed-rotor case with the lumped models, where
+$\mathcal{G}'=1/(1-f_s-\gamma_m)=1/\alpha$,
+\begin{equation}
+  \mathcal{H}'(\mu) = \frac{\varkappa}{\alpha}\cdot
+    \frac{3}{2}\,\beta\,\sqrt{m} ,
+  \label{eq:Hprime2}
+\end{equation}
+with $\beta$ as in \cref{eq:beta}, whose specific energy is net of the reserve,
+$\eb(1-\varsigma)$ in the notation of this section. The iteration therefore
+contracts precisely when $\tfrac32\varkappa\beta\sqrt m < \alpha$, which at
+$\varkappa=1$ is the condition $F'(m)>0$ of \cref{cor:dmdm}, i.e.\ $m<m^*$. On
+the power-limited branch $\mathcal{H}' = p_b^{-1}(\dd P_{\mathrm{peak}}/\dd m)
+\mathcal{G}'$ instead, and where the two branches exchange the maximum
+$\mathcal{H}$ has a kink.
+\end{proposition}
+
+\begin{proof}
+Differentiate the energy term of \cref{eq:outermap} by the chain rule. From
+\cref{eq:beta,eq:ptot},
+$P_{\mathrm{hover}}(m) = \beta\,\eb(1-\varsigma)\, m^{3/2}/t_f + \Paux$, so
+$\dd P_{\mathrm{hover}}/\dd m = \tfrac32\beta\,\eb(1-\varsigma)\, m^{1/2}/t_f$.
+Substituting into \cref{eq:Hprime} with $\mathcal{G}'=1/\alpha$, the factors
+$t_f$ and $\eb(1-\varsigma)$ cancel and \cref{eq:Hprime2} remains.
+\end{proof}
+
+\begin{remark}[What the overhead does, and does not, do]
+\Cref{prop:contraction} connects the algebraic and the simulated pictures: the
+condition for the simulation-in-the-loop iteration to converge is the
+light-branch condition with $\beta$ multiplied by $\varkappa$. It is tempting to
+say that overhead ``degrades $\alpha$''. That is a reading of one inequality,
+not an identity. Multiplying the whole power by $\varkappa$ turns the closure
+into
+\begin{equation}
+  \alpha m - \varkappa\beta\, m^{3/2}
+  = \mfix + \varkappa\,\frac{\Paux t_f}{\eb},
+  \label{eq:kappaclosure}
+\end{equation}
+which scales the energy coupling and the auxiliary part of $\Mzero$ together,
+and by \cref{eq:closedform} lowers the critical load by the factor
+$1/\varkappa^2$. A change of $\alpha$ would do neither.
+\end{remark}
+
+\subsection{Residual formulation}
+
+Rather than iterate \cref{eq:fixedpoint} naively, the engine treats the pair
+$y = (m,\mbat)$ and drives the residual
+\begin{equation}
+  \vect{\mathcal{R}}(y) =
+  \begin{bmatrix}
+    m - \big(\mfix + \mstr(m) + \mprop(m) + \mbat\big) \\[2pt]
+    \mbat - \max\left\{\dfrac{E_{\mathrm{mission}}(m,\mbat)}{\eb(1-\varsigma)},\;
+                       \dfrac{P_{\mathrm{peak}}(m,\mbat)}{p_b}\right\}
+  \end{bmatrix}
+  = \vect 0 .
+  \label{eq:residual}
+\end{equation}
+The first component is algebraic and cheap; the second requires a trajectory
+simulation. The engine solves $\mathcal{R}_1=0$ at every outer step by the
+iteration of \cref{prop:inner}, reducing the problem to the scalar
+$\mathcal{R}_2=0$ at one simulation per update. When $|\mathcal{R}_2|$ falls
+below tolerance the battery is rounded up to the last requirement and the
+design is flown again; the run is declared converged only when that
+verification flight requires no more battery than it carries. The energy margin
+$\eb(1-\varsigma)\mbat-E_{\mathrm{mission}}$, the power margin
+$p_b\mbat-P_{\mathrm{peak}}$ and the path constraints \cref{eq:cd4} of the final
+flight are then reported separately. Closing the mass and energy balance and
+satisfying the path constraints are different outcomes: a converged battery
+loop can still be an unacceptable flight.
+
+\subsection{The outer optimisation}
+
+With the closure solved, \cref{eq:cd5} becomes a function of the design vector
+alone, and \cref{prob:codesign} reduces to a constrained finite-dimensional
+program
+\begin{equation}
+  \min_{p\in\mathcal{P}} \ \mathcal{J}(p)
+  \quad\text{s.t.}\quad
+  g_j(p)\le0,\ j=1,\dots,J ,
+  \label{eq:outerprog}
+\end{equation}
+with $\mathcal{P}$ a box and $g_j$ the constraints of \cref{eq:cd4} together
+with the modelling-validity constraints of
+\cref{as:sigma,as:stall,eq:reynolds}. The objective is non-convex, cheap to
+evaluate on the algebraic layer and expensive on the simulated one, and has
+large infeasible regions where the closure has no solution at all. This
+combination dictates the choice of a population-based method with exterior
+penalties, discussed in \cref{sec:numerics}.
+
+\begin{remark}[Why not adjoint optimal control]
+\Cref{prob:codesign} in full generality is a control co-design problem and
+could be attacked with adjoint-based methods over the trajectory. We do not,
+for two reasons. First, the objective is dominated by steady hover, for which
+the trajectory contributes a scalar $\varkappa$ near unity; the sensitivity of
+the design to the control law is small compared with its sensitivity to the
+rotor geometry. Second, and more importantly, the constraints that actually
+bind, acoustic and geometric, are algebraic functions of $p$ and do not involve
+$u(\cdot)$ at all. Spending effort on trajectory optimisation would refine the
+part of the problem that is not deciding the answer.
+\end{remark}

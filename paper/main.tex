@@ -1,0 +1,108 @@
+\documentclass[11pt,twoside]{article}
+\input{preamble}
+\input{results/macros}
+
+\title{\bfseries The Flying Screen:\\
+Coupled Sizing, Flight Dynamics and Control\\
+of a Human-Adjacent Hovering Display}
+
+\author{Derivation, computational treatment and design study}
+\date{}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+\noindent
+A display that hovers beside a standing person is not an aircraft-sizing
+problem with a payload attached. It is a coupled problem: the mass of the
+machine determines the power it needs, the power determines the mass of the
+battery, the battery is part of the mass, and the trajectory the controller
+flies determines the power in the first place. This paper derives the whole
+system and solves it. The derivation combines analytical models (momentum and
+blade-element theory, thin-wall beam theory, rigid-body dynamics), empirical
+fits where theory runs out (motor mass, the acoustic anchor), numerical
+optimisation and simulation, and says which is which.
+
+The paper has three parts. Part~I develops the algebraic layer. From the
+actuator-disk control volume we
+obtain the induced velocity and ideal hover power, add a blade-element profile
+term to produce rather than assume a figure of merit, and close the mass
+budget. The closure reduces to $\alpha m - \beta m^{q} = M_0$ with
+$q = (3-p)/2$, where $p$ is the exponent in a disk-area scaling law
+$A \sim m^{p}$. \Cref{thm:trichotomy} shows that for $q>1$ this equation admits
+exactly two, one, or zero positive solutions according to the sign of
+$M_0^{\max} - M_0$, that the transition is a saddle-node bifurcation, and that
+the lighter root is precisely the attracting fixed point of the naive sizing
+iteration. \Cref{thm:sensitivity} gives the logarithmic sensitivities of
+$M_0^{\max}$ in closed form; endurance enters with exponent $-2$ and specific
+energy, figure of merit and electrical efficiency each with $+2$.
+
+Part~II derives the flight dynamics on $\SEthree$: Newton-Euler translation
+and rotation with the full inertia tensor of one shared geometry, rotor thrust
+and reaction torque through an allocation map, first-order rotor-speed
+dynamics, a battery energy state, an orientation-dependent flat-plate model for
+the screen that couples attitude to translation and back, and a gimbal. It then
+builds the cascaded controller: a geometric attitude law with angular-rate
+feedforward from differential flatness, a gain heuristic sized from the
+machine's own control authority, which is computed by linear programming, and a
+reference governor whose keep-out constraint moves with the user.
+
+Part~III states the co-design problem as a differential-algebraic system with a
+fixed-point constraint, gives conditions for the inner map to be well posed and
+for the simulation-in-the-loop battery iteration to contract, describes the
+engine and its numerical methods, reports verification against the closed
+forms and calibration against measured hardware, and presents the resulting
+design.
+
+Four findings invert the naive expectation. First, for an indoor
+human-adjacent machine the binding constraint is acoustic, not energetic.
+Second, a declared sound-power level is not a pressure at one metre, and the
+eight-decibel confusion between them, compounded by an uncalibrated anchor,
+was worth fourteen decibels of error. Third, the standoff a user specifies is
+measured to the display, while the rotors reach most of a metre back toward
+them; a safety criterion evaluated at the vehicle centre is wrong by the whole
+reach of the machine. Fourth, the standoff that makes the blades safe makes
+ordinary text too small: at \SI{1.2}{\metre} a \num{1920}-pixel laptop panel
+needs about \rUiScale\,\% interface scaling to meet a \SI{16}{\arcminute}
+character height, which leaves a desktop of about
+$\rLogicalW\times\rLogicalH$ logical pixels. The resolution is there; the
+usable workspace is that of a tablet.
+\end{abstract}
+
+\tableofcontents
+\clearpage
+
+\input{sec01-intro}
+\input{sec02-notation}
+
+\part{The Algebraic Layer: Existence of a Design}
+\input{sec03-momentum}
+\input{sec04-blade}
+\input{sec05-closure}
+\input{sec06-fold}
+\input{sec07-scaling}
+\input{sec08-components}
+\input{sec09-acoustics}
+\input{sec10-nearfield}
+
+\part{The Differential Layer: Flight}
+\input{sec11-dynamics}
+\input{sec12-control}
+
+\part{Coupling, Computation and Results}
+\input{sec13-codesign}
+\input{sec14-engine}
+\input{sec15-numerics}
+\input{sec16-verification}
+\input{sec17-results}
+\input{sec18-limitations}
+
+\appendix
+\input{appA-nomenclature}
+\input{appB-proofs}
+
+\bibliographystyle{plain}
+\bibliography{refs}
+
+\end{document}

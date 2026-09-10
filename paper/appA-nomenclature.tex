@@ -1,0 +1,114 @@
+\section{Nomenclature}
+\label{app:nomenclature}
+
+Dimensionless quantities carry the unit $1$.
+
+\begin{longtable}{@{}llp{7.4cm}@{}}
+\caption{Symbols.}\label{tab:symbols}\\
+\toprule
+Symbol & Unit & Meaning \\
+\midrule
+\endfirsthead
+\toprule
+Symbol & Unit & Meaning \\
+\midrule
+\endhead
+\multicolumn{3}{@{}l}{\emph{Geometry and mass}}\\
+$m$              & \si{\kilo\gram} & gross mass\\
+$\mfix$          & \si{\kilo\gram} & fixed payload and avionics\\
+$\mstr$          & \si{\kilo\gram} & structural mass\\
+$\mprop$         & \si{\kilo\gram} & motors, speed controllers, propellers\\
+$\mbat$          & \si{\kilo\gram} & battery pack\\
+$S(m)$           & \si{\kilo\gram} & $\mstr(m)+\mprop(m)$, the mass that scales with $m$\\
+$N$              & 1               & number of rotors\\
+$N_b$            & 1               & blades per rotor\\
+$D,R$            & \si{\metre}     & rotor diameter, radius\\
+$A$              & \si{\metre\squared} & total actuator disk area, $N\pi D^2/4$\\
+$L$              & \si{\metre}     & arm length, hub to rotor centre\\
+$\mathcal{R}$    & \si{\metre}     & reach, $L+R$, centre to nearest blade tip\\
+$\ell$           & \si{\metre}     & distance from the user's eye to the nearest rotor disk\\
+$c$              & \si{\metre}     & blade chord\\
+$\sigma$         & 1               & solidity, $N_b c/(\pi R)$\\
+$\mathrm{AR}$    & 1               & blade aspect ratio, $R/c$\\
+$J$              & \si{\kilo\gram\metre\squared} & inertia tensor about the centre of mass\\
+$I$              & \si{\metre\tothe{4}} & second moment of area\\
+\midrule
+\multicolumn{3}{@{}l}{\emph{Aerodynamics}}\\
+$T$              & \si{\newton}    & total thrust\\
+$\vind$          & \si{\metre\per\second} & induced velocity at the disk\\
+$w$              & \si{\metre\per\second} & far-wake velocity, $2\vind$\\
+$\mathrm{DL}$    & \si{\pascal}    & disk loading, $T/A$\\
+$\Vtip$          & \si{\metre\per\second} & tip speed, $\Omega R$\\
+$\Ct$            & 1               & thrust coefficient\\
+$\Ct/\sigma$     & 1               & blade loading coefficient\\
+$\Cdz$           & 1               & blade profile drag coefficient\\
+$\kappa$         & 1               & induced power factor\\
+$\kappa_{\mathrm{int}}$ & 1        & rotor interference factor\\
+$\FM$            & 1               & figure of merit\\
+$\rho$           & \si{\kilo\gram\per\metre\cubed} & air density\\
+$C_{D,n},C_{D,t}$& 1               & screen drag coefficients, normal and tangential\\
+\midrule
+\multicolumn{3}{@{}l}{\emph{Power and energy}}\\
+$\Pideal$        & \si{\watt}      & ideal induced power, $T\vind$\\
+$\Pind,\Pprof$   & \si{\watt}      & induced and profile power\\
+$\Pshaft,\Pelec$ & \si{\watt}      & shaft and electrical power\\
+$\Paux$          & \si{\watt}      & non-propulsive electrical load\\
+$\eta$           & 1               & motor times speed-controller efficiency\\
+$\eb$            & \si{\joule\per\kilo\gram} & battery specific energy available to the mission (\cref{mod:battery})\\
+$p_b$            & \si{\watt\per\kilo\gram}  & usable battery specific power\\
+$E$              & \si{\joule}     & remaining battery energy\\
+$t_f$            & \si{\second}    & mission duration\\
+$\varsigma$      & 1               & state-of-charge reserve at landing\\
+$\Theta_p(m)$    & \si{\second}    & longest mission a mass $m$ closes, \cref{eq:theta}\\
+$\hat m$         & \si{\kilo\gram} & mass at which $\Theta_p$ is largest\\
+$\vartheta$      & 1               & propulsive share of total power at $\hat m$, \cref{eq:wallslope}\\
+\midrule
+\multicolumn{3}{@{}l}{\emph{Closure}}\\
+$\alpha$         & 1               & thrust coupling, $1-f_s-\gamma_m$\\
+$\beta$          & \si{\kilo\gram^{-1/2}} & energy coupling\\
+$\Mzero$         & \si{\kilo\gram} & effective fixed load\\
+$\Mmax$          & \si{\kilo\gram} & critical fixed load at the fold\\
+$m^*$            & \si{\kilo\gram} & fold mass\\
+$f_s$            & 1               & structural mass fraction\\
+$\gamma_m$       & 1               & propulsion mass fraction, $\lambda g/S_m$\\
+$\gamma_b$       & 1               & battery mass fraction\\
+$\lambda$        & 1               & thrust margin, $T_{\max}/mg$\\
+$S_m$            & \si{\newton\per\kilo\gram} & propulsion specific thrust\\
+$p$              & 1               & disk-area scaling exponent, $A\sim m^p$\\
+$q$              & 1               & power exponent, $(3-p)/2$\\
+$\mathcal{F}$    & \si{\kilo\gram} & component closure residual, \cref{eq:fpclosure}\\
+$\mathcal{G},\mathcal{H}$ & \si{\kilo\gram} & inner and outer maps of the co-design fixed point\\
+\midrule
+\multicolumn{3}{@{}l}{\emph{Dynamics and control}}\\
+$\vect r,\vect v$& \si{\metre},\si{\metre\per\second} & position, velocity\\
+$R,q$            & 1               & attitude as rotation matrix, quaternion\\
+$\vect\omega$    & \si{\radian\per\second} & body angular velocity\\
+$\vect\omega_d,\dt{\vect\omega}_d$ & \si{\radian\per\second},\si{\radian\per\second\squared} & desired body rate and its derivative\\
+$\vect j_d$      & \si{\metre\per\second\cubed} & reference jerk\\
+$\vect h_\omega$ & \si{\radian\per\second} & rate of the desired thrust direction, \cref{eq:omegad}\\
+$\Omega_i$       & \si{\radian\per\second} & speed of rotor $i$\\
+$k_T,k_Q,k_P$    & 1               & rotor thrust, torque, power coefficients\\
+$\mat M$         & 1               & allocation matrix\\
+$\Delta$         & \si{\radian\squared\per\second\squared} & balanced squared-speed differential, \cref{eq:authority}\\
+$\tau_m$         & \si{\second}    & rotor speed time constant\\
+$\vect e_R,\vect e_\omega$ & 1     & attitude and rate errors\\
+$K_R,K_\omega$   & \si{\per\second\squared},\si{\per\second} & attitude gains\\
+$K_p,K_d,K_i$    & 1               & position gains\\
+$\tau_j^{\max},\alpha_j^{\max}$ & \si{\newton\metre},\si{\radian\per\second\squared} & torque and angular acceleration authority\\
+$\vect r_g,\vect v_g$ & \si{\metre},\si{\metre\per\second} & governed reference\\
+$\vect c$        & \si{\metre}     & user's head position\\
+$\varrho$        & \si{\metre}     & keep-out radius, $d_{\mathrm{safe}}+\mathcal{R}+\varepsilon$\\
+$\varepsilon$    & \si{\metre}     & tracking margin inside the keep-out radius\\
+$e_{\mathrm{track}},e_{\mathrm{lag}}$ & \si{\metre} & error against the governed and the raw reference\\
+$\varkappa$      & 1               & mission power overhead, $\bar P/P_{\mathrm{hover}}$\\
+\midrule
+\multicolumn{3}{@{}l}{\emph{Acoustics}}\\
+$L_p,L_W$        & \si{\decibel}   & sound pressure, sound power level\\
+$C$              & \si{\decibel}   & acoustic anchor\\
+$Q$              & 1               & directivity factor\\
+$\mathcal{R}_{\mathrm{room}}$ & \si{\metre\squared} & room constant\\
+$\bar\alpha$     & 1               & average absorption coefficient\\
+$r_c$            & \si{\metre}     & critical distance\\
+$f_{\mathrm{BPF}}$ & \si{\hertz}   & blade passage frequency\\
+\bottomrule
+\end{longtable}

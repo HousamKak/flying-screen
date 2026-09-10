@@ -1,0 +1,311 @@
+﻿\section{The fold: existence, multiplicity and the sizing iteration}
+\label{sec:fold}
+
+This section analyses \cref{eq:closure-q} completely. The results are
+elementary but they are the substance of the problem, and they are what
+separates ``the design is heavy'' from ``the design does not exist''.
+
+Throughout, fix $\alpha>0$, $\beta>0$, $\Mzero>0$ and $q>0$, and define
+\begin{equation}
+  F:(0,\infty)\to\R, \qquad F(m) \coloneqq \alpha m - \beta m^{q} .
+  \label{eq:F}
+\end{equation}
+$F(m)$ is the fixed load that a machine of gross mass $m$ can support: gross
+mass less what structure, propulsion and battery consume. Solving the closure
+means solving $F(m)=\Mzero$.
+
+\subsection{The trichotomy}
+
+\begin{lemma}[Strict concavity]
+\label{lem:concave}
+If $q>1$ then $F$ is strictly concave on $(0,\infty)$, attains a unique
+maximum at
+\begin{equation}
+  m^{*} = \left(\frac{\alpha}{q\beta}\right)^{\frac{1}{q-1}} ,
+  \label{eq:mstar}
+\end{equation}
+and
+\begin{equation}
+  \Mmax \coloneqq F(m^{*}) = \alpha\, m^{*}\left(1 - \frac{1}{q}\right) .
+  \label{eq:Mmax}
+\end{equation}
+Moreover $F(0^+)=0$, $F$ is strictly increasing on $(0,m^*)$, strictly
+decreasing on $(m^*,\infty)$, and $F(m)\to-\infty$ as $m\to\infty$.
+\end{lemma}
+
+\begin{proof}
+$F$ is smooth on $(0,\infty)$ with
+\begin{equation}
+  F'(m) = \alpha - q\beta m^{q-1},
+  \qquad
+  F''(m) = -q(q-1)\beta m^{q-2} .
+  \label{eq:Fderiv}
+\end{equation}
+For $q>1$ and $m>0$ we have $q(q-1)\beta m^{q-2}>0$, hence $F''<0$ everywhere
+on $(0,\infty)$: $F$ is strictly concave. Setting $F'(m)=0$ gives
+$m^{q-1} = \alpha/(q\beta)$, and since $q-1>0$ the map $m\mapsto m^{q-1}$ is a
+strictly increasing bijection of $(0,\infty)$ onto itself, so the stationary
+point is unique and given by \cref{eq:mstar}. Strict concavity makes it the
+global maximum. Evaluating,
+\[
+  F(m^*) = \alpha m^* - \beta (m^*)^{q}
+         = \alpha m^* - \beta m^* (m^*)^{q-1}
+         = \alpha m^* - \beta m^* \frac{\alpha}{q\beta}
+         = \alpha m^*\left(1-\frac1q\right),
+\]
+which is \cref{eq:Mmax}. The sign of $F'$ follows from monotonicity of
+$m^{q-1}$, and $F(m) = m(\alpha - \beta m^{q-1}) \to -\infty$ because the
+bracket tends to $-\infty$.
+\end{proof}
+
+\begin{theorem}[Trichotomy for the closure]
+\label{thm:trichotomy}
+Let $q>1$, $\alpha,\beta,\Mzero>0$, and let $\Mmax$ be as in \cref{eq:Mmax}.
+Then the equation $F(m)=\Mzero$ has, on $(0,\infty)$,
+\begin{enumerate}[label=(\roman*),nosep]
+  \item exactly two solutions $0 < m_- < m^* < m_+$ if $\Mzero < \Mmax$;
+  \item exactly one solution $m = m^*$, a double root, if $\Mzero = \Mmax$;
+  \item no solution if $\Mzero > \Mmax$.
+\end{enumerate}
+\end{theorem}
+
+\begin{proof}
+By \cref{lem:concave}, $F$ increases strictly from $F(0^+)=0$ to $F(m^*)=\Mmax$
+on $(0,m^*]$ and decreases strictly from $\Mmax$ to $-\infty$ on
+$[m^*,\infty)$. Both branches are continuous and strictly monotone.
+
+(iii) If $\Mzero>\Mmax$ then $F(m)\le \Mmax < \Mzero$ for all $m>0$, so no
+solution exists.
+
+(ii) If $\Mzero=\Mmax$, then $F(m)=\Mzero$ forces $m=m^*$ by uniqueness of the
+maximiser. It is a double root because $F'(m^*)=0$, so $F(m)-\Mzero$ has a zero
+of order at least two; the order is exactly two since $F''(m^*)<0$.
+
+(i) If $0<\Mzero<\Mmax$ then on $(0,m^*]$ the function $F$ is a strictly
+increasing continuous bijection onto $(0,\Mmax]$, so there is exactly one
+$m_-\in(0,m^*)$ with $F(m_-)=\Mzero$. On $[m^*,\infty)$, $F$ is a strictly
+decreasing continuous bijection onto $(-\infty,\Mmax]$, so there is exactly one
+$m_+\in(m^*,\infty)$ with $F(m_+)=\Mzero$. Strictness gives $m_-<m^*<m_+$ and
+excludes further roots.
+\end{proof}
+
+\begin{corollary}[Closed forms at $q=3/2$]
+\label{cor:closedform}
+For the fixed-rotor case $q=3/2$,
+\begin{equation}
+  m^{*} = \frac{4\alpha^{2}}{9\beta^{2}},
+  \qquad
+  \Mmax = \frac{4\alpha^{3}}{27\beta^{2}} .
+  \label{eq:closedform}
+\end{equation}
+\end{corollary}
+
+\begin{proof}
+Put $q=3/2$ in \cref{eq:mstar}: $1/(q-1)=2$ and $\alpha/(q\beta)
+= 2\alpha/(3\beta)$, so $m^* = 4\alpha^2/(9\beta^2)$. Then \cref{eq:Mmax} gives
+$\Mmax = \alpha m^*(1-2/3) = \alpha m^*/3 = 4\alpha^3/(27\beta^2)$.
+\end{proof}
+
+\begin{remark}[Which root is the design]
+The physically meaningful root is $m_-$. Both roots satisfy the mass budget,
+but $m_+$ is a machine that is heavier than necessary, carries a battery sized
+for its own excess weight, and is, by \cref{thm:iteration} below, unstable
+under the natural sizing iteration. It is a mathematical artefact of the
+quadratic-like structure, not a design.
+\end{remark}
+
+\begin{remark}[Cubic reduction]
+\Cref{eq:closure} at $q=3/2$ becomes a cubic under the substitution
+$u=\sqrt m$: $\beta u^3 - \alpha u^2 + \Mzero = 0$. The product of its three
+roots is $-\Mzero/\beta<0$, so exactly one root is negative and the other two
+are the pair $\sqrt{m_\pm}$ of \cref{thm:trichotomy}, real precisely when the
+discriminant is non-negative. The engine solves the equation by bracketing
+rather than by radicals, for reasons given in \cref{sec:numerics}.
+\end{remark}
+
+\subsection{The transition is a saddle-node bifurcation}
+
+Regard $\Mzero$ as a parameter and consider the one-parameter family of
+equations $G(m;\Mzero) \coloneqq F(m)-\Mzero = 0$.
+
+\begin{theorem}[Saddle-node]
+\label{thm:bifurcation}
+At $(m,\Mzero)=(m^*,\Mmax)$ the family $G$ undergoes a saddle-node
+(fold) bifurcation: the defining conditions
+\begin{equation}
+  G = 0, \qquad \frac{\partial G}{\partial m} = 0
+  \label{eq:sn1}
+\end{equation}
+hold, together with the nondegeneracy and transversality conditions
+\begin{equation}
+  \frac{\partial^2 G}{\partial m^2}(m^*,\Mmax) = -q(q-1)\beta (m^*)^{q-2} \ne 0,
+  \qquad
+  \frac{\partial G}{\partial \Mzero}(m^*,\Mmax) = -1 \ne 0 .
+  \label{eq:sn2}
+\end{equation}
+Consequently, near the bifurcation the two roots behave as
+\begin{equation}
+  m_{\pm} = m^* \pm \sqrt{\frac{2(\Mmax-\Mzero)}{q(q-1)\beta (m^*)^{q-2}}}
+            + O(\Mmax-\Mzero) ,
+  \label{eq:sqrtlaw}
+\end{equation}
+so they approach one another with a square-root law and annihilate.
+\end{theorem}
+
+\begin{proof}
+\Cref{eq:sn1} is \cref{lem:concave} together with the definition of $\Mmax$.
+\Cref{eq:sn2} follows from \cref{eq:Fderiv} and $\partial G/\partial \Mzero=-1$.
+These are exactly the hypotheses of the saddle-node normal form theorem
+(see e.g.\ Guckenheimer and Holmes~\cite[\S3.4]{guckenheimer1983} or
+Kuznetsov~\cite[\S3.2]{kuznetsov2004}), which asserts the existence of a smooth
+change of coordinates taking $G$ to $\dot y = \mu - y^2$ near the point.
+For \cref{eq:sqrtlaw}, Taylor-expand $F$ about $m^*$:
+\[
+  \Mzero = F(m) = \Mmax + \tfrac12 F''(m^*)(m-m^*)^2 + O((m-m^*)^3),
+\]
+using $F'(m^*)=0$. Solving for $m-m^*$ and inserting
+$F''(m^*)=-q(q-1)\beta(m^*)^{q-2}$ gives the stated expansion.
+\end{proof}
+
+\begin{remark}[Why this matters practically]
+\Cref{eq:sqrtlaw} says that near the boundary of feasibility the design mass is
+an infinitely sensitive function of the requirement: $\dd m_-/\dd \Mzero \to
+\infty$ as $\Mzero\uparrow\Mmax$. A design placed close to the fold is not
+merely marginal; its mass is unbounded in its derivative with respect to every
+assumption. This is a stronger statement than ``leave margin'' and is the
+reason the engine reports the utilisation $\Mzero/\Mmax$ as a first-class
+quantity.
+\end{remark}
+
+\subsection{The naive sizing iteration}
+
+The obvious way to size such a vehicle is to guess a mass, compute what it
+implies, and repeat:
+\begin{equation}
+  m_{k+1} = \Phi(m_k),
+  \qquad
+  \Phi(m) \coloneqq \Mzero + f_s m + \gamma_m m + \beta m^{q} .
+  \label{eq:iteration}
+\end{equation}
+$\Phi$ is exactly \cref{eq:budget} read as an assignment. Its fixed points are
+the roots of \cref{eq:closure-q}, since
+$\Phi(m)=m \iff F(m)=\Mzero$.
+
+\begin{theorem}[Convergence of the sizing iteration]
+\label{thm:iteration}
+Let $q>1$ and $\Mzero<\Mmax$, with roots $m_-<m^*<m_+$ as in
+\cref{thm:trichotomy}. Then
+\begin{enumerate}[label=(\roman*),nosep]
+  \item $\Phi'(m) = 1 - F'(m)$, so $\Phi'(m_-)<1$ and $\Phi'(m_+)>1$;
+  \item $m_-$ is an attracting fixed point of \cref{eq:iteration} with
+        asymptotic linear rate $\Phi'(m_-) = 1-F'(m_-) \in (0,1)$, and $m_+$ is
+        repelling;
+  \item the iteration started from any $m_0 \in [0,m_+)$ converges
+        monotonically upward to $m_-$ if $m_0<m_-$, and monotonically downward
+        to $m_-$ if $m_0\in(m_-,m_+)$;
+  \item for $m_0>m_+$ the iterates increase without bound;
+  \item if $\Mzero>\Mmax$ the iterates increase without bound from every
+        starting point.
+\end{enumerate}
+\end{theorem}
+
+\begin{proof}
+(i) Differentiating \cref{eq:iteration},
+$\Phi'(m) = f_s+\gamma_m + q\beta m^{q-1}$. Using
+$f_s+\gamma_m = 1-\alpha$ from \cref{eq:alpha} and
+$F'(m)=\alpha - q\beta m^{q-1}$ from \cref{eq:Fderiv},
+\[
+  \Phi'(m) = 1-\alpha + q\beta m^{q-1} = 1 - F'(m).
+\]
+By \cref{lem:concave}, $F'(m_-)>0$ and $F'(m_+)<0$, giving $\Phi'(m_-)<1$ and
+$\Phi'(m_+)>1$. Also $\Phi'>0$ everywhere since $f_s,\gamma_m,\beta\ge0$ and not
+all zero, so $\Phi$ is strictly increasing; and $\Phi'(m_-) = 1-F'(m_-) > 0$
+because $F'(m_-) \le \alpha < 1$.
+
+(ii) Standard: a fixed point of a $C^1$ map is attracting when
+$|\Phi'|<1$ and repelling when $|\Phi'|>1$, with linear rate $|\Phi'|$.
+
+(iii) $\Phi$ is increasing and $\Phi(m)-m = \Mzero-F(m)$, which is negative
+exactly on $(m_-,m_+)$ and positive on $[0,m_-)$. Hence for $m_0<m_-$ the
+sequence is increasing and bounded above by $m_-$ (because $\Phi$ increasing
+and $\Phi(m_-)=m_-$ imply $m_k<m_-\Rightarrow m_{k+1}<m_-$), so it converges,
+necessarily to a fixed point in $[m_0,m_-]$, which must be $m_-$. The argument
+on $(m_-,m_+)$ is symmetric with the sequence decreasing.
+
+(iv) For $m_0>m_+$, $\Phi(m)-m = \Mzero - F(m) > 0$ since $F(m)<\Mzero$ there,
+so the sequence increases; it cannot converge because there is no fixed point
+above $m_+$; hence it diverges.
+
+(v) If $\Mzero>\Mmax$ then $\Mzero-F(m)>0$ for every $m$, so
+$m_{k+1}>m_k$ always and there is no fixed point to converge to.
+\end{proof}
+
+\begin{corollary}[Local stability criterion]
+\label{cor:dmdm}
+A design is a stable fixed point of the sizing iteration if and only if
+\begin{equation}
+  \frac{\dd}{\dd m}\Big[\mstr(m)+\mprop(m)+\mbat(m)\Big] < 1 ,
+  \label{eq:dmdm}
+\end{equation}
+which for the model of \cref{sec:closure} reads
+$f_s + \gamma_m + q\beta m^{q-1} < 1$, equivalently $F'(m)>0$, equivalently
+$m<m^*$.
+\end{corollary}
+
+\Cref{cor:dmdm} is the precise form of the intuition that ``each extra kilogram
+must require less than a kilogram of extra machine to carry it''. The engine
+evaluates \cref{eq:dmdm} numerically at the solved design point and reports it.
+
+\begin{remark}[Critical slowing down]
+By \cref{thm:iteration}(ii) the convergence rate is $1-F'(m_-)$, and
+$F'(m_-)\to 0$ as $\Mzero\uparrow\Mmax$. The iteration therefore becomes
+arbitrarily slow near the fold: near-infeasible designs are not distinguished
+from infeasible ones by a fixed iteration budget. This is a real trap. A
+practical consequence is that a solver which reports ``did not converge in $K$
+iterations'' cannot be used to decide feasibility; the analytic criterion
+$\Mzero \lessgtr \Mmax$ must be used instead. The engine does exactly this and
+classifies slow convergence separately from divergence.
+\end{remark}
+
+\subsection{Behaviour when \texorpdfstring{$q\le1$}{q <= 1}}
+
+\begin{theorem}[No fold for $q\le1$]
+\label{thm:pfold}
+Let $\alpha,\beta,\Mzero>0$.
+\begin{enumerate}[label=(\roman*),nosep]
+  \item If $q=1$ and $\alpha>\beta$, then $F(m)=\Mzero$ has the unique solution
+        $m=\Mzero/(\alpha-\beta)$; if $\alpha\le\beta$ there is no solution and
+        $F\le 0$.
+  \item If $0<q<1$, then $F(m)=\Mzero$ has exactly one solution for every
+        $\Mzero>0$. In particular no critical payload exists.
+\end{enumerate}
+Consequently, under the disk-area scaling \cref{eq:areascaling} a fold exists
+if and only if $p<1$.
+\end{theorem}
+
+\begin{proof}
+(i) $F(m)=(\alpha-\beta)m$ is linear; the claim is immediate.
+
+(ii) For $0<q<1$, $F'(m)=\alpha-q\beta m^{q-1}$ with $q-1<0$, so
+$m^{q-1}\to\infty$ as $m\to0^+$ and $m^{q-1}\to0$ as $m\to\infty$. Hence
+$F'(m)<0$ for small $m$ and $F'(m)>0$ for large $m$, with a single sign change
+at $m_{\min}=(q\beta/\alpha)^{1/(1-q)}$. Thus $F$ decreases from $F(0^+)=0$ to
+a negative minimum and then increases strictly to $+\infty$ (since
+$F(m)=m(\alpha-\beta m^{q-1})$ and the bracket tends to $\alpha>0$). On
+$[m_{\min},\infty)$, $F$ is a strictly increasing continuous bijection onto
+$[F(m_{\min}),\infty)\supset(0,\infty)$, so there is exactly one root with
+$F=\Mzero>0$, and none on $(0,m_{\min})$ where $F\le0<\Mzero$.
+
+The final statement follows from $q=(3-p)/2$: $q>1 \iff p<1$.
+\end{proof}
+
+\begin{finding}
+The catastrophe is not a property of flight. It is a property of holding the
+rotor area fixed while the mass grows. Let the disk grow at least as fast as
+the mass and the fold disappears entirely, replaced by the far gentler
+condition \cref{eq:constdlfeas}. What is then unbounded is not the mass but the
+rotor diameter, so the binding constraint migrates from energy to geometry,
+noise and safety. It does not go away. Nor does the absence of a fold mean the
+absence of a ceiling: at $p=1$ exactly the longest mission that closes is still
+finite (\cref{prop:twall}); only for $p>1$ does it disappear.
+\end{finding}

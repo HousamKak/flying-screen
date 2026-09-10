@@ -1,0 +1,126 @@
+﻿\section{Notation, frames and standing assumptions}
+\label{sec:notation}
+
+\subsection{Frames}
+
+Let $\mathcal{I}$ be an inertial frame with orthonormal basis
+$\{\vect{e}_1,\vect{e}_2,\vect{e}_3\}$, $\vect{e}_3$ pointing vertically
+upward, so that gravity acts along $-\vect{e}_3$. Let $\mathcal{B}$ be a frame
+fixed in the airframe with origin at its centre of mass, $\vect{b}_3$ along the
+nominal thrust axis and $\vect{b}_1$ pointing toward the user.
+
+The attitude is the rotation $R \in \SOthree$ mapping body coordinates to
+inertial coordinates: a vector with body coordinates $\vect{u}$ has inertial
+coordinates $R\vect{u}$. Position and velocity of the centre of mass in
+$\mathcal{I}$ are $\vect{r},\vect{v}\in\R^3$, and the angular velocity of
+$\mathcal{B}$ relative to $\mathcal{I}$, expressed in $\mathcal{B}$, is
+$\vect{\omega}\in\R^3$.
+
+\subsection{Algebraic preliminaries}
+
+The hat map $\hatmap{\cdot}:\R^3\to\sothree$ is the isomorphism
+\begin{equation}
+  \hatmap{\vect{u}}
+  = \begin{bmatrix} 0 & -u_3 & u_2\\ u_3 & 0 & -u_1\\ -u_2 & u_1 & 0
+    \end{bmatrix},
+  \qquad
+  \hatmap{\vect{u}}\vect{w} = \vect{u}\times\vect{w}
+  \quad\forall\, \vect{u},\vect{w}\in\R^3,
+  \label{eq:hat}
+\end{equation}
+with inverse the vee map $\veemap{(\cdot)}:\sothree\to\R^3$. We use repeatedly
+the identities
+\begin{equation}
+  \hatmap{(R\vect{u})} = R\,\hatmap{\vect{u}}\,R\transp,
+  \qquad
+  \tr(\hatmap{\vect{u}}\transp \hatmap{\vect{w}}) = 2\,\vect{u}\transp\vect{w},
+  \qquad R\in\SOthree .
+  \label{eq:hatid}
+\end{equation}
+
+A unit quaternion $q = (q_0,\vect{q}_v)\in\mathbb{S}^3$ represents the same
+rotation through
+\begin{equation}
+  R(q) = (q_0^2 - \vect{q}_v\transp\vect{q}_v)\,I
+       + 2\,\vect{q}_v\vect{q}_v\transp
+       + 2q_0\,\hatmap{\vect{q}_v},
+  \label{eq:quat2rot}
+\end{equation}
+a two-to-one covering, $R(q)=R(-q)$. We integrate the quaternion rather than
+$R$ because \cref{eq:quat2rot} carries no coordinate singularity, unlike any
+three-parameter attitude representation.
+
+\subsection{Symbols}
+
+\Cref{tab:symbols} in \cref{app:nomenclature} lists every symbol. The ones used
+constantly are: $m$ gross mass, $g$ gravitational acceleration, $\rho$ air
+density, $N$ rotor count, $D$ rotor diameter, $A = N\pi D^2/4$ total actuator
+disk area, $T$ total thrust, $\vind$ induced velocity, $\FM$ figure of merit,
+$\eta$ electrical efficiency, $\eb$ usable battery specific energy, $t_f$
+mission duration, $\lambda$ thrust margin, $J$ inertia tensor.
+
+\subsection{Standing assumptions}
+
+The following hold throughout unless explicitly suspended. They are stated
+here so that later results can be read as conditional on them rather than as
+claims about reality.
+
+\begin{assumption}[Incompressible, steady, inviscid outer flow]
+\label{as:flow}
+The air is incompressible with constant density $\rho$, the flow through the
+rotor disk is steady in the mean, and outside thin boundary layers on the
+blades it is inviscid. Tip Mach numbers stay below $0.3$, which the designs of
+\cref{sec:results} satisfy by a wide margin.
+\end{assumption}
+
+\begin{assumption}[Rigid airframe]
+\label{as:rigid}
+The airframe is a rigid body. \Cref{sec:components} sizes the arms so that the
+first structural bending mode lies at least an order of magnitude above the
+attitude-loop bandwidth, which is the condition under which this assumption is
+self-consistent, and the engine reports the ratio so that it can be checked
+rather than assumed.
+\end{assumption}
+
+\begin{assumption}[Constant mass]
+\label{as:mass}
+$\dot m = 0$ in flight. The battery loses energy, not mass. The relativistic
+mass defect $\dot m = -P/c^2 \approx \SI{-1e-15}{\kilo\gram\per\second}$ at
+$P=\SI{100}{\watt}$ is ignored.
+\end{assumption}
+
+\begin{assumption}[Uniform disk loading]
+\label{as:uniform}
+Within the momentum-theory layer each rotor is modelled as an actuator disk
+carrying uniform loading. Non-uniformity and tip loss are absorbed into an
+empirical induced-power factor $\kappa>1$ (\cref{sec:blade}).
+\end{assumption}
+
+\begin{assumption}[Rotors share thrust equally in trim]
+\label{as:share}
+In hover each of the $N$ rotors carries $mg/N$. Differential thrust for
+attitude control is a perturbation about this trim.
+\end{assumption}
+
+\begin{assumption}[Quasi-steady rotor aerodynamics]
+\label{as:quasisteady}
+Rotor thrust and torque respond instantaneously to rotor speed; all actuator
+lag is placed in the rotor-speed dynamics of \cref{sec:dynamics}. Inflow
+dynamics, whose time constant is of order $R/\vind \approx \SI{0.1}{\second}$,
+are not modelled.
+\end{assumption}
+
+\begin{assumption}[Perfect state estimation]
+\label{as:estimation}
+The controller has exact knowledge of $\vect{r},\vect{v},R,\vect{\omega}$ and
+of the human's position. This is the assumption most obviously false in
+practice and is revisited in \cref{sec:limitations}.
+\end{assumption}
+
+\begin{remark}
+\Cref{as:flow,as:uniform,as:quasisteady} belong to the sizing layer;
+\cref{as:rigid,as:mass,as:share,as:estimation} to the dynamic layer. The
+separation matters: the algebraic results of \cref{sec:fold,sec:scaling} do not
+depend on the dynamic assumptions at all, and remain valid statements about the
+closure equation whatever one believes about the controller.
+\end{remark}

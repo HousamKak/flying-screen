@@ -1,0 +1,215 @@
+﻿\section{Blade element corrections and the figure of merit}
+\label{sec:blade}
+
+Momentum theory bounds the power from below. A real rotor pays two further
+tolls: the induced flow is not uniform and the blades are finite in number, and
+the blade sections have profile drag. This section derives the second from
+blade element theory and absorbs the first into a coefficient, with the
+consequence that the figure of merit becomes an output of blade geometry rather
+than an input.
+
+\subsection{Induced power factor}
+
+\begin{model}[Non-ideal induced power]
+\label{mod:kappa}
+The induced power is written
+\begin{equation}
+  \Pind = \kappa\,T\vind, \qquad \kappa > 1 ,
+  \label{eq:kappa}
+\end{equation}
+where $\kappa$ collects non-uniform inflow, tip loss and swirl. Typical values
+for small rotors are $\kappa \in [1.10,1.25]$~\cite[\S2.4]{leishman2006}; we
+take $\kappa = 1.15$.
+\end{model}
+
+The alternative is Prandtl's tip-loss factor $B$, with the induced velocity
+computed over an effective disk of radius $BR$. The two are related by
+$\kappa \approx B^{-2}$ for small losses; \cref{eq:kappa} is used because it
+keeps the algebra of \cref{sec:closure} in closed form.
+
+\subsection{Profile power}
+
+\begin{definition}[Solidity]
+For a rotor with $N_b$ blades of constant chord $c$ and radius $R$, the
+solidity is the ratio of blade planform area to disk area,
+\begin{equation}
+  \sigma \coloneqq \frac{N_b c R}{\pi R^2} = \frac{N_b c}{\pi R}
+        = \frac{N_b}{\pi\,\mathrm{AR}},
+  \qquad \mathrm{AR} \coloneqq \frac{R}{c} .
+  \label{eq:solidity}
+\end{equation}
+\end{definition}
+
+\begin{proposition}[Profile power of a rotor in hover]
+\label{prop:profile}
+Let each blade section have drag coefficient $\Cdz$, taken constant along the
+span, and let the rotor turn at angular rate $\Omega$ with tip speed
+$\Vtip = \Omega R$. Neglecting the inflow angle in the drag direction, the
+profile power is
+\begin{equation}
+  \Pprof = \frac{1}{8}\,\rho\, A\, \Vtip^{3}\, \sigma\, \Cdz .
+  \label{eq:profile}
+\end{equation}
+\end{proposition}
+
+\begin{proof}
+Consider a blade element at radius $r$ of span $\dd r$. Its sectional velocity
+is $\Omega r$ to leading order, so the drag on the element is
+\[
+  \dd D = \tfrac12 \rho (\Omega r)^2 c\, \Cdz \dd r ,
+\]
+and the power absorbed is $\dd P = \Omega r \dd D$. Integrating over the blade
+and multiplying by $N_b$ blades,
+\[
+  \Pprof = N_b \int_0^R \tfrac12 \rho \Omega^3 r^3 c\,\Cdz \dd r
+         = \tfrac{1}{8}\rho\,\Omega^3 c\, N_b\, \Cdz R^4 .
+\]
+Substituting $c = \sigma \pi R/N_b$ from \cref{eq:solidity},
+\[
+  \Pprof = \tfrac{1}{8}\rho\,\Omega^3 \Cdz \,\sigma \pi R^{5}
+         = \tfrac{1}{8}\rho\, \Cdz\, \sigma\, (\pi R^2)(\Omega R)^3
+         = \tfrac{1}{8}\rho\, A\, \Vtip^3\, \sigma\, \Cdz . \qedhere
+\]
+\end{proof}
+
+\subsection{Figure of merit}
+
+\begin{definition}[Figure of merit]
+\begin{equation}
+  \FM \coloneqq \frac{\Pideal}{\Pshaft}
+      = \frac{T\vind}{\kappa T\vind + \Pprof} \in (0,1) .
+  \label{eq:fm}
+\end{equation}
+\end{definition}
+
+\begin{proposition}[Figure of merit at fixed blade loading]
+\label{prop:fmblade}
+Define the blade loading coefficient
+\begin{equation}
+  \frac{\Ct}{\sigma} \coloneqq \frac{T}{\rho A \Vtip^2 \sigma} .
+  \label{eq:ctsigma}
+\end{equation}
+Then
+\begin{equation}
+  \FM = \left[\kappa + \frac{\Cdz}{8}\,
+        \frac{1}{(\Ct/\sigma)}\,\frac{\Vtip}{\vind}\right]^{-1},
+  \qquad
+  \frac{\Vtip}{\vind} = \sqrt{\frac{2}{\sigma\,(\Ct/\sigma)}} ,
+  \label{eq:fmclosed}
+\end{equation}
+so that at fixed blade loading the figure of merit depends on the blade
+geometry only through the group $\sigma\,(\Ct/\sigma) = \Ct$, and is
+independent of rotor size and of tip speed separately.
+\end{proposition}
+
+\begin{proof}
+From \cref{eq:profile,eq:ctsigma}, $\rho A \sigma = T/(\Vtip^2 (\Ct/\sigma))$
+and hence
+\[
+  \Pprof = \tfrac18 \Vtip^3 \Cdz \cdot \frac{T}{\Vtip^2 (\Ct/\sigma)}
+         = \frac{\Cdz}{8}\,\frac{T\,\Vtip}{(\Ct/\sigma)} .
+\]
+Dividing \cref{eq:fm} through by $T\vind$ gives the first identity. For the
+second, \cref{eq:vi} gives $\vind^2 = T/(2\rho A)$ and \cref{eq:ctsigma} gives
+$\Vtip^2 = T/(\rho A \sigma (\Ct/\sigma))$, so
+$\Vtip^2/\vind^2 = 2/(\sigma (\Ct/\sigma))$.
+\end{proof}
+
+\begin{corollary}[Design rule]
+\label{cor:designrule}
+Holding blade loading at its design value and increasing solidity lowers the
+tip speed required to carry a given thrust,
+$\Vtip \propto \sigma^{-1/2}$, and lowers the profile power with it,
+$\Pprof \propto \Vtip \propto \sigma^{-1/2}$.
+\end{corollary}
+
+\begin{proof}
+Immediate from \cref{eq:ctsigma} at fixed $T$, $\rho A$ and $\Ct/\sigma$, and
+from $\Pprof = (\Cdz/8) T\Vtip/(\Ct/\sigma)$.
+\end{proof}
+
+\Cref{cor:designrule} is not obvious and is used heavily later: a fatter,
+slower blade is better on \emph{both} counts, quieter by
+\cref{sec:acoustics} and cheaper in profile power, until the assumptions break.
+They break in two places, and both are enforced as constraints.
+
+\subsection{Two limits on solidity and blade loading}
+
+\begin{assumption}[Blade-element independence]
+\label{as:sigma}
+Blade element theory treats each section as an isolated aerofoil in a uniform
+inflow. This fails once the blades operate as a cascade. Helicopter rotors run
+$\sigma \in [0.05,0.12]$; high-solidity propellers reach about $0.25$. We
+impose $\sigma \le \sigma_{\max} = 0.25$ and report violations, because beyond
+it the model flatters the rotor and one no longer has a propeller but a ducted
+fan without a duct.
+\end{assumption}
+
+\begin{assumption}[Stall margin]
+\label{as:stall}
+Sectional lift coefficient is bounded by stall, which through
+$\Ct/\sigma \approx C_L/6$ for linearly twisted blades bounds the blade
+loading. We impose $\Ct/\sigma \le 0.14$ and design at $0.12$.
+\end{assumption}
+
+\begin{remark}[Fixed-pitch rotors run at constant $\Ct$]
+For a fixed-pitch rotor at fixed collective, $T \propto \Omega^2$ so
+$\Ct = T/(\rho A \Vtip^2)$ is invariant under changes of rotor speed. The
+blade-loading constraint therefore binds identically in hover and at maximum
+thrust, which is why the engine reports the same $\Ct/\sigma$ at both
+conditions. Stall margin cannot be recovered by spinning faster.
+\end{remark}
+
+\subsection{Reynolds number}
+
+Both \cref{prop:profile,prop:fmblade} take $\Cdz$ constant. A design driven
+toward low tip speed by \cref{cor:designrule} operates at chord Reynolds
+numbers
+\begin{equation}
+  \mathrm{Re} = \frac{0.7\,\Vtip\, c}{\nu} ,
+  \label{eq:reynolds}
+\end{equation}
+evaluated at the $0.7R$ station, of order $10^5$ or below, where profile drag
+rises sharply. Treating $\Cdz$ as constant would hand the optimiser a free
+lunch: it would drive the tip speed arbitrarily low. We therefore use
+\begin{equation}
+  \Cdz(\mathrm{Re}) = \Cdz^{\mathrm{ref}}
+    \min\!\left\{\left(\frac{\mathrm{Re}_{\mathrm{ref}}}{\mathrm{Re}}
+    \right)^{0.2},\,3\right\},
+  \qquad \mathrm{Re}_{\mathrm{ref}} = 2\times 10^5 ,
+  \label{eq:recorrection}
+\end{equation}
+an empirical power law of the standard form for attached turbulent flow, capped
+to keep it from diverging. This is the crudest submodel in the paper and is
+flagged as such; its only job is to prevent an unphysical optimum.
+
+\subsection{Electrical power}
+
+Motor and electronic speed controller losses are lumped into a single
+efficiency $\eta$, so the electrical power drawn by the propulsion system is
+\begin{equation}
+  \Pelec = \frac{\Pshaft}{\eta}
+         = \frac{\kappa T\vind + \Pprof}{\eta}
+         = \frac{\Pideal}{\FM\,\eta}
+         = \frac{T^{3/2}}{\FM\,\eta\,\sqrt{2\rho A}} .
+  \label{eq:pelec}
+\end{equation}
+The final form is the one carried into \cref{sec:closure}; the intermediate
+forms are what the engine actually evaluates, so that $\FM$ is computed from
+\cref{eq:fm} rather than assumed.
+
+Adding the non-propulsive load $\Paux$ (display, computer, sensors), the total
+electrical power in hover is
+\begin{equation}
+  P_{\mathrm{tot}}(m) = \frac{(mg)^{3/2}}{\FM\,\eta\,\sqrt{2\rho A}} + \Paux .
+  \label{eq:ptot}
+\end{equation}
+
+\begin{remark}
+Unlike a camera drone, this vehicle carries a payload that consumes power
+continuously. $\Paux$ is not negligible: at the designs of \cref{sec:results}
+it is \SIrange{14}{16}{\watt} against roughly \SI{80}{\watt} of propulsion, and
+because it is constant it converts directly into battery mass, appearing in
+\cref{sec:closure} as an addition to the fixed load rather than as a term
+scaling with $m$.
+\end{remark}

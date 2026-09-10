@@ -1,0 +1,82 @@
+﻿\section{The engine}
+\label{sec:engine}
+
+\subsection{Design principles}
+
+The implementation follows three rules, each of which was adopted because
+violating it caused a specific error during development.
+
+\paragraph{One source of truth for parameters.} Every assumption is declared
+once, in a schema carrying its symbol, unit, admissible range, grouping and
+help text. Validation, the command line interface and the browser controls are
+all generated from that schema. Nothing about the model is written down twice.
+The alternative, a model that reads parameters and a user interface that
+mirrors them, guarantees eventual divergence between the two.
+
+\paragraph{Analytic and numerical layers coexist.} The closed forms of
+\cref{sec:fold,sec:scaling} are implemented alongside the numerical solvers
+that supersede them, and the test suite asserts agreement. The closed forms are
+not documentation; they are the oracle against which the code is verified. This
+is what caught the errors reported in \cref{sec:verification}.
+
+\paragraph{Assumptions are outputs wherever possible.} The lumped constants
+$f_s$, $S_m$ and $\FM$ remain as inputs to the algebraic layer, but the
+first-principles layer computes them and the engine reports both side by side.
+A model whose assumptions can be audited against its own detailed submodels is
+much harder to fool oneself with.
+
+\subsection{Module structure}
+
+\begin{table}[t]
+\centering
+\caption{Modules and the sections of this paper they implement.}
+\label{tab:modules}
+\small
+\begin{tabular}{@{}llp{6.6cm}@{}}
+\toprule
+Module & Sections & Responsibility \\
+\midrule
+\code{params.py}      & \ref{sec:notation}      & parameter schema, derived quantities, named presets \\
+\code{sizing.py}      & \ref{sec:momentum} to \ref{sec:scaling} & momentum theory, closure, fold, sensitivities, fixed-point trace \\
+\code{components.py}  & \ref{sec:blade}, \ref{sec:components}, \ref{sec:nearfield} & rotor blade model, beam-sized arms, motor and propeller mass, inertia, near-field corrections \\
+\code{acoustics.py}   & \ref{sec:acoustics}     & source model, sound power, room field, A-weighting, blade passage \\
+\code{electrical.py}  & \ref{sec:components}    & pack selection, $K_V$ sizing, currents, C-rate checks \\
+\code{dynamics.py}    & \ref{sec:dynamics}      & state, forces, moments, allocation, hover linearisation \\
+\code{control.py}     & \ref{sec:control}       & cascaded controller, authority, gain selection \\
+\code{mission.py}     & \ref{sec:dynamics}, \ref{sec:control} & human trajectories, wind, reference governor with keep-out \\
+\code{simulate.py}    & \ref{sec:dynamics}      & fixed-step integrator, telemetry, mission energy \\
+\code{closure.py}     & \ref{sec:codesign}      & residual formulation, secant-accelerated battery loop, verification flight, margins \\
+\code{numerics.py}    & \ref{sec:numerics}      & bounded mass-root search with explicit failure status, controllability rank \\
+\code{optimize.py}    & \ref{sec:codesign}      & penalised objective, differential evolution, trade studies \\
+\code{tether.py}      & \ref{sec:results}       & the closure with energy off-board \\
+\code{sweep.py}       & \ref{sec:scaling}       & feasibility maps, exponent sweeps, endurance walls \\
+\code{payloads.py}    & \ref{sec:results}       & display catalogue, readability, bill of materials \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Interfaces}
+
+Three front ends share the engine: a command line for scripted studies, an HTTP
+API, and a browser tool that generates its controls from the schema and
+recomputes on every parameter change. The tool exists because the questions
+that matter here, ``what does this assumption cost'', are answered by moving one
+number and watching six others, which is a different activity from running a
+batch job.
+
+The browser tool renders the assembly in three dimensions from the same solved
+dimensions used by the closure: arm length and wall thickness from
+\cref{eq:armlength,eq:wall}, rotor diameter and chord from
+\cref{sec:blade}, motor body size from \cref{eq:motormass}, and the individual
+battery cells from the pack selection of \cref{sec:components}. The check that
+this is a drawing of the machine rather than a picture beside it is that the
+drawn parts sum to the closure's gross mass.
+
+\subsection{Reproducing the results}
+
+Every number in \cref{sec:results} is produced by one script,
+\code{paper/make\_results.py}, which writes the numbers together with the
+configuration that produced them (preset, payload, window, step, settling
+interval, seed, governor limits, solver tolerances and optimiser settings) to
+\code{paper/results/results.json}, and emits the table rows and macros that the
+\LaTeX\ sources include. No figure in the design study is typed by hand.

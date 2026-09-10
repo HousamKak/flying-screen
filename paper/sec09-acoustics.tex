@@ -1,0 +1,202 @@
+﻿\section{Acoustics}
+\label{sec:acoustics}
+
+For a machine that hovers beside a person's head, the acoustic model is not a
+secondary consideration; \cref{sec:results} finds it to be the binding
+constraint. It is also the place where the most error was found, so it is
+developed carefully.
+
+\subsection{Why the sixth power}
+
+\begin{model}[Broadband loading noise]
+\label{mod:acoustic}
+At the scales and Reynolds numbers considered, rotor noise is dominated by
+broadband loading noise: unsteady lift on the blade sections, arising from
+inflow turbulence and boundary-layer vortex shedding, radiating as a
+distribution of acoustic dipoles.
+\end{model}
+
+Curle's extension of Lighthill's acoustic analogy to flows bounded by solid
+surfaces~\cite{lighthill1952,curle1955} shows that the surface term is dipole
+in character, and dimensional analysis of the dipole source strength gives the
+acoustic power radiated by a body of characteristic area $A_b$ in a flow of
+characteristic velocity $U$:
+\begin{equation}
+  W_{\mathrm{ac}} \;\sim\; \frac{\rho\, A_b\, U^{6}}{c_0^{3}} ,
+  \label{eq:dipole}
+\end{equation}
+with $c_0$ the speed of sound. This is the classical $U^6$ dipole law, against
+$U^8$ for the quadrupole (free jet) case; see Ffowcs Williams and
+Hawkings~\cite{fwh1969} for the rotating-surface generalisation, and
+Brooks, Pope and Marcolini~\cite{brooks1989} for the airfoil self-noise
+mechanisms this lumps together.
+
+Taking $10\log_{10}$ of \cref{eq:dipole} with $U=\Vtip$ gives a
+$60\log_{10}\Vtip$ dependence. Loading enters through the sectional lift, for
+which we take an empirical $10\log_{10}T$, and $N$ statistically independent
+rotors add incoherently, contributing $10\log_{10}N$. Hence
+
+\begin{model}[Source model]
+\label{mod:spl}
+\begin{equation}
+  L_p(\SI{1}{\metre})
+  = C + 60\log_{10}\!\frac{\Vtip}{\Vtip^{\mathrm{ref}}}
+      + 10\log_{10}\!\frac{T_{\mathrm{rotor}}}{T^{\mathrm{ref}}}
+      + 10\log_{10} N ,
+  \label{eq:splmodel}
+\end{equation}
+with $\Vtip^{\mathrm{ref}}=\SI{100}{\metre\per\second}$,
+$T^{\mathrm{ref}}=\SI{5}{\newton}$ and $C$ an anchor calibrated against
+measured aircraft in \cref{sec:verification}.
+\end{model}
+
+\begin{observation}[The design lever]
+\label{obs:sixthpower}
+Halving tip speed reduces the level by $60\log_{10}2 = \SI{18.1}{\decibel}$.
+No other parameter in the model has comparable authority. Together with
+\cref{cor:designrule}, which says that raising solidity lowers the tip speed
+needed to carry a given thrust, this determines the entire shape of the
+machine: large, fat-bladed, slowly turning rotors.
+\end{observation}
+
+\subsection{Sound power against sound pressure}
+
+\begin{definition}
+The sound power level $L_W$ of a source is
+$L_W = 10\log_{10}(W/W_0)$, $W_0=\SI{1e-12}{\watt}$, a property of the source
+alone. The sound pressure level $L_p$ at a point is
+$L_p = 20\log_{10}(p_{\mathrm{rms}}/p_0)$, $p_0=\SI{20}{\micro\pascal}$, and
+depends on the environment.
+\end{definition}
+
+\begin{proposition}[Free-field conversion]
+\label{prop:lwlp}
+For a point source of directivity factor $Q$ radiating into free space above a
+rigid plane, the mean-square pressure at distance $r$ satisfies
+\begin{equation}
+  L_p(r) = L_W + 10\log_{10}\!\left(\frac{Q}{4\pi r^2}\right) ,
+  \label{eq:lwlp}
+\end{equation}
+so for a source above a reflecting plane, $Q=2$, and at $r=\SI{1}{\metre}$,
+\begin{equation}
+  L_p(\SI{1}{\metre}) = L_W - 10\log_{10}(2\pi) = L_W - \SI{7.98}{\decibel} .
+  \label{eq:eightdb}
+\end{equation}
+\end{proposition}
+
+\begin{proof}
+Acoustic intensity at distance $r$ for a source of power $W$ radiating with
+directivity $Q$ is $I = QW/(4\pi r^2)$. In the far field of a plane wave
+$I = p_{\mathrm{rms}}^2/(\rho c_0)$, and the reference quantities are chosen so
+that $10\log_{10}(I/I_0) = L_p$ with $I_0 = p_0^2/(\rho c_0)$ to within
+\SI{0.1}{\decibel} at standard conditions. Taking logarithms gives
+\cref{eq:lwlp}; substituting $Q=2$, $r=1$ gives \cref{eq:eightdb}.
+\end{proof}
+
+\begin{remark}[A trap worth naming]
+European regulation 2019/945 requires manufacturers of unmanned aircraft to
+declare a \emph{sound power} level $L_{WA}$. It is routinely misread as a
+pressure at one metre. By \cref{prop:lwlp} that misreading is worth
+\SI{8}{\decibel}, and in the wrong direction: it makes published aircraft sound
+louder than they are, and so makes a design calibrated against the misreading
+look quieter than it is. \Cref{sec:verification} records the consequences.
+\end{remark}
+
+\subsection{The room}
+
+Free field is the wrong model indoors. The classical treatment
+(Sabine; see Beranek~\cite{beranek1988} or Kuttruff~\cite{kuttruff2009}) writes
+the steady-state level as the sum of a direct field, which falls with distance,
+and a diffuse reverberant field, which does not.
+
+\begin{definition}[Room constant]
+For a room of total interior surface area $S$ and average absorption
+coefficient $\bar\alpha$,
+\begin{equation}
+  \mathcal{R}_{\mathrm{room}} \coloneqq \frac{S\,\bar\alpha}{1-\bar\alpha} .
+  \label{eq:roomconstant}
+\end{equation}
+\end{definition}
+
+\begin{proposition}[Steady-state level in a room]
+\label{prop:room}
+\begin{equation}
+  L_p(r) = L_W + 10\log_{10}\!\left(
+    \frac{Q}{4\pi r^{2}} + \frac{4}{\mathcal{R}_{\mathrm{room}}}\right) .
+  \label{eq:roomlevel}
+\end{equation}
+The two contributions are equal at the critical distance
+\begin{equation}
+  r_c = \sqrt{\frac{Q\,\mathcal{R}_{\mathrm{room}}}{16\pi}} .
+  \label{eq:critdist}
+\end{equation}
+\end{proposition}
+
+\begin{proof}[Sketch]
+The direct term is \cref{eq:lwlp}. For the reverberant term, in the diffuse
+field approximation the energy density is uniform and in steady state the power
+absorbed equals the power injected: $W = \tfrac14 \bar\alpha S\, c_0\, E$ with
+$E$ the energy density, whence $E = 4W/(c_0 S\bar\alpha)$; correcting for the
+fact that the first reflection has already occurred replaces $S\bar\alpha$ by
+$\mathcal{R}_{\mathrm{room}}$, and $p_{\mathrm{rms}}^2 = \rho c_0^2 E$ gives the $4/\mathcal{R}_{\mathrm{room}}$
+term. Setting the two terms equal and solving for $r$ gives
+\cref{eq:critdist}.
+\end{proof}
+
+\begin{finding}
+\Cref{prop:room} has a consequence that no free-field figure can express:
+beyond $r_c$, moving away from the machine buys nothing. The level is then set
+by how absorbent the room is, not by how far away one stands. A flying display
+does not make a quiet place near itself and a loud place far away; it raises
+the level of the entire room to within a few decibels of the level at the user's
+own ear.
+\end{finding}
+
+For an ordinary furnished room, $\bar\alpha\approx0.20$ and $r_c$ is under a
+metre, which is smaller than the standoff at which such a machine is useful.
+The user therefore sits close to the boundary between the two regimes and
+receives both contributions.
+
+\subsection{Weighting and tonal content}
+
+The A-weighting of IEC 61672 is
+\begin{equation}
+  R_A(f) = \frac{12194^2 f^4}
+    {\big(f^2+20.6^2\big)\sqrt{\big(f^2+107.7^2\big)\big(f^2+737.9^2\big)}
+     \big(f^2+12194^2\big)},
+  \quad
+  A(f) = 20\log_{10}R_A(f) + 2.00 .
+  \label{eq:aweight}
+\end{equation}
+
+The blade passage frequency is
+\begin{equation}
+  f_{\mathrm{BPF}} = \frac{N_b\,\Omega}{2\pi} = \frac{N_b\,\mathrm{rpm}}{60} .
+  \label{eq:bpf}
+\end{equation}
+
+\begin{remark}[What the broadband number omits]
+\Cref{eq:splmodel} predicts a broadband level. What makes a rotor
+\emph{annoying} rather than merely loud is tonal content at
+$f_{\mathrm{BPF}}$ and its harmonics. For the designs of \cref{sec:results},
+$f_{\mathrm{BPF}}\approx\SI{\rBpf}{\hertz}$, which \cref{eq:aweight} discounts by
+about \SI{38}{\decibel}. That is a genuine perceptual benefit of turning slowly
+and it is also a warning: the acoustic energy has not gone anywhere. It has
+moved to low frequency, where rooms absorb poorly, where Sabine's diffuse-field
+assumption fails because the modal density is low, and where humans report a
+throb rather than a hiss. Furthermore several rotors at slightly different
+speeds beat at the difference frequency, which is perceptually worse than a
+steady tone. None of this is in the A-weighted broadband figure, and it is the
+most likely way for a built prototype to be unacceptable at a level the model
+calls acceptable.
+\end{remark}
+
+The Schroeder frequency, above which a room behaves diffusely,
+\begin{equation}
+  f_S \approx 2000\sqrt{\frac{T_{60}}{V}} ,
+  \label{eq:schroeder}
+\end{equation}
+is of order \SI{200}{\hertz} for a domestic room, which is precisely where the
+first several blade harmonics lie. \Cref{prop:room} is therefore being applied
+slightly outside its domain of validity for exactly the components that matter
+most perceptually. This is stated as a limitation rather than repaired.

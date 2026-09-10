@@ -1,0 +1,464 @@
+﻿\section{Control}
+\label{sec:control}
+
+\subsection{Why a cascade}
+
+The vehicle is underactuated: four independent rotor speeds control six
+degrees of freedom. Horizontal motion is available only by tilting the thrust
+vector, so the causal chain is
+\begin{equation}
+  \tau_y \;\to\; \ddt\theta \;\to\; \theta \;\to\; \ddt x \;\to\; x ,
+  \label{eq:chain}
+\end{equation}
+four integrations from moment to position. Near hover, linearising
+\cref{eq:vdot,eq:wdot} about $R=I$, $T=mg$ gives the classical decoupling
+\begin{equation}
+  \ddt{x}\approx g\theta,\quad
+  \ddt{y}\approx -g\phi,\quad
+  \ddt{z}\approx \frac{\delta T}{m},\quad
+  \ddt\phi = \frac{\tau_x}{J_x},\quad
+  \ddt\theta = \frac{\tau_y}{J_y},\quad
+  \ddt\psi = \frac{\tau_z}{J_z} .
+  \label{eq:linhover}
+\end{equation}
+The attitude loop is two integrations from its input, the position loop four.
+Since $\sqrt{K_R}\gg\sqrt{K_p}$ in any sensible design, time-scale separation
+justifies the cascade
+
+\begin{center}
+position $\to$ velocity $\to$ attitude $\to$ body rate $\to$ rotor speed,
+\end{center}
+
+each level treating the level below as instantaneous. This is standard
+practice~\cite{mahony2012}, and \cref{eq:linhover} is its justification.
+
+\begin{remark}[Flatness]
+The quadrotor with these dynamics is differentially flat with flat outputs
+$(x,y,z,\psi)$~\cite{mellinger2011}: every state and input is an algebraic
+function of the flat outputs and finitely many derivatives. This is what makes
+feedforward from a desired trajectory possible and is why the controller below
+uses $\ddt{\vect r}_d$ directly rather than relying on feedback alone.
+\end{remark}
+
+\subsection{Position loop}
+
+Given a reference $(\vect r_d,\dt{\vect r}_d,\ddt{\vect r}_d)$, define errors
+$\vect e_p = \vect r_d - \vect r$, $\vect e_v = \dt{\vect r}_d - \vect v$, and
+command
+\begin{equation}
+  \vect a_c = \ddt{\vect r}_d + K_p\vect e_p + K_d\vect e_v
+              + K_i\!\int\!\vect e_p\,\dd t ,
+  \qquad
+  \vect F_c = m(\vect a_c + g\ez) .
+  \label{eq:poscmd}
+\end{equation}
+The desired thrust magnitude and thrust direction are
+\begin{equation}
+  T_c = \|\vect F_c\|,
+  \qquad
+  \vect b_3^d = \frac{\vect F_c}{\|\vect F_c\|} ,
+  \label{eq:thrustdir}
+\end{equation}
+and with a desired yaw $\psi_d$ the desired attitude is completed by
+\begin{equation}
+  \vect b_2^d = \frac{\vect b_3^d \times \vect b_1^{\psi}}
+                     {\|\vect b_3^d \times \vect b_1^{\psi}\|},
+  \quad
+  \vect b_1^d = \vect b_2^d\times\vect b_3^d,
+  \quad
+  R_d = [\,\vect b_1^d\ \vect b_2^d\ \vect b_3^d\,],
+  \label{eq:Rd}
+\end{equation}
+where $\vect b_1^{\psi}=(\cos\psi_d,\sin\psi_d,0)$. \Cref{eq:Rd} is singular
+only when $\vect b_3^d\parallel\vect b_1^{\psi}$, i.e.\ at \SI{90}{\degree} of
+tilt, which the thrust limit precludes; the engine falls back to an alternative
+reference axis if it occurs.
+
+\subsection{Geometric attitude control on \texorpdfstring{$\SOthree$}{SO(3)}}
+
+Attitude error is measured on the group rather than in coordinates, which
+avoids both the singularities of Euler angles and the unwinding of naive
+quaternion feedback.
+
+\begin{definition}[Attitude error]
+\begin{equation}
+  \vect e_R = \tfrac12\big(R_d\transp R - R\transp R_d\big)^{\vee},
+  \qquad
+  \vect e_\omega = \vect\omega - R\transp R_d\,\vect\omega_d ,
+  \label{eq:attitudeerror}
+\end{equation}
+with configuration error function
+$\Psi(R,R_d) = \tfrac12\tr\!\big(I - R_d\transp R\big) \in [0,2]$.
+\end{definition}
+
+\begin{model}[Geometric attitude law]
+\label{mod:leecontrol}
+\begin{equation}
+  \vect\tau = -K_R\,\vect e_R - K_\omega\,\vect e_\omega
+              + \vect\omega\times J\vect\omega
+              - J\big(\hatmap{\vect\omega}R\transp R_d\vect\omega_d
+                      - R\transp R_d\dt{\vect\omega}_d\big) .
+  \label{eq:leecontrol}
+\end{equation}
+\end{model}
+
+\begin{theorem}[Exponential attitude stability; Lee, Leok and
+McClamroch~\cite{lee2010}, Proposition~1]
+\label{thm:lee}
+Consider \cref{eq:wdot} under \cref{eq:leecontrol} with positive scalar gains
+$k_R,k_\omega$ in place of $K_R,K_\omega$ and a smooth reference
+$(R_d,\vect\omega_d,\dt{\vect\omega}_d)$. The equilibrium
+$(\vect e_R,\vect e_\omega)=(0,0)$ is exponentially stable, and its region of
+attraction contains the set
+\begin{equation}
+  \Psi(R(0),R_d(0)) < 2,
+  \qquad
+  \|\vect e_\omega(0)\|^2 < \frac{2}{\lambda_{\max}(J)}\,k_R\big(2-\Psi(R(0),R_d(0))\big) .
+  \label{eq:roa}
+\end{equation}
+\end{theorem}
+
+The excluded set is $\Psi=2$, where $R_d\transp R$ is a rotation by $\pi$. For
+the unweighted $\Psi$ used here every such rotation is a critical point: if
+$R_d\transp R = 2\vect u\vect u\transp - I$ for a unit vector $\vect u$, the
+matrix is symmetric and $\vect e_R=0$. The critical set of $\Psi$ is therefore
+the identity together with a two-dimensional family of attitudes, not three
+isolated points. \Cref{thm:lee} is a statement on the sublevel set
+\cref{eq:roa}, and no almost-global claim is made here.
+
+The engine implements
+\begin{equation}
+  \vect\tau = J\big(-K_R\vect e_R - K_\omega\vect e_\omega\big)
+              + \vect\omega\times J\vect\omega
+              - J\big(\hatmap{\vect\omega}R\transp R_d\vect\omega_d
+                      - R\transp R_d\dt{\vect\omega}{}_d^{\psi}\big),
+  \qquad
+  \vect e_\omega = \vect\omega - R\transp R_d\vect\omega_d ,
+  \label{eq:leeused}
+\end{equation}
+with the desired angular velocity taken from differential
+flatness~\cite{mellinger2011}. With $\vect j_d$ the reference jerk and $T_c$ the
+commanded thrust,
+\begin{equation}
+  \vect h_\omega = \frac{m}{T_c}\Big(\vect j_d
+     - (\vect b_3^d\cdot\vect j_d)\,\vect b_3^d\Big),
+  \quad
+  \vect\omega_d = \begin{bmatrix}
+     -\vect h_\omega\cdot\vect b_2^d\\ \vect h_\omega\cdot\vect b_1^d\\
+     \dt\psi_d\,(\vect b_3^d\cdot\ez) \end{bmatrix},
+  \quad
+  \dt{\vect\omega}{}_d^{\psi} = \begin{bmatrix} 0\\0\\
+     \ddt\psi_d\,(\vect b_3^d\cdot\ez)\end{bmatrix} .
+  \label{eq:omegad}
+\end{equation}
+\Cref{eq:leeused} differs from the law of \cref{thm:lee} in three ways. The
+gains $JK_R$ and $JK_\omega$ are matrices, which coincide with scalar gains only
+when $J$ is a multiple of the identity. The tilt part of $\dt{\vect\omega}_d$,
+which needs the reference snap, is omitted. And the plant has motor lag and
+rotor saturation, which the theorem does not. \Cref{thm:lee} therefore
+motivates \cref{eq:leeused} and does not certify it: the behaviour of the
+implemented loop is established by simulation for the trajectories reported,
+not by proof. Normalising by $J$ makes $K_R$ carry units of
+\si{\per\second\squared} and gives it a direct reading: the angular
+acceleration commanded per radian of attitude error.
+
+\begin{remark}[Why the rate feedforward matters]
+An earlier version of the engine set $\vect\omega_d=0$. On a curved path the
+thrust direction rotates at the turn rate of the path, and a loop with no rate
+feedforward follows it with a standing attitude error of about
+$K_\omega\|\vect\omega_d\|/K_R$. On the turnaround mission of
+\cref{sec:results} that version reached a peak tracking error of
+\SI{0.27}{\metre} and a rotor disk passed \SI{0.34}{\metre} from the user's
+eye. With \cref{eq:omegad} the same mission gives \SI{\rTurnTrack}{\milli\metre}
+and \SI{\rTurnClear}{\metre}.
+\end{remark}
+
+\subsection{Control authority and gain selection}
+
+\Cref{thm:lee} says nothing about saturation, and saturation is what actually
+limits this vehicle.
+
+\begin{definition}[Torque and angular acceleration authority]
+Holding total thrust at $mg$ and the other two moments at zero, the authority
+about body axis $j$ is the smaller of the two one-sided maxima
+\begin{equation}
+  \tau_j^{\max} = \min\{\tau_j^{+},\tau_j^{-}\},
+  \qquad
+  \tau_j^{\pm} = \max\Big\{\pm\tau :
+     \mat M\vect u = (mg,\ \tau\vect e_j),\
+     0\le u_i\le\Omega_{\max}^2\Big\} ,
+  \label{eq:authority}
+\end{equation}
+a linear program in $\vect u=(\Omega_1^2,\dots,\Omega_N^2)$ that the engine
+solves for every layout, with $\Omega_{\max}^2 = \lambda\,\Omega_h^2$ and
+$\Omega_h^2 = mg/(Nk_T)$. For the symmetric quadrotor with alternating spins
+it has the closed form (\cref{app:proofs})
+\begin{equation}
+  \tau_j^{\max} = \Delta\sum_{i=1}^{4}\big|\mat M_{j+1,i}\big|,
+  \qquad
+  \Delta = \min\{\Omega_h^2,\ \Omega_{\max}^2-\Omega_h^2\} ,
+  \label{eq:authquad}
+\end{equation}
+the differential being bounded by whichever is smaller, the room to speed two
+rotors up or the room to slow the other two down. The angular acceleration
+authority is $\alpha_j^{\max} = (J^{-1})_{jj}\,\tau_j^{\max}$, which is
+$\tau_j^{\max}/J_{jj}$ only when $J$ is diagonal.
+\end{definition}
+
+For the design of \cref{sec:results}, \cref{eq:authority} gives
+$\tau_{\mathrm{roll}}^{\max}=\tau_{\mathrm{pitch}}^{\max}=\SI{\rTauRoll}{\newton\metre}$
+and $\tau_{\mathrm{yaw}}^{\max}=\SI{\rTauYaw}{\newton\metre}$, i.e.\
+$\alpha^{\max}_{\mathrm{roll}/\mathrm{pitch}/\mathrm{yaw}} =
+\rAlphaRoll/\rAlphaPitch/\rAlphaYaw\ \si{\radian\per\second\squared}$. An earlier
+version of \cref{eq:authority} divided the sum by $N$, on the reasoning that
+the thrust constraint ``shares'' the differential among the rotors; it does
+not, the constraint is met by pairing increments with decrements, and the
+error was a factor of four. It was found by independent review and is
+recorded in \cref{sec:verification}.
+
+\begin{model}[Gain heuristic]
+\label{mod:gains}
+With $e_{\max}$ the largest attitude error the loop is expected to correct and
+$\zeta$ a damping ratio, the engine sets
+\begin{equation}
+  K_R = \min\left\{\frac{\alpha^{\max}}{2\,e_{\max}},\
+                   \Big(\frac{0.3}{\tau_m}\Big)^{2}\right\},
+  \qquad
+  \alpha^{\max} \coloneqq \min\{\alpha_{\mathrm{roll}}^{\max},
+                                \alpha_{\mathrm{pitch}}^{\max}\},
+  \qquad
+  K_\omega = 2\zeta\sqrt{K_R} ,
+  \label{eq:kr}
+\end{equation}
+and, one level up,
+$K_p = \min\{a_{\max}/e_{p,\max},\ K_R/9\}$, $K_d = 2\zeta\sqrt{K_p}$, with
+$a_{\max}$ the acceleration cap of the reference governor. The second term
+keeps the position bandwidth $\sqrt{K_p}$ at least a factor three below the
+attitude bandwidth $\sqrt{K_R}$, which is the time-scale separation the
+cascade of \cref{eq:chain} rests on; a machine whose attitude authority has
+been cut, by a display on a boom, is destabilised by position gains that were
+fine without the boom.
+\end{model}
+
+The first bound is the linearised saturation argument: with $\vect e_\omega$
+small the commanded angular acceleration is $K_R\|\vect e_R\|\le K_R e_{\max}$,
+and half the single-axis authority is reserved for the rate term, for
+simultaneous demands on the other axes and for yaw. The second bound keeps the
+attitude bandwidth $\sqrt{K_R}$ below $0.3/\tau_m$, so that the first-order
+motor lag of \cref{eq:motorlag} contributes less than about \ang{17} of phase
+at crossover. $K_\omega$ follows from the linearised closed loop
+$\ddt e + K_\omega\dt e + K_R e = 0$. None of this is a saturation certificate:
+it neglects the rate feedback term, simultaneous torque demands, the yaw axis
+and the actuator dynamics, and \cref{sec:results} verifies by simulation that
+the resulting loop stays out of saturation on the missions flown. For the
+design the two bounds are \SI{\rKRauth}{\per\second\squared} and
+\SI{\rKRlag}{\per\second\squared}, the lag bound binds, and the value used is
+$K_R=\SI{\rKR}{\per\second\squared}$, $K_\omega=\SI{\rKw}{\per\second}$.
+
+\begin{remark}[Yaw is the weak axis]
+By \cref{eq:alloc} the yaw column involves $k_Q$ rather than $k_T L$, and
+$k_Q/k_T \sim \Cdz$-scale quantities. A rotor optimised for quietness by
+\cref{obs:sixthpower} turns slowly and has small reaction torque, so
+$\alpha_{\mathrm{yaw}}^{\max}$ is an order of magnitude below the roll and
+pitch values: \SI{\rAlphaYaw}{\radian\per\second\squared} against
+\SI{\rAlphaRoll}{\radian\per\second\squared} for the design. A quiet hovering
+display therefore cannot turn to face its user quickly. The engine responds by
+governing the heading reference as it governs position, with a rate cap of
+\SI{1.5}{\radian\per\second} and an acceleration cap of half the yaw
+authority; the architectural response, a yaw axis on the gimbal where a
+\SI{30}{\gram} motor solves what the airframe cannot, is not modelled.
+\end{remark}
+
+\subsection{Control allocation under saturation}
+
+Given a desired wrench $\vect\chi_d = (T_c,\vect\tau)$ the allocation problem is
+\begin{equation}
+  \text{find } \vect u\in[0,\Omega_{\max}^2]^N
+  \quad\text{with}\quad \mat M\vect u = \vect\chi_d .
+  \label{eq:allocprob}
+\end{equation}
+When $\vect\chi_d$ lies outside $\mat M[0,\Omega_{\max}^2]^N$ no exact solution
+exists and a priority must be chosen. We solve the unconstrained least-norm
+problem $\vect u = \mat M^{+}\vect\chi_d$ and, on violation, iterate
+\begin{equation}
+  \vect u \leftarrow \Pi_{[0,\Omega_{\max}^2]}(\vect u),
+  \qquad
+  \vect u \leftarrow \vect u + \mat M^{+}
+    \big(\vect\chi_d - \mat M\vect u\big)\odot \vect\nu ,
+  \label{eq:allociter}
+\end{equation}
+with weights $\vect\nu$ that de-prioritise the thrust channel. The
+engineering content is the priority: \emph{attitude is preserved and thrust is
+sacrificed}, because losing attitude loses the vehicle whereas losing thrust
+loses altitude, which is recoverable.
+
+\subsection{The reference governor}
+
+Tracking a person's face rigidly is the wrong specification, and this is a
+statement about kinematics rather than taste.
+
+\begin{proposition}[The cost of a rigid standoff during a turn]
+\label{prop:turn}
+Let the user rotate their heading by $\pi$ in time $\Delta t$ while the display
+is required to remain at standoff $d$ ahead of them. Then the display must
+traverse a semicircle of radius $d$, and its mean speed and peak centripetal
+acceleration satisfy
+\begin{equation}
+  \bar v = \frac{\pi d}{\Delta t},
+  \qquad
+  a_c = \frac{\bar v^2}{d} = \frac{\pi^2 d}{\Delta t^2} .
+  \label{eq:turncost}
+\end{equation}
+\end{proposition}
+
+For $d=\SI{0.7}{\metre}$ and $\Delta t = \SI{1}{\second}$ this is
+\SI{2.2}{\metre\per\second} and \SI{6.9}{\metre\per\second\squared}, and the
+simulated demand including the translation is over
+\SI{10}{\metre\per\second\squared}. The engine confirms that increasing the
+thrust margin makes the outcome \emph{worse}, because the controller then tilts
+harder and the gimbal cannot keep up.
+
+\begin{model}[Rate-limited reference with a moving keep-out]
+\label{mod:governor}
+Let $(\vect r_{\mathrm{raw}},\vect v_{\mathrm{raw}},\vect a_{\mathrm{raw}},
+\vect j_{\mathrm{raw}})$ be the ideal display trajectory and its derivatives,
+and let $\vect c(t)$ be the user's head with velocity $\dt{\vect c}$ and
+acceleration $\ddt{\vect c}$. The governed reference is the state
+$(\vect r_g,\vect v_g)$ of a second-order filter with acceleration feedforward,
+\begin{equation}
+  \vect a^{\star} = \vect a_{\mathrm{raw}}
+    + k_p(\vect r_{\mathrm{raw}}-\vect r_g)
+    + k_d(\vect v_{\mathrm{raw}}-\vect v_g) ,
+  \label{eq:gov1}
+\end{equation}
+whose acceleration is projected, by alternating projections, onto the
+intersection of three convex sets: the acceleration ball
+$\|\vect a\|\le a_{\max}$, the next-step speed ball
+$\|\vect v_g+\vect a\,\dd t\|\le v_{\max}$, and the keep-out half-space
+$\vect n\transp\vect a\ge\ell$. With
+$\varrho = d_{\mathrm{safe}}+\mathcal{R}+\varepsilon$ the keep-out radius,
+$\vect n = (\vect r_g-\vect c)/\|\vect r_g-\vect c\|$,
+$h = \|\vect r_g-\vect c\|-\varrho$, $\dt h = \vect n\transp(\vect v_g-\dt{\vect c})$
+and $\|\vect v_t\|^2 = \|\vect v_g-\dt{\vect c}\|^2-\dt h^2$,
+\begin{equation}
+  \ell = \max\left\{
+    \vect n\transp\ddt{\vect c} - \frac{\|\vect v_t\|^2}{\|\vect r_g-\vect c\|}
+      - 2\gamma\,\dt h - \gamma^2 h ,\;
+    \vect n\transp\ddt{\vect c} - \frac{2\,(h + \dt h\,\dd t)}{\dd t^{2}}
+  \right\},
+  \qquad \gamma = 4 .
+  \label{eq:barrier}
+\end{equation}
+The state then advances by
+$\vect r_g\leftarrow\vect r_g+\vect v_g\,\dd t+\tfrac12\vect a\,\dd t^2$,
+$\vect v_g\leftarrow\vect v_g+\vect a\,\dd t$. There is no position projection.
+If the three sets have empty intersection the step is flagged infeasible, the
+acceleration is scaled back to $a_{\max}$, and the violation is reported. The
+heading reference is governed separately by the same filter in one dimension
+with a rate cap and an acceleration cap.
+\end{model}
+
+\begin{proposition}[What the keep-out guarantees]
+\label{prop:governor}
+\begin{enumerate}[label=(\roman*),nosep]
+  \item The caps alone do not keep the reference out of the user. On a curved
+        raw path the acceleration cap makes the governed reference cut the
+        corner, and since the raw path lies at distance $d$ from the user by
+        construction, the governed reference can approach the user
+        arbitrarily closely as $a_{\max}$ decreases.
+  \item In continuous time, and while the first term of \cref{eq:barrier} is
+        the active constraint, the set
+        $\{h\ge0,\ \dt h+\gamma h\ge0\}$ is forward invariant: a reference
+        that starts outside the keep-out sphere with an admissible closing
+        rate never enters it, whatever the user does.
+  \item The second term of \cref{eq:barrier} is the one-step condition
+        $h_{k+1}\ge0$ under constant $\ddt{\vect c}$ over the step, linearised
+        in the tangent plane. It is what the discrete update enforces.
+  \item The vehicle, not the reference, is what must stay clear. If
+        $\sup_t\|\vect r(t)-\vect r_g(t)\|\le\varepsilon$ on a mission, then on
+        that mission the vehicle's centre stays at least
+        $d_{\mathrm{safe}}+\mathcal{R}$ from the head, and hence every blade tip
+        at least $d_{\mathrm{safe}}$. The hypothesis is checked per run and
+        reported; it is not proved.
+\end{enumerate}
+\end{proposition}
+
+\begin{proof}
+(i) In the limit of small $a_{\max}$ the filter output is a convex combination
+of past raw positions, and a chord of a circular arc lies inside the arc, so
+the reference lies inside the sphere of radius $d$ about the user.
+(ii) Differentiating $h$ twice along the governed motion, with
+$\dt{\vect n} = \vect v_t/\|\vect r_g-\vect c\|$ in the notation above,
+\[
+  \ddt h = \vect n\transp(\vect a-\ddt{\vect c})
+           + \frac{\|\vect v_t\|^2}{\|\vect r_g-\vect c\|} ,
+\]
+so the constraint $\vect n\transp\vect a\ge\ell_1$ with $\ell_1$ the first
+term of \cref{eq:barrier} is exactly $\ddt h\ge-2\gamma\dt h-\gamma^2 h$. Put
+$\psi=\dt h+\gamma h$; then $\dt\psi = \ddt h+\gamma\dt h\ge-\gamma\psi$, so
+$\psi(t)\ge\psi(0)e^{-\gamma t}\ge0$, and then
+$\dt h\ge-\gamma h$ gives $h(t)\ge h(0)e^{-\gamma t}\ge0$. This is the
+second-order barrier construction of Ames et al.~\cite{ames2017}, with both
+poles at $-\gamma$ to match the filter's own $k_p=\gamma^2$, $k_d=2\gamma$.
+(iii) Expand $\|\vect r_g+\vect v_g\dd t+\tfrac12\vect a\,\dd t^2 -
+\vect c-\dt{\vect c}\dd t-\tfrac12\ddt{\vect c}\dd t^2\|$ to first order in the
+tangent plane about $\vect n$. (iv) Triangle inequality:
+$\|\vect r-\vect c\|\ge\|\vect r_g-\vect c\|-\|\vect r-\vect r_g\|
+\ge\varrho-\varepsilon = d_{\mathrm{safe}}+\mathcal{R}$, and the reach bound
+\cref{eq:reach}.
+\end{proof}
+
+Three things the proposition does not say. The invariance in (ii) is a
+statement about the continuous-time reference; the engine enforces (iii) at
+update instants, and between them the reference moves under a constant
+acceleration, so (ii) is the limit the discrete scheme approaches, not what it
+executes. The guarantee lapses whenever the step is infeasible, which is why
+that is reported as a violation rather than absorbed. And $\vect c$ is the
+true head position: an estimator with latency or dropouts moves the sphere
+away from the head, and no estimator is modelled (\cref{as:estimation}).
+
+\begin{remark}[The governor's bandwidth must be high]
+The gains $k_p,k_d$ in \cref{eq:gov1} must place the filter's natural frequency
+well above the frequency content of the mission; otherwise the governor adds a
+steady lag on every curved path, which is a different and worse behaviour than
+yielding during a turn. With $k_p=16$, $k_d=8$ the filter is critically damped
+at \SI{4}{\radian\per\second}, and with the feedforward $\vect a_{\mathrm{raw}}$
+in \cref{eq:gov1} it is exactly transparent whenever no cap binds. Without the
+feedforward it lags every acceleration by $\vect a_{\mathrm{raw}}/k_p$, about
+\SI{5}{\centi\metre} at \SI{0.8}{\metre\per\second\squared}, which was enough
+to push the reference into the keep-out sphere a third of the time on a mission
+with no turn in it.
+\end{remark}
+
+\begin{definition}[Two error measures]
+With a governor in the loop, two distinct errors must be reported:
+\begin{equation}
+  e_{\mathrm{track}} = \|\vect r_g - \vect r\|
+  \quad\text{(control performance)},
+  \qquad
+  e_{\mathrm{lag}} = \|\vect r_{\mathrm{raw}} - \vect r\|
+  \quad\text{(what the user sees)} .
+  \label{eq:twoerrors}
+\end{equation}
+Reporting only $e_{\mathrm{track}}$ would flatter the design, since the governor
+is free to make its own reference easy to follow. The peak of
+$e_{\mathrm{track}}$ over the whole window, start-up included, is the quantity
+that must stay below $\varepsilon$ for \cref{prop:governor}(iv).
+\end{definition}
+
+\subsection{Hover linearisation and controllability}
+
+Linearising \cref{eq:ode} about the hover trim by central differences gives
+$\dt{\delta x} = \mat A\,\delta x + \mat B\,\delta u$ on the $12+N$ rigid-body
+and rotor states, after removing the quaternion scalar component which is not
+a free coordinate. The trim is computed, not assumed: with the display on a
+boom the centre of mass is off the rotor centroid and hover needs unequal
+rotor speeds. Controllability is assessed by the rank of the reachable
+subspace, computed by an orthogonal iteration
+$Q_{k+1} = \operatorname{range}[\mat B\ \ Q_k\ \ \mat A Q_k]$ on the matrices
+scaled by their 2-norms with a singular-value tolerance of $10^{-9}$, which
+avoids forming the ill-conditioned powers of the Kalman matrix. Controllability
+requires the rank to equal the state dimension; for the design of
+\cref{sec:results} it is $16$ of $16$. The eigenvalues cluster at the origin,
+reflecting the six open-loop integrators of \cref{eq:chain}, which is
+precisely why the cascade rather than a single loop is required.

@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Flying screen co-design</title>
+  <link rel="stylesheet" href="/app/css/app.css" />
+</head>
+<body>
+  <div id="root">
+    <aside id="sidebar">
+      <div id="brand">
+        <h1>Flying screen</h1>
+        <p>Mass closure, 6-DOF flight, mission energy and design search over one set of assumptions.</p>
+      </div>
+      <div id="presetbox"></div>
+      <div id="params"></div>
+      <div id="sidefoot">
+        <button class="act" id="btn-reset">Reset</button>
+        <button class="act" id="btn-copy">Copy JSON</button>
+        <button class="act" id="btn-paste">Load JSON</button>
+      </div>
+    </aside>
+    <main id="main">
+      <nav id="tabs"></nav>
+      <section id="view"></section>
+    </main>
+  </div>
+  <div id="busy"><div class="box"><span class="spin">/</span> <span id="busy-text">working</span></div></div>
+  <script type="module" src="/app/js/app.js"></script>
+</body>
+</html>

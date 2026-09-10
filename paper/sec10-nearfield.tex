@@ -1,0 +1,164 @@
+﻿\section{Near-field aerodynamic corrections}
+\label{sec:nearfield}
+
+\Cref{mod:disk} treats an isolated rotor in an unbounded fluid at rest. A
+machine hovering at head height in a room violates all three conditions: there
+is a floor below, a ceiling above, other rotors alongside, and after a short
+time the air is not at rest but circulating. This section quantifies the first
+three and measures the fourth.
+
+\subsection{Ground effect}
+
+When the wake is constrained by a surface a distance $z$ below the rotor, the
+streamtube cannot contract freely, the induced velocity at the disk falls, and
+the rotor produces more thrust for the same power.
+
+\begin{model}[Cheeseman-Bennett]
+\label{mod:ige}
+Modelling the ground by an image source, Cheeseman and
+Bennett~\cite{cheeseman1955} obtain, at constant power,
+\begin{equation}
+  \frac{T_{\mathrm{IGE}}}{T_{\mathrm{OGE}}}\bigg|_{P}
+  = \frac{1}{1-\left(\dfrac{R}{4z}\right)^{2}} ,
+  \label{eq:ige}
+\end{equation}
+valid for $z/R \gtrsim 0.5$; equivalently, at constant thrust the induced power
+is reduced by the same factor.
+\end{model}
+
+The dependence is inverse-square in $z/R$, which decides the magnitude
+immediately.
+
+\begin{example}
+For $R=\SI{0.246}{\metre}$ and a rotor plane $z=\SI{\rZrotorAbove}{\metre}$
+above the floor, the adopted layout of \cref{sec:results},
+$(R/4z)^2 \approx 2\times10^{-3}$ and the effect is $0.2\%$. Ground effect
+is negligible for a small rotor at chest height, and would only matter within
+about one radius of a surface.
+\end{example}
+
+\subsection{Ceiling effect}
+
+A ceiling above the rotor restricts the \emph{inflow} rather than the wake. The
+low-pressure region above the disk is bounded, the rotor is drawn toward the
+surface, and thrust rises at constant power. The functional form is taken to be
+the same as \cref{eq:ige} with a separate coefficient,
+\begin{equation}
+  \frac{T_{\mathrm{ICE}}}{T_{\mathrm{OGE}}}\bigg|_{P}
+  = \frac{1}{1-k_c\left(\dfrac{R}{4z_c}\right)^{2}} ,
+  \label{eq:ice}
+\end{equation}
+with $z_c$ the distance to the ceiling and $k_c>1$ because at equal spacing
+ceiling effect is the stronger of the two.
+
+\begin{remark}[Honesty about $k_c$]
+Published values for ceiling proximity scatter considerably across geometries
+and measurement techniques~\cite{sanchezcuevas2017,conyers2019}. $k_c$ is the
+least certain constant in this paper. It is exposed as a user parameter and
+the engine reports the resulting factor separately so that its influence can be
+bounded rather than believed. For the designs here it contributes $1.3\%$ at
+$k_c=2$, and the entire range $k_c\in[0.5,6]$ moves the design mass by less
+than $10$ grams.
+\end{remark}
+
+\subsection{Rotor-to-rotor interference}
+
+Adjacent rotors each operate partly in the other's induced flow. The penalty is
+negligible when the tip-to-tip gap exceeds roughly a quarter diameter and grows
+as the disks approach.
+
+\begin{model}[Interference factor]
+\label{mod:interference}
+With $s$ the tip-to-tip gap and $D$ the diameter,
+\begin{equation}
+  \kappa_{\mathrm{int}}(s/D) =
+  \begin{cases}
+    1, & s/D \ge 0.25,\\[2pt]
+    1 + \varepsilon\left(1 - \dfrac{s/D}{0.25}\right)^{2},
+      & 0 \le s/D < 0.25,
+  \end{cases}
+  \qquad \varepsilon = 0.07 ,
+  \label{eq:interference}
+\end{equation}
+applied as a multiplier on induced power. The quadratic interpolation is chosen
+so that the penalty and its derivative vanish at the matching point, consistent
+with an induced-flow interaction that decays smoothly.
+\end{model}
+
+For a quadrotor with $k_{\mathrm{gap}}=1.10$ in \cref{eq:armlength}, the
+adjacent hub spacing is $2L\sin(\pi/4)=2.2R$ and the tip-to-tip gap is
+$0.2R = 0.1D$, giving $\kappa_{\mathrm{int}} = 1.025$.
+
+\subsection{Net effect and why it is worth stating}
+
+The three corrections enter the induced power as
+\begin{equation}
+  \Pind = \frac{\kappa\,\kappa_{\mathrm{int}}}
+               {k_{\mathrm{ground}}\,k_{\mathrm{ceiling}}}\;T\vind ,
+  \label{eq:kappatotal}
+\end{equation}
+and they partly cancel. \Cref{tab:nearfield} gives the measured influence on a
+converged design.
+
+\begin{table}[t]
+\centering
+\caption{Effect of the near-field corrections on the converged design of
+\cref{sec:results}; the four rows differ only in the corrections applied.
+$\kappa_{\mathrm{tot}}$ is the induced power factor actually used,
+\cref{eq:kappatotal}. The whole span of the four combinations is
+\SI{\rNfSpanDb}{\decibel} and \SI{\rNfSpanG}{\gram}.}
+\label{tab:nearfield}
+\begin{tabular}{@{}lrrrr@{}}
+\toprule
+Model & $\kappa_{\mathrm{tot}}$ & Gross mass & Hover power & $L_p(\SI{1}{\metre})$ \\
+\midrule
+\inputrows{results/tab_nearfield_rows}
+\end{tabular}
+\end{table}
+
+\begin{finding}
+The corrections were worth adding not because they changed the design but
+because they bounded their own importance. A caveat that says ``ground and
+ceiling effect are not modelled'' is unfalsifiable; a table that says they are
+worth a quarter of a decibel is a result. The value of a model is often in the
+size of the term it lets you discard.
+\end{finding}
+
+\subsection{Recirculation: the correction that is not made}
+
+\Cref{mod:disk} assumes the fluid far upstream is at rest. In a closed room
+this is false, and the timescale over which it becomes false is computable.
+
+\begin{definition}[Room exchange time]
+The volumetric flow through the disks is $\dot{V} = A\vind$. For a room of
+volume $V_{\mathrm{room}}$,
+\begin{equation}
+  t_{\mathrm{ex}} \coloneqq \frac{V_{\mathrm{room}}}{A\vind}
+  \label{eq:exchange}
+\end{equation}
+is the time for a volume of air equal to the room's to pass through the rotor
+disks once.
+\end{definition}
+
+\begin{example}
+For the design of \cref{sec:results}, $A=\SI{0.760}{\metre\squared}$ and
+$\vind=\SI{3.0}{\metre\per\second}$, so in a
+$5\times4\times\SI{2.4}{\metre}$ room
+$\dot V = \SI{2.28}{\metre\cubed\per\second}$,
+$V_{\mathrm{room}}=\SI{48}{\metre\cubed}$ and
+$t_{\mathrm{ex}} = \SI{21}{\second}$. The mean return velocity distributed over
+the floor plan is $\dot V/(5\times4) = \SI{0.11}{\metre\per\second}$.
+\end{example}
+
+\begin{finding}
+Within one minute of a thirty-minute session the machine is flying in air it
+has already accelerated. The quiescent-inflow assumption underlying every
+result of \cref{sec:momentum} has quietly ceased to hold. Correcting this is
+not a matter of a coefficient: it requires solving the room flow, which is a
+computational fluid dynamics problem with a moving boundary. It is the largest
+outstanding gap in the model and is recorded as such in
+\cref{sec:limitations}. A secondary consequence is a persistent draught of
+order \SI{0.1}{\metre\per\second} throughout the room, far below the
+\SI{\rWake}{\metre\per\second} wake velocity but present continuously and over the
+whole floor area.
+\end{finding}

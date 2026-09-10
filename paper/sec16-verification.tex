@@ -1,0 +1,208 @@
+﻿\section{Verification, calibration and errors found}
+\label{sec:verification}
+
+A model of this kind is only as good as the evidence that it computes what it
+claims. This section records the verification strategy, the calibration against
+measured hardware, and, because they are instructive, the errors that the
+strategy caught.
+
+\subsection{Verification against the closed forms}
+
+The closed forms of \cref{sec:fold,sec:scaling} exist in the implementation
+alongside the numerical solvers and serve as an oracle. The test suite
+comprises 66 assertions; those bearing on the theory are:
+
+\begin{itemize}[nosep]
+  \item \emph{Momentum theory.} $T = 2\rho A\vind^2$ holds identically to
+        machine precision; with $\Cdz\to0$, $\kappa\to1$ and the near-field
+        corrections disabled, the computed $\FM\to1$ to within $10^{-5}$,
+        confirming \cref{thm:momentum,eq:fm}.
+  \item \emph{Coefficients.} $\alpha$ and $\beta$ from \cref{def:coeffs} agree
+        with hand computation to four figures.
+  \item \emph{Fold.} $m^*$ and $\Mmax$ agree with \cref{eq:closedform} to
+        $10^{-12}$ relative; both roots satisfy \cref{eq:closure} to $10^{-8}$;
+        $m_-<m^*<m_+$ as \cref{thm:trichotomy} requires; at
+        $\Mzero=\Mmax-10^{-9}$ the two roots agree to $10^{-3}$ relative,
+        exhibiting the square-root merging of \cref{eq:sqrtlaw}; and for
+        $\Mzero>\Mmax$ no solution is returned.
+  \item \emph{Iteration.} The naive iteration converges to the analytic $m_-$
+        to $10^{-4}$ relative from a distant start, and is classified as
+        diverging when $\Mzero>\Mmax$, confirming \cref{thm:iteration}.
+  \item \emph{Scaling.} $\Mmax(2t_f) = \Mmax(t_f)/4$ to $10^{-9}$, and the
+        numerically computed logarithmic sensitivities reproduce
+        \cref{thm:sensitivity} to three decimal places, including the
+        non-obvious $S_g=-3.770$ which depends on $\gamma_m/\alpha$.
+  \item \emph{Exponent.} The endurance wall is finite for $p=0$ and absent for
+        $p=1.4$, confirming \cref{thm:pfold}.
+  \item \emph{Dynamics.} With zero thrust the vertical acceleration is exactly
+        $-g$; at the hover trim the allocation returns $T=mg$ and
+        $\vect\tau=\vect0$ to $10^{-9}$; $\dt E$ equals the negative of the
+        computed electrical power identically; rotations satisfy
+        $RR\transp=I$ and $\det R=1$ to $10^{-10}$ through the quaternion
+        round trip; and the hover linearisation is controllable at full rank.
+  \item \emph{Review regressions.} The near-fold root pair of
+        \cref{sec:numerics} is found; the quadrotor authority equals the
+        balanced differential \cref{eq:authquad} on every axis; the slab
+        inertia is assigned to the panel axes; a forward boom produces a
+        product of inertia and a trimmed hover with unequal rotor speeds;
+        telemetry at $t$ compares the state at $t$ with the references at $t$;
+        the governor keeps a reference out of a head that walks toward it;
+        the battery loop's reported battery survives its verification flight;
+        and the inner-map slope of \cref{prop:inner} lies in $[0,0.9)$ over
+        \SIrange{0.8}{50}{\kilo\gram} for the shipped component models.
+\end{itemize}
+
+\subsection{Calibration of the acoustic anchor, and a fourteen-decibel error}
+
+\Cref{mod:spl} contains an anchor $C$ which was initially assigned by
+judgement, at $C=68$. Calibration against published declarations exposed this
+as badly wrong.
+
+Manufacturers declare a sound \emph{power} level $L_{WA}$ under EU regulation
+2019/945. Converting to pressure at \SI{1}{\metre} by \cref{eq:eightdb} and
+inverting \cref{eq:splmodel} gives $C$ for each aircraft.
+
+\begin{table}[t]
+\centering
+\caption{Calibration of the acoustic anchor. Hover rotor speeds are
+manufacturer figures; tip speed and thrust per rotor follow from geometry and
+mass. The four aircraft span a factor of $3.6$ in mass and agree on $C$ to
+\SI{1.4}{\decibel}.}
+\label{tab:acoustic}
+\begin{tabular}{@{}lrrrrrr@{}}
+\toprule
+Aircraft & $m$ & $T/\text{rotor}$ & $\Vtip$ & $L_{WA}$ & $L_p(\SI{1}{\metre})$ & $C$ \\
+\midrule
+DJI Mini 3      & \SI{0.249}{\kilo\gram} & \SI{0.61}{\newton} & \SI{71.6}{\metre\per\second} & 79.0 & 71.0 & 82.8 \\
+DJI Air 2S      & \SI{0.595}{\kilo\gram} & \SI{1.46}{\newton} & \SI{67.1}{\metre\per\second} & 82.0 & 74.0 & 83.8 \\
+DJI Mavic 3     & \SI{0.895}{\kilo\gram} & \SI{2.19}{\newton} & \SI{68.8}{\metre\per\second} & 83.0 & 75.0 & 82.3 \\
+DJI Mavic 2 Pro & \SI{0.907}{\kilo\gram} & \SI{2.22}{\newton} & \SI{67.9}{\metre\per\second} & 83.0 & 75.0 & 82.6 \\
+\midrule
+\multicolumn{6}{r}{mean} & \textbf{82.9} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\Cref{tab:acoustic} gives $C = 82.9$ with a spread of \SI{1.4}{\decibel}. The
+consistency across a $3.6\times$ mass range is strong evidence that the
+functional form \cref{eq:splmodel} is right, and that the original anchor was
+\SI{14}{\decibel} optimistic.
+
+\begin{finding}
+Fourteen decibels is not a refinement. It is the difference between a machine
+one can think beside and one that must leave the room, and it exceeds the
+entire range spanned by every design decision available in the study. The error
+had two components: an uncalibrated anchor, and the eight-decibel confusion of
+\cref{prop:lwlp} between a declared sound power and a pressure at one metre. It
+was found only because the model was made to reproduce measured hardware.
+\end{finding}
+
+The test suite now asserts that \cref{eq:splmodel} reproduces the declared
+levels of three of these aircraft to within \SI{1.5}{\decibel}.
+
+\subsection{Calibration of the motor model}
+
+$k_\tau$ in \cref{eq:motormass} was likewise assigned by judgement at
+\SI{3.0}{\newton\metre\per\kilo\gram} and found to be pessimistic by roughly a
+factor of two.
+
+\begin{table}[t]
+\centering
+\caption{Motor mass model against catalogue peak torque. The model is
+conservative at the large end, which is the safe direction for a design study;
+the designs here use motors of \SIrange{50}{60}{\gram} where the error is
+small.}
+\label{tab:motor}
+\begin{tabular}{@{}lrrrr@{}}
+\toprule
+Motor & Actual mass & Peak torque & Model mass & Error \\
+\midrule
+T-Motor MN2806  & \SI{66}{\gram}  & \SI{0.30}{\newton\metre} & \SI{63}{\gram}  & $-5\%$ \\
+T-Motor MN3110  & \SI{96}{\gram}  & \SI{0.63}{\newton\metre} & \SI{111}{\gram} & $+16\%$ \\
+T-Motor MN505-S & \SI{190}{\gram} & \SI{2.03}{\newton\metre} & \SI{273}{\gram} & $+44\%$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+With $k_\tau = \SI{5.5}{\newton\metre\per\kilo\gram}$ at
+$m_{\mathrm{ref}}=\SI{0.1}{\kilo\gram}$ and $e=0.30$, \cref{tab:motor} results.
+The recalibration mattered structurally, not just numerically: with the
+pessimistic constant the motor mass penalty overwhelmed the induced-power
+benefit of a larger rotor, and the optimum diameter sat on the lower bound of
+the search box. After recalibration a genuine interior optimum appears, which
+is the physically expected behaviour, and the test suite now asserts its
+existence.
+
+\subsection{Errors found by the model itself}
+
+Three defects were found not by inspection but because a computed quantity was
+inconsistent with a hand calculation.
+
+\paragraph{The tip-speed design rule.} Holding tip speed fixed while growing
+the rotor made power \emph{increase} with diameter, contradicting
+\cref{obs:dl}. The cause was that at fixed tip speed the profile power
+\cref{eq:profile} scales with disk area while the induced power falls only as
+$A^{-1/2}$. The resolution is \cref{cor:designrule}: a rotor is designed at
+constant blade loading, not constant tip speed, and with $\Vtip$ derived from
+\cref{eq:ctsigma} the expected monotonicity is recovered.
+
+\paragraph{Safety measured to the wrong point.} The simulator's minimum-distance
+check measured from the vehicle centre of mass to the user. By \cref{eq:reach}
+the blades extend $\mathcal{R}$ from that point, and for these designs
+$\mathcal{R}=\SI{0.63}{\metre}$, so the check was optimistic by the entire reach
+of the machine. Recomputing to the nearest blade tip showed the nominal
+configuration violating its own safety distance by a factor of three. This is
+discussed in \cref{sec:results}.
+
+\paragraph{A startup transient masquerading as a failure.} The simulation began
+with the vehicle at rest at the reference position while the human was already
+at full walking speed. On a curved path the display sits directly in the
+person's path, so the separation collapsed from \SI{1.100}{\metre} to
+\SI{0.603}{\metre} within \SI{0.62}{\second} before recovering. Initialising the
+vehicle and the governor with the reference velocity, as noted in
+\cref{sec:numerics}, removed it; the minimum envelope gap then agrees with the
+static tip gap of \cref{eq:clearance} to within a centimetre, the difference
+being the conservative sphere against the actual blade tips. The same mistake
+reappeared one level up: the vehicle was initialised level while the
+reference on a curved path already needed a tilt and a body rate, and the
+attitude loop spent the first second catching up. That transient set the
+whole-window peak tracking error, which is the quantity the keep-out margin is
+checked against. The initial attitude, body rate and thrust are now the trim
+for the reference at $t=0$.
+
+\begin{remark}
+The common feature of all of these is that they were caught by comparison
+against an independently computed quantity, not by reading the code. This is
+the argument for keeping the analytic layer alive in the implementation even
+after it has been superseded.
+\end{remark}
+
+\subsection{Errors found by independent review}
+
+An independent review of the engine and of an earlier draft of this paper
+found five defects that the tests above had not, each now covered by a
+regression test.
+
+\begin{enumerate}[nosep]
+  \item The component closure bracketed the first sign change of
+        $\mathcal{F}$ on a geometric grid of ratio $1.35$ and called a grid
+        with no positive sample infeasible. Near the fold the positive stretch
+        is narrower than the grid, and a design with two roots was reported as
+        having none. The paper had also described that failure as
+        infeasibility. \Cref{sec:numerics} gives the replacement.
+  \item The torque authority divided the balanced differential by $N$, a
+        factor of four on every axis, which propagated into the gain rule and
+        into every layout comparison. \Cref{eq:authority} is now a linear
+        program and \cref{app:proofs} the closed form it reduces to.
+  \item Telemetry compared the state advanced to $t+\dd t$ with references
+        evaluated at $t$, labelled $t$.
+  \item The display slab's inertia was assigned to the wrong body axes, and the
+        offsets were not moved to the centre of mass, so a boom produced no
+        product of inertia. \Cref{sec:components} now builds one tensor from
+        one geometry.
+  \item After the review, and found by the tracking statistics it demanded:
+        the attitude loop used a zero desired angular rate, so on a curved
+        path it lagged the rotating thrust direction by a standing error. The
+        rate feedforward of \cref{eq:omegad} removed a \SI{0.27}{\metre}
+        tracking excursion and a rotor pass at \SI{0.34}{\metre} from the eye.
+\end{enumerate}

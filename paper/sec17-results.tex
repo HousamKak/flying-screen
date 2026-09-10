@@ -1,0 +1,438 @@
+﻿\section{Design study}
+\label{sec:results}
+
+Every number in this section is produced by \code{paper/make\_results.py}
+from the engine, together with the configuration that produced it
+(\cref{sec:engine}). Unless stated otherwise the flights use a window of
+\SI{\rTwindow}{\second} at a step of \SI{\rDt}{\milli\second}, statistics
+taken after a settling interval of \SI{\rSettle}{\second}, gust seed
+\rSeed, and the governor of \cref{mod:governor} at
+$v_{\max}=\SI{2.5}{\metre\per\second}$,
+$a_{\max}=\SI{2.5}{\metre\per\second\squared}$,
+$\varepsilon=\SI{\rTrackMargin}{\milli\metre}$, heading rate cap
+\SI{1.5}{\radian\per\second}.
+
+\subsection{The requirement, worked backwards}
+
+Four human-facing requirements bound the design.
+
+\begin{enumerate}[label=(R\arabic*),nosep]
+  \item \emph{Readability.} Two quantities, and they pull in opposite
+        directions. Pixel density in pixels per degree,
+        $1920/(2\arctan(w/2d))$ for a panel of width $w$ at distance $d$,
+        measures sharpness and rises with distance. Text size is an angular
+        height: ANSI/HFES 100~\cite{hfes2007} asks for a character height of
+        at least \SI{16}{\arcminute}, with \SIrange{20}{22}{\arcminute}
+        preferred, and it falls with distance. A desktop meets the second by
+        scaling its interface, which divides the usable workspace by the
+        scale factor.
+  \item \emph{Noise.} A quiet office is \SI{45}{\decibel A}, ordinary speech
+        \SI{60}{\decibel A}. Working beside a source for half an hour requires
+        something in between.
+  \item \emph{Downwash.} Loose paper begins to move at roughly
+        \SI{5}{\metre\per\second}. By \cref{eq:dl} the wake velocity is
+        $2\vind = 2\sqrt{\mathrm{DL}/2\rho}$, so this bounds disk loading.
+  \item \emph{Size and safety.} The machine must fit beside a desk, and by
+        \cref{eq:reach} its blades extend $\mathcal{R}$ from its centre.
+\end{enumerate}
+
+All four pull the same way, toward large slowly turning lightly loaded rotors,
+and (R2) to (R4) conflict with the span limit through $\mathcal{R}=L+R$.
+
+\subsection{The binding constraint is acoustic}
+
+Applying \cref{eq:mmaxexplicit} to the fixed load of the design below
+(\SI{\rFixed}{\gram} of panel, electronics and gimbal), the energetic wall is
+comfortable at short sessions: at \SI{20}{\minute} the critical effective load
+is \SI{\rWallTwenty}{\kilo\gram} against a requirement of
+\SI{\rMzeroTwenty}{\kilo\gram}, a utilisation of \SI{\rWallUse}{\percent}.
+Half an hour of flight costs about a quarter of a kilogram of cells. Energy
+is not what stops this product.
+
+Noise is. \Cref{obs:sixthpower} says the only lever with authority is tip
+speed, and \cref{cor:designrule} says solidity is how one buys it. Optimising
+under (R1) to (R4) drives the design to four rotors of
+\SI{\rDiam}{\milli\metre} diameter with wide, low-aspect-ratio blades turning
+at \SI{\rRpm}{rpm}, a tip speed of \SI{\rVtip}{\metre\per\second} against
+roughly \SI{68}{\metre\per\second} for a commercial camera drone.
+
+\subsection{Which display}
+
+A resolution is not a payload. \Cref{tab:displays} evaluates the candidates at
+the standoff the safety analysis below will impose, \SI{\rStandoff}{\metre},
+each with the aircraft re-optimised around it by differential evolution over
+rotor diameter, blade loading, aspect ratio and blade count under a span limit
+of \SI{\rOptSpan}{\metre}, a free-field level of \SI{\rOptSpl}{\decibel A} at
+\SI{1}{\metre}, a wake of \SI{\rOptWash}{\metre\per\second} and a gross mass
+of \SI{\rOptMass}{\kilo\gram}. Every $1920$-wide panel is sharp at that
+distance; none delivers a full desktop there, for the reason in (R1). Areal
+density is what discriminates between the aircraft: a desktop monitor panel is
+more than twice as heavy per unit area as a laptop panel, because it carries
+thicker glass, a heavier backlight and a metal chassis.
+
+\begin{table}[t]
+\centering
+\caption{Display options at \SI{\rStandoff}{\metre}, each with the aircraft
+re-optimised under identical limits. ``Logical'' is the desktop width in
+logical pixels once the interface is scaled to a \SI{16}{\arcminute} character
+height. Areal density in \si{\kilo\gram\per\metre\squared}, n/a for a whole
+device. Levels in \si{\decibel A}, free field at \SI{1}{\metre} and at the
+user's ear in a $5\times4\times\SI{2.4}{\metre}$ room with $\bar\alpha=0.20$
+by \cref{prop:room}. ``Over limits'' means the closure exists but the best
+design found violates at least one of the four limits.}
+\label{tab:displays}
+\footnotesize\setlength{\tabcolsep}{4pt}
+\begin{tabular}{@{}lrrrrrrrl@{}}
+\toprule
+Display & px/deg & Logical & Areal & Gross & Power & $L_p(\SI{1}{\metre})$ & At ear & Verdict\\
+\midrule
+\inputrows{results/tab_displays_rows}
+\end{tabular}
+\end{table}
+
+\begin{finding}
+The full $1920\times1080$ panel is available, provided it is a laptop panel
+and not a monitor panel. Flying a whole laptop is not: the panel is a sixth
+of a 15.6-inch machine's mass and the rest is keyboard, battery, cooling and
+chassis, none of which is visible while hovering. A tablet is different in
+kind because a tablet is almost entirely screen, which is why the iPad flown
+whole still closes while the laptop flown whole does not. What no panel of
+this size delivers at \SI{\rStandoff}{\metre} is a full desktop's worth of
+text: see \cref{sec:readability}.
+\end{finding}
+
+\subsection{Geometry relative to the user}
+
+The standoff a user specifies is measured to the \emph{display}. The rotors
+extend $\mathcal{R}=L+R$ back toward them from the machine's centre.
+
+\begin{proposition}[Blade clearance]
+\label{prop:clearance}
+Let the display be at horizontal standoff $d$ from the user's eye, carried a
+distance $b\ge0$ ahead of the rotor centroid on a boom, with the rotor plane a
+height $\Delta z$ above the eye. Then the nearest blade tip lies at
+\begin{equation}
+  \ell_0 = \sqrt{\big(\max\{d+b-\mathcal{R},0\}\big)^2 + \Delta z^2} ,
+  \label{eq:clearance}
+\end{equation}
+and the requirement $\ell_0\ge d_{\mathrm{safe}}$ is met either by
+\begin{equation}
+  d \ge \mathcal{R} + \sqrt{d_{\mathrm{safe}}^2 - \Delta z^2} - b
+  \qquad\text{or}\qquad
+  b \ge \mathcal{R} + \sqrt{d_{\mathrm{safe}}^2-\Delta z^2} - d .
+  \label{eq:clearancefix}
+\end{equation}
+\end{proposition}
+
+At a nominal $d=\SI{0.70}{\metre}$ with $\mathcal{R}=\SI{\rReach}{\metre}$
+and $|\Delta z|=\SI{0.13}{\metre}$, \cref{eq:clearance} gives
+$\ell_0=\SI{0.148}{\metre}$ against a safe distance of \SI{0.45}{\metre}: a
+violation by a factor of three, invisible to any check evaluated at the
+vehicle centre.
+
+\Cref{tab:clearance} compares the two remedies, each option closed, its gains
+capped by \cref{mod:gains} for its own authority (attitude and position gains
+together, since the cascade needs its time-scale separation), and flown
+through the turnaround mission with the governor active. For every option but
+the last standoff the ideal display position lies inside the keep-out radius
+$\varrho = d_{\mathrm{safe}}+\mathcal{R}+\varepsilon$, by up to
+\SI{\rCldNearInside}{\centi\metre}; those missions start on the sphere and the
+governor holds the reference there, so their ``turn'' clearance measures the
+keep-out sphere and not the option. The sphere is conservative for a boom,
+whose reach is set by the rear rotors while the front rotors are what
+approach the user.
+
+\begin{table}[t]
+\centering
+\caption{Two ways to recover blade clearance. The boom keeps the display close
+and pays in pitch inertia and authority; standing back is free on every axis
+and quieter, and pays in text size. ``Turn'' is the minimum distance from the
+eye to the nearest rotor disk during the turnaround mission, against the
+\SI{0.45}{\metre} required. $J_{yy}$ in \si{\kilo\gram\metre\squared},
+$\alpha^{\max}_{\mathrm{pitch}}$ in \si{\radian\per\second\squared}, $K_R$ in
+\si{\per\second\squared}, screen angle is the panel's apparent width, logical
+width as in \cref{tab:displays}.}
+\label{tab:clearance}
+\footnotesize\setlength{\tabcolsep}{4pt}
+\begin{tabular}{@{}lrrrrrrrrr@{}}
+\toprule
+Option & Tip gap & Gross & Power & $J_{yy}$ & $\alpha^{\max}_{\mathrm{pitch}}$
+       & $K_R$ & Screen & Logical & Turn\\
+\midrule
+\inputrows{results/tab_clearance_rows}
+\end{tabular}
+\end{table}
+
+\begin{finding}
+A boom of \SI{0.38}{\metre} multiplies the pitch inertia by \rBoomJratio,
+reduces the pitch authority to \rBoomAlphaRatio\ of the no-boom value and the
+admissible attitude gain to $K_R=\rClbMidKR$, and costs \SI{\rBoomGross}{\gram}
+of gross mass and \SI{\rBoomEar}{\decibel A} at the ear against
+\SI{\rStandEar}{\decibel A}. Standing back to \SI{1.20}{\metre} achieves the
+same static clearance at no cost in mass, power or authority, is the only
+option whose ideal position is outside the keep-out sphere, and keeps its
+rotors \SI{\rCldFarClear}{\metre} from the eye through the turnaround. The
+price is the one (R1) names, and it is paid below.
+\end{finding}
+
+\subsection{What the user can read}
+\label{sec:readability}
+
+At \SI{\rStandoff}{\metre} the 15.6-inch panel subtends \ang{\rScreenDeg} at
+\SI{\rPpd}{px\per\degree}: sharper than any desktop monitor. But a
+\SI{16}{px} body-text character, cap height \SI{11}{px}, subtends only
+\SI{\rCapArcmin}{\arcminute} at that distance, against the \SI{16}{\arcminute}
+minimum of~\cite{hfes2007}. Meeting the minimum takes an interface scale of
+\SI{\rUiScale}{\percent} (\SI{\rUiScalePref}{\percent} for the preferred
+\SI{20}{\arcminute}), which leaves a logical desktop of
+$\rLogicalW\times\rLogicalH$ pixels. That is a tablet's workspace on a
+laptop's panel. At \SI{0.70}{\metre} the same panel gives
+\SI{\rCapArcminNear}{\arcminute} and a logical width of \rLogicalWNear, a
+laptop's workspace, and its blades \SI{0.15}{\metre} from the eye.
+
+\begin{finding}
+The two safe ways to fly a panel this size, standing back or a boom, and the
+requirement that the user read a full desktop on it, are not simultaneously
+satisfiable at $1920\times1080$ in \SI{345}{\milli\metre}. A safe flying
+screen at reading distance either carries a physically larger panel, which
+\cref{tab:displays} shows the acoustics will not allow, or presents a smaller
+workspace than the resolution suggests. The resolution is not the constraint;
+the angular size of a character is.
+\end{finding}
+
+\subsection{Screen above or below the rotors}
+
+Because the display is vertical and the rotor flow is vertical
+(\cref{sec:dynamics}), placing the panel above or below the rotor plane is
+nearly free aerodynamically: \SI{\rGrossBelow}{\kilo\gram} against
+\SI{\rGross}{\kilo\gram}, with the same noise. What changes is geometry. With
+the screen below, the rotor plane sits at \SI{\rZrotorBelow}{\metre}, level
+with the user's head; with it above, the rotors drop to
+\SI{\rZrotorAbove}{\metre} and the panel itself lies between the blades and
+the user's face. The latter is adopted. Tracking is marginally better in still
+air, because by the remark following \cref{eq:screenmoment} the drag moment
+becomes weathercock-stable, and marginally worse in a steady breeze for the
+same reason.
+
+\subsection{The design}
+
+\Cref{tab:design} gives the resulting machine with a buildable payload: a bare
+laptop panel on a matched controller board, a Raspberry Pi running a remote
+desktop client, a separate flight controller, and an on-sensor inference
+camera.
+
+\begin{table}[t]
+\centering
+\caption{DESK-1/W with the thin-client payload, screen above the rotors,
+standoff \SI{\rStandoff}{\metre}. Sized for hover by \cref{eq:fpclosure}.}
+\label{tab:design}
+\footnotesize\setlength{\tabcolsep}{4pt}
+\begin{tabular}{@{}llrl@{}}
+\toprule
+& Quantity & Value & Note\\
+\midrule
+\multirow{4}{*}{Geometry}
+& rotors & $4\times\SI{\rDiam}{\milli\metre}$ & 2 blades, \SI{\rChord}{\milli\metre} chord, AR 3.0\\
+& solidity & \rSolidity & below the 0.25 cascade limit\\
+& span & \SI{\rSpan}{\metre} & reach \SI{\rReach}{\metre}\\
+& display & $345\times\SI{194}{\milli\metre}$ & 15.6 in, \SI{\rPpd}{px\per\degree}, $\rLogicalW\times\rLogicalH$ logical\\
+\midrule
+\multirow{5}{*}{Mass}
+& fixed payload & \SI{\rFixed}{\gram} & panel \SI{\rPanel}{\gram}, electronics \SI{\rElectronics}{\gram}, gimbal \SI{\rGimbal}{\gram}\\
+& frame & \SI{\rFrame}{\gram} & arms \SI{\rArms}{\gram}, guards \SI{\rGuards}{\gram}\\
+& propulsion & \SI{\rProp}{\gram} & motors \SI{\rMotors}{\gram}, props \SI{\rProps}{\gram}\\
+& battery & \SI{\rBattery}{\gram} & \rPackS S1P \rPackCell, \SI{\rPackWh}{\watt\hour}\\
+& \textbf{gross} & \textbf{\SI{\rGross}{\kilo\gram}} & $\FM=\rFM$ implied\\
+\midrule
+\multirow{4}{*}{Rotor}
+& speed & \SI{\rRpm}{rpm} & \SI{\rRpmMax}{rpm} at $T_{\max}$\\
+& tip speed & \SI{\rVtip}{\metre\per\second} & \SI{\rVtipMax}{\metre\per\second} at $T_{\max}$\\
+& blade loading & \rCtSigma & stall at 0.14\\
+& Reynolds & \rReynolds & $\Cdz = \rCdzero$ corrected\\
+\midrule
+\multirow{3}{*}{Power}
+& hover & \SI{\rPower}{\watt} & of which \SI{\rPaux}{\watt} auxiliary\\
+& session, hovering & \SI{\rEndReserve}{\minute} & to the \SI{12}{\percent} reserve; \SI{\rEndEmpty}{\minute} to empty\\
+& session, worst mission & \SI{\rEndTurn}{\minute} & turnaround, to the reserve\\
+\midrule
+\multirow{4}{*}{Human factors}
+& $L_p$ free field \SI{1}{\metre} & \SI{\rSplOne}{\decibel A} & \\
+& $L_p$ at the ear, in room & \SI{\rSplEar}{\decibel A} & \cref{prop:room}, $r_c=\SI{\rCritDist}{\metre}$\\
+& $L_p$ elsewhere in room & \SI{\rSplFar}{\decibel A} & does not fall with distance\\
+& wake velocity & \SI{\rWake}{\metre\per\second} & Beaufort 3\\
+\midrule
+\multirow{4}{*}{Control}
+& $J_{xx},J_{yy},J_{zz}$ & $\rJxx,\ \rJyy,\ \rJzz$ & \si{\kilo\gram\metre\squared}, about the centre of mass\\
+& authority roll/pitch/yaw & $\rAlphaRoll/\rAlphaPitch/\rAlphaYaw$ & \si{\radian\per\second\squared}, \cref{eq:authority}\\
+& gains & $K_R=\rKR$, $K_\omega=\rKw$ & below the bound \rKRsug\ of \cref{mod:gains}\\
+& blade tip to face, static & \SI{\rTipGap}{\metre} & against \SI{0.45}{\metre} required\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Flight performance}
+
+\Cref{tab:flight} reports the design of \cref{tab:design}, with its hover-sized
+battery, flown through each mission with the governor of \cref{mod:governor}
+active. Two clearances are reported. The envelope gap is the distance from the
+eye to a sphere of radius $\mathcal{R}$ about the centre of mass, the
+conservative quantity that \cref{prop:governor}(iv) bounds. The rotor
+clearance is the distance from the eye to the nearest oriented rotor disk,
+which is what a blade could actually touch.
+
+\begin{table}[t]
+\centering
+\caption{Missions flown on the hover-sized battery. $\varkappa$ is the mission
+overhead of \cref{prop:contraction}; ``session'' is how long the
+\SI{\rBattery}{\gram} pack lasts at that power to the \SI{12}{\percent}
+reserve. ``Track'' is the peak tracking error over the whole window, start-up
+included, to be compared with $\varepsilon=\SI{\rTrackMargin}{\milli\metre}$;
+lag is the r.m.s.\ distance from the ideal display position,
+\cref{eq:twoerrors}.}
+\label{tab:flight}
+\footnotesize\setlength{\tabcolsep}{4pt}
+\begin{tabular}{@{}lrrrrrrrrr@{}}
+\toprule
+Mission & Power & $\varkappa$ & Session & Track & Lag rms & Screen tilt & Sat.\ & Envelope & Rotor\\
+\midrule
+\inputrows{results/tab_flight_rows}
+\end{tabular}
+\end{table}
+
+The overhead $\varkappa$ ranges from \rKappaMin\ standing to \rKappaMax\ on
+the turnaround. The peak tracking error stays below $\varepsilon$ on every
+mission (worst \SI{\rTrackWorst}{\milli\metre}), so by
+\cref{prop:governor}(iv) the envelope guarantee holds on these runs; the
+nearest any rotor disk comes to the eye is \SI{\rClearWorst}{\metre}, on the
+turnaround. Disturbance rejection is not what limits the machine indoors: a
+\SI{3}{\metre\per\second} breeze with \SI{1.5}{\metre\per\second} gusts, far
+stronger than any room, produces \SI{\rBreezeLag}{\milli\metre} of lag and
+\ang{\rBreezeTilt} of screen tilt while the airframe leans
+\ang{\rBreezeLean}, which is the gimbal doing what it exists for.
+
+What the table also shows is that a battery sized for hover is not sized for
+the mission: on every moving mission the pack lands below its reserve, at
+\SI{7}{\percent} on the turnaround. That is the reason the coupled loop exists.
+
+\subsection{The fully coupled loop, following the user}
+
+The design of \cref{tab:design} was sized for hover and then flown. That is
+not \cref{prob:codesign}. The coupled problem sizes the battery around the
+motion actually performed: guess $\mbat$, close frame and propulsion around it
+by \cref{prop:inner}, rebuild the vehicle including its inertia tensor and
+rotor constants, fly the mission with the governor and keep-out, integrate the
+electrical power, and ask what battery that mission required, by
+\cref{eq:batreq}. \Cref{tab:coupled} gives the result for each motion. Every
+row converged in \rCoupItLo\ battery updates by the secant iteration
+\cref{eq:secant} followed by two verification flights, \rCoupSimLo\ full
+6-DOF simulations in all, and every row's final flight met the reserve, the
+peak-power requirement, the rotor clearance and the readability limit.
+
+\begin{table}[t]
+\centering
+\caption{The fully coupled closure \cref{eq:residual} on the final design, one
+row per motion. ``Hover sizing'' is the first-principles closure of
+\cref{eq:fpclosure} with the mission assumed to be hover, i.e.\ the design of
+\cref{tab:design}. ``Updates/sims'' counts battery updates and total
+simulations including the verification flights; ``reserve'' is the state of
+charge left at $t_f$ on the final flight; ``rotor'' the minimum eye-to-disk
+distance on it; ``feasible'' whether that flight met every path constraint.}
+\label{tab:coupled}
+\footnotesize\setlength{\tabcolsep}{4pt}
+\begin{tabular}{@{}lrrrrrrrrl@{}}
+\toprule
+Motion & Gross & Battery & vs.\ hover & Mean power & $\varkappa$ & Upd./sims & Reserve & Rotor & Feasible\\
+\midrule
+hover sizing & \SI{\rGross}{\kilo\gram} & \SI{\rBattery}{\gram} & n/a & \SI{\rPower}{\watt} & n/a & n/a & \SI{12.0}{\percent} & n/a & n/a\\
+\midrule
+\inputrows{results/tab_coupled_rows}
+\end{tabular}
+\end{table}
+
+Three observations follow.
+
+\emph{The standing row reproduces the hover sizing} to within
+\SI{\rCoupStandBat}{\gram} of battery. This is a consistency check, not a
+validation: the simulation and the closure share the rotor model of
+\cref{sec:blade}, and agreement between them says that the substitution of
+\cref{mod:battery} at $\varkappa=1$ is implemented correctly, nothing more.
+
+\emph{Following a person is cheap; turning with them is not.} Ordinary motion
+costs between \SI{\rCoupOrdLo}{\gram} and \SI{\rCoupOrdHi}{\gram} of battery.
+Repeated turnarounds cost \SI{\rCoupTurnBat}{\gram} of battery and
+\SI{\rCoupTurnGross}{\gram} of gross mass, almost all of it the mission
+overhead $\varkappa=\rCoupTurnKappa$ propagated through the fixed point: by
+\cref{eq:kappaclosure} the overhead multiplies $\beta$, and here it moves the
+design \SI{\rCoupTurnUp}{\percent} further up the closure curve. Sizing the
+battery for the most demanding motion is a worst-case operating policy, and
+it is the one adopted here. For a defined session with known phases the
+energy is the time-weighted sum over the phases, with the peak-power
+requirement enforced separately by \cref{eq:batreq}; a session of occasional
+turns needs less than \cref{tab:coupled}'s last row, and one of continuous
+turning needs exactly it.
+
+\emph{The inertia coupling is weak for this layout.} The cycle \cref{eq:cycle2}
+runs through $J$, but the battery sits near the centre of mass, so $J_{yy}$
+moves only from \num{\rCoupJlo} to \SI{\rCoupJhi}{\kilo\gram\metre\squared}
+between the lightest and heaviest converged designs. The coupling that matters
+is the energy one; the dynamic one is present and small.
+
+\paragraph{Dynamic clearance.} The static clearance of \cref{tab:design},
+\SI{\rTipGap}{\metre}, is not the clearance flown. During the turnaround the
+governed reference is held outside $\varrho = d_{\mathrm{safe}}+\mathcal{R}+
+\varepsilon$ of the head by \cref{eq:barrier}, the vehicle tracks it to within
+\SI{\rTurnTrack}{\milli\metre}, and the nearest rotor disk passes the eye at
+\SI{\rTurnClear}{\metre} (envelope gap \SI{\rTurnEnv}{\metre}). An earlier
+version of the governor, with a keep-out on position only and a velocity test
+that ignored the head's own motion, let the vehicle inside the safe distance
+by about \SI{4}{\centi\metre} on this mission; the margin $\varepsilon$ and
+the moving-boundary barrier are what closed that gap, and
+\cref{prop:governor}(iv) states exactly the hypothesis under which they do.
+
+\subsection{The tether}
+
+Taking the battery off the aircraft removes the mission time from the closure.
+What replaces it is a conductor whose mass follows from Ohm's law: at bus
+voltage $V$ delivering power $P$ over length $L$ with fractional drop
+$\delta$,
+\begin{equation}
+  I = \frac{P}{V},
+  \quad
+  R_{\mathrm{cond}} = \frac{2\rho_e L}{A_c},
+  \quad
+  IR_{\mathrm{cond}}\le\delta V
+  \;\Longrightarrow\;
+  A_c \ge \frac{2\rho_e L P}{\delta V^2},
+  \quad
+  m_c = 2\rho_m L A_c ,
+  \label{eq:tether}
+\end{equation}
+with $A_c$ taken as the largest of the resistive requirement, the continuous
+current density limit $I/J_{\max}$ with $J_{\max}=\SI{\rTethJmax}{\ampere\per\milli\metre\squared}$,
+and a handling floor of \SI{\rTethAreaMin}{\milli\metre\squared}.
+
+\begin{observation}
+\Cref{eq:tether} contains no mission time, so endurance ceases to be a design
+variable and becomes an operating choice. It does not delete the fold. A
+carried conductor sized by resistance has mass proportional to $P\propto
+m^{3/2}$, which is the same term as the battery's with a coefficient smaller by
+orders of magnitude at these lengths and voltages: the fold moves far away, it
+does not vanish. The $m^{3/2}$ term is absent only when the carried cable mass
+stops depending on power, because the tether is supported from above or
+because a gauge floor binds. For the case below the lumped closure is
+gauge-limited (\rTethGaugeLimited), which is why its $\beta_{\mathrm{tether}}$
+is zero.
+\end{observation}
+
+Redesigning the aircraft for a \SI{\rTethLen}{\metre} lead at
+\SI{\rTethV}{\volt}, with the same component models as the battery closure,
+gives \SI{\rTethGross}{\kilo\gram} at \SI{\rTethPower}{\watt} and
+\SI{\rTethEar}{\decibel A} at the ear. This is not the battery design with the
+battery removed: propulsion and structure are resized around the lighter
+aircraft, and it still carries a \SI{\rTethReserve}{\gram} landing reserve,
+sized by the peak power it must deliver (\rTethResLimit-limited) rather than by
+energy. The current is \SI{\rTethCurrent}{\ampere}; the conductor is set by
+\rTethSizedBy\ at \SI{\rTethArea}{\milli\metre\squared} per leg and
+\SI{\rTethMass}{\gram} for the lead. \SI{\rTethV}{\volt} remains below the
+\SI{60}{\volt} DC safety-extra-low-voltage threshold, and the design
+\rTethFeasible\ the convergence and current-density checks the engine applies.

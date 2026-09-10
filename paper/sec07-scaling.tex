@@ -1,0 +1,250 @@
+﻿\section{Scaling laws and sensitivity}
+\label{sec:scaling}
+
+\Cref{cor:closedform} gives the critical payload in closed form. Because it is
+a product of powers of the underlying parameters, its logarithmic derivatives
+are exact rational numbers, and those numbers are the design guidance.
+
+\subsection{The explicit critical payload}
+
+\begin{proposition}[Explicit form of $\Mmax$]
+\label{prop:mmaxexplicit}
+For $q=3/2$,
+\begin{equation}
+  \Mmax
+  = \frac{4\alpha^{3}}{27\beta^{2}}
+  = \frac{8\,\alpha^{3}\,\rho\, \Adisk\, \eb^{2}\,\FM^{2}\,\eta^{2}}
+         {27\, g^{3}\, t_f^{2}} .
+  \label{eq:mmaxexplicit}
+\end{equation}
+\end{proposition}
+
+\begin{proof}
+From \cref{eq:beta}, $\beta^2 = t_f^2 g^3/(\eb^2\FM^2\eta^2\cdot 2\rho A)$.
+Hence $1/\beta^2 = 2\rho A \eb^2\FM^2\eta^2/(t_f^2 g^3)$ and
+$\Mmax = (4\alpha^3/27)\cdot 2\rho A\eb^2\FM^2\eta^2/(t_f^2g^3)$, which is
+\cref{eq:mmaxexplicit}.
+\end{proof}
+
+\subsection{Exact logarithmic sensitivities}
+
+\begin{definition}
+For a positive quantity $Y$ depending on a positive parameter $x$, the
+logarithmic sensitivity is
+$S_x \coloneqq \partial \ln Y/\partial \ln x$, so that a relative change
+$\delta x/x$ produces $S_x\,\delta x/x$ to first order.
+\end{definition}
+
+\begin{theorem}[Sensitivities of the critical payload]
+\label{thm:sensitivity}
+With $\Mmax$ as in \cref{eq:mmaxexplicit} and
+$\gamma_m = \lambda g/S_m$, $\alpha = 1-f_s-\gamma_m$,
+\begin{align}
+  S_{t_f} &= -2, &
+  S_{\eb} &= +2, &
+  S_{\FM} &= +2, &
+  S_{\eta} &= +2, \label{eq:sens1}\\
+  S_{\Adisk} &= +1, &
+  S_{D} &= +2, &
+  S_{N} &= +1, &
+  S_{\rho} &= +1, \label{eq:sens2}
+\end{align}
+and for the parameters entering through $\alpha$,
+\begin{align}
+  S_{f_s} &= -\frac{3 f_s}{\alpha}, &
+  S_{\lambda} &= -\frac{3\gamma_m}{\alpha}, &
+  S_{S_m} &= +\frac{3\gamma_m}{\alpha}, &
+  S_{g} &= -3 - \frac{3\gamma_m}{\alpha} . \label{eq:sens3}
+\end{align}
+\end{theorem}
+
+\begin{proof}
+Take logarithms of \cref{eq:mmaxexplicit}:
+\[
+  \ln \Mmax = \ln\tfrac{8}{27} + 3\ln\alpha + \ln\rho + \ln A
+              + 2\ln \eb + 2\ln\FM + 2\ln\eta - 3\ln g - 2\ln t_f .
+\]
+For any parameter $x$ not appearing in $\alpha$, differentiation is immediate
+and gives \cref{eq:sens1,eq:sens2}; the entries for $D$ and $N$ follow from
+$A = N\pi D^2/4$, so $\partial\ln A/\partial\ln D = 2$ and
+$\partial\ln A/\partial \ln N = 1$.
+
+For $f_s$: $\partial\alpha/\partial f_s = -1$, so
+$\partial \ln\Mmax/\partial\ln f_s = 3 f_s\,\partial\ln\alpha/\partial f_s
+= -3f_s/\alpha$.
+
+For $\lambda$: $\alpha = 1-f_s-\lambda g/S_m$, so
+$\partial\alpha/\partial\lambda = -g/S_m$ and
+$\partial\ln\Mmax/\partial\ln\lambda
+= 3\lambda(-g/S_m)/\alpha = -3\gamma_m/\alpha$. The result for $S_m$ follows
+identically with the opposite sign since $\gamma_m\propto S_m^{-1}$.
+
+For $g$: gravity appears both explicitly, as $g^{-3}$, and inside $\alpha$
+through $\gamma_m = \lambda g/S_m$. Hence
+\[
+  S_g = -3 + 3\frac{g}{\alpha}\frac{\partial \alpha}{\partial g}
+      = -3 + \frac{3g}{\alpha}\left(-\frac{\lambda}{S_m}\right)
+      = -3 - \frac{3\gamma_m}{\alpha}. \qedhere
+\]
+\end{proof}
+
+\begin{corollary}[The inverse-square endurance law]
+\label{cor:tsquared}
+At fixed technology and geometry, $\Mmax \propto t_f^{-2}$. Multiplying the
+required endurance by $k$ divides the supportable fixed load by $k^2$.
+\end{corollary}
+
+\begin{example}[Verification against the engine]
+For the parameter set of \cref{sec:results} the engine computes the
+sensitivities numerically by central differences in $\ln$-space and returns
+$S_{t_f}=-2.000$, $S_{\eb}=S_{\FM}=S_{\eta}=+2.000$, $S_D=+2.000$, $S_N=+1.000$,
+$S_\rho=+1.000$, $S_{f_s}=-0.943$, $S_{S_m}=+0.770$, $S_\lambda=-0.770$ and
+$S_g=-3.770$. With $\gamma_m = 2\times 9.80665/120 = 0.16344$ and
+$\alpha=0.63656$, \cref{eq:sens3} predicts
+$S_{f_s} = -3(0.20)/0.63656 = -0.9426$,
+$S_{S_m} = 3(0.16344)/0.63656 = 0.7703$ and
+$S_g = -3-0.7703 = -3.7703$. The agreement to the printed precision is a
+verification of both the closed form and its implementation. See
+\cref{sec:verification}.
+\end{example}
+
+\begin{remark}[How to read \cref{thm:sensitivity}]
+Three groups of parameters behave quite differently.
+
+The \emph{squared} levers, $\eb$, $\FM$, $\eta$ and $t_f$, are the ones with
+real authority, and their sign structure is unforgiving: a 20\% better cell
+buys 44\% more payload, once; a doubling of endurance costs three quarters of
+it. The figure of merit and the electrical efficiency are bounded above by
+unity, so at $\FM=0.73$ and $\eta=0.78$ there remains at most a factor
+$(1/0.73)^2(1/0.78)^2 \approx 3.1$ in that direction, ever.
+
+The \emph{linear} levers are disk area and air density. Disk area is the only
+one of the four that the designer controls freely, and because $D$ enters
+squared it is in practice the strongest available lever.
+
+The \emph{cubic-in-$\alpha$} levers, $f_s$, $\lambda$, $S_m$, have modest
+sensitivity as long as $\alpha$ is comfortably positive, and become violent as
+$\alpha\to0$. They are not where the design is won or lost unless one has been
+careless.
+\end{remark}
+
+\subsection{The exponent, the constants, and where the wall sits}
+
+A claim one meets in discussions of this problem is that ``the exponents kill
+you, not the constants''. \Cref{thm:sensitivity} lets us be precise about the
+sense in which that is and is not true.
+
+\begin{observation}
+\label{obs:expconst}
+The exponent $q$ determines whether a wall exists at all
+(\cref{thm:pfold}: it exists iff $q>1$) and the asymptotic behaviour of the
+closure. The constants $\alpha$ and $\beta$ determine where the wall sits,
+through \cref{eq:closedform}, and their influence is not weak: $\Mmax$ is
+cubic in $\alpha$ and inverse-quadratic in $\beta$. The correct statement is
+that the exponent creates the wall and the constants locate it.
+\end{observation}
+
+For finite engineering at finite scales the location is what one actually
+cares about. \Cref{eq:mmaxexplicit} says that location moves by a factor of two
+for a 41\% improvement in cell energy density, or a 41\% improvement in figure
+of merit, or a doubling of disk area, or a 29\% reduction in endurance.
+
+\subsection{The endurance wall across the exponent}
+
+Combining \cref{thm:pfold} with \cref{prop:plaw} gives the full picture, but
+only once two statements that are easily conflated are separated: whether the
+closure has a fold, and whether there is a longest mission it can close. They
+are different, and they part company at $p=1$.
+
+Write the closure with its dependence on duration explicit. Under
+\cref{eq:areascaling} the propulsive power is $c_P m^q$ with
+$c_P = c_0 m_0^{p/2}$ and $c_0 = g^{3/2}/(\FM\,\eta\sqrt{2\rho A_0})$, so a mass
+$m$ closes a mission of duration $t$ if and only if
+$\alpha m - (t/\eb)(c_P m^q + \Paux) = \mfix$, that is if and only if
+$t = \Theta_p(m)$ with
+\begin{equation}
+  \Theta_p(m) \coloneqq
+  \frac{\eb\,(\alpha m - \mfix)}{c_P\, m^{q} + \Paux} .
+  \label{eq:theta}
+\end{equation}
+Define the endurance wall at fixed $\mfix$, $\Paux$ and anchor $(m_0,A_0)$ as
+$t_f^{\max}(p) \coloneqq \sup_{m>0}\Theta_p(m)$.
+
+\begin{proposition}[The endurance wall]
+\label{prop:twall}
+Let $\alpha>0$ and $\mfix>0$.
+\begin{enumerate}[label=(\roman*),nosep]
+  \item If $p<1$, $\Theta_p$ attains its maximum at a finite mass
+        $\hat m(p) > \mfix/\alpha$, and $t_f^{\max}(p)=\Theta_p(\hat m)$ is
+        finite and attained.
+  \item If $p=1$, $\Theta_1$ is strictly increasing and
+        \begin{equation}
+          t_f^{\max}(1) = t_{\lim} = \frac{\alpha\,\eb}{c_P} ,
+          \label{eq:tlim}
+        \end{equation}
+        which is finite and not attained: for every $t_f<t_{\lim}$ the unique
+        mass is finite, and it diverges as $t_f\uparrow t_{\lim}$. Here $\eb$
+        is net of the landing reserve, as in \cref{mod:battery}.
+  \item If $p>1$, $\Theta_p(m)\to\infty$ as $m\to\infty$ and there is no wall.
+  \item Where $\hat m$ is differentiable in $p$,
+        \begin{equation}
+          \frac{\dd\ln t_f^{\max}}{\dd p}
+          = \frac{\vartheta}{2}\,\ln\frac{\hat m}{m_0} ,
+          \qquad
+          \vartheta = \frac{c_P\hat m^{q}}{c_P \hat m^{q}+\Paux}\in(0,1],
+          \label{eq:wallslope}
+        \end{equation}
+        so the wall rises with $p$ if and only if the mass at the wall exceeds
+        the anchor mass. It is not monotone in $p$ for every anchor.
+\end{enumerate}
+\end{proposition}
+
+\begin{proof}
+$\Theta_p$ is continuous, negative for $m<\mfix/\alpha$ and positive beyond.
+(i) For $q>1$ the numerator grows like $m$ and the denominator like $m^q$, so
+$\Theta_p(m)\to0$ as $m\to\infty$; a continuous function that is positive on
+$(\mfix/\alpha,\infty)$ and tends to $0$ at both ends of that interval attains
+its supremum. (ii) At $q=1$,
+$\Theta_1'(m)$ has the sign of
+$\alpha(c_P m+\Paux) - c_P(\alpha m-\mfix) = \alpha\Paux + c_P\mfix>0$, and
+$\Theta_1(m)\to\alpha\eb/c_P$. The mass closing duration $t$ is
+$m = (\mfix + \Paux t/\eb)/(\alpha - c_P t/\eb)$, positive and finite exactly
+when $t<t_{\lim}$; with $\Paux=0$ this is \cref{eq:constdlfeas}. (iii) For
+$q<1$ the numerator outgrows the denominator. (iv) By the envelope theorem,
+$\partial_m\Theta_p(\hat m)=0$ gives
+$\dd\ln t_f^{\max}/\dd p = \partial_p\ln\Theta_p(\hat m)
+= -\partial_p \ln(c_P \hat m^q + \Paux)$, and with
+$\partial_p\ln c_P = \tfrac12\ln m_0$ and $\partial_p q = -\tfrac12$ this is
+$-\vartheta(\tfrac12\ln m_0 - \tfrac12\ln\hat m)$.
+\end{proof}
+
+\begin{remark}
+With $\Paux=0$ the maximiser is explicit: $\hat m = q\,\mfix/[\alpha(q-1)]$,
+which tends to infinity as $q\downarrow1$, reconciling (i) with (ii). If the
+anchor is the fold mass of the fixed-area closure at the nominal duration $t_f$,
+then $\sqrt{m_0} = 2\alpha/(3\beta)$ and \cref{eq:tlim} gives exactly
+$t_{\lim} = \tfrac32 t_f$, independently of $\Paux$.
+\end{remark}
+
+\Cref{tab:pwall} records the computed values. The default parameters do not
+close at fixed area at the nominal hour, so the common anchor is the fold mass,
+and the $p=1$ entry is $\tfrac32 t_f$ as the remark predicts.
+
+\begin{table}[t]
+\centering
+\caption{Endurance wall against the disk-area exponent at the engine's default
+parameters ($t_f=\SI{\rPwallTf}{\second}$), anchored at the fold mass
+$m_0=\SI{\rPwallAnchor}{\kilo\gram}$ of the fixed-area closure. Computed by bisection on
+$t_f$ with \code{sweep.endurance\_wall} and checked against direct maximisation
+of \cref{eq:theta}. The last column is $\hat m/m_0$; it exceeds one throughout,
+so by \cref{eq:wallslope} the wall rises with $p$ for this anchor. At $p=1$ there
+is no fold but there is still a ceiling, the unattained supremum
+\cref{eq:tlim}.}
+\label{tab:pwall}
+\begin{tabular}{@{}rrlrr@{}}
+\toprule
+$p$ & $q=(3-p)/2$ & fold exists & $t_f^{\max}$ & $\hat m/m_0$ \\
+\midrule
+\inputrows{results/tab_pwall_rows}
+\end{tabular}
+\end{table}

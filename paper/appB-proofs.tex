@@ -1,0 +1,128 @@
+\section{Supplementary derivations}
+\label{app:proofs}
+
+\subsection{The cubic form of the closure}
+
+At $q=3/2$, substituting $u=\sqrt m>0$ into \cref{eq:closure} gives
+\begin{equation}
+  \beta u^3 - \alpha u^2 + \Mzero = 0 .
+  \label{eq:cubic}
+\end{equation}
+
+\begin{proposition}
+\Cref{eq:cubic} has exactly one negative real root for all
+$\alpha,\beta,\Mzero>0$. Its two remaining roots are real and positive if and
+only if $\Mzero\le\Mmax$, in agreement with \cref{thm:trichotomy}.
+\end{proposition}
+
+\begin{proof}
+Write $\Pi(u) = \beta u^3-\alpha u^2+\Mzero$. By Vieta, the product of the
+three roots is $-\Mzero/\beta<0$, so either one or three roots are negative.
+Since $\Pi(0)=\Mzero>0$ and $\Pi(u)\to+\infty$ as $u\to+\infty$, and
+$\Pi'(u)=3\beta u^2-2\alpha u = u(3\beta u - 2\alpha)$ has roots $u=0$ and
+$u=2\alpha/(3\beta)$, the function decreases on $(0,2\alpha/(3\beta))$ and
+increases thereafter, so it has at most two positive roots. Hence exactly one
+root is negative. The local minimum value is
+\[
+  \Pi\!\left(\frac{2\alpha}{3\beta}\right)
+  = \beta\frac{8\alpha^3}{27\beta^3} - \alpha\frac{4\alpha^2}{9\beta^2} + \Mzero
+  = \frac{8\alpha^3-12\alpha^3}{27\beta^2} + \Mzero
+  = \Mzero - \frac{4\alpha^3}{27\beta^2}
+  = \Mzero - \Mmax ,
+\]
+using \cref{eq:closedform}. Two positive real roots exist iff this is
+non-positive, i.e.\ iff $\Mzero\le\Mmax$. Note also that
+$u^* = 2\alpha/(3\beta)$ satisfies $(u^*)^2 = 4\alpha^2/(9\beta^2) = m^*$, as
+required for consistency.
+\end{proof}
+
+\subsection{Derivative of the closure solution with respect to endurance}
+
+Differentiating $F(m(t_f))=\Mzero(t_f)$ implicitly, with
+$\beta = \beta_0 t_f$ and $\Mzero = \mfix + \Paux t_f/\eb$,
+\begin{equation}
+  F'(m)\,\frac{\dd m}{\dd t_f}
+  = \frac{\partial \Mzero}{\partial t_f} + m^{3/2}\frac{\partial\beta}{\partial t_f}
+  = \frac{\Paux}{\eb} + \beta_0 m^{3/2} ,
+\end{equation}
+so
+\begin{equation}
+  \frac{\dd m}{\dd t_f}
+  = \frac{\Paux/\eb + \beta_0 m^{3/2}}{\alpha - \tfrac32\beta\sqrt m} .
+  \label{eq:dmdt}
+\end{equation}
+The denominator is $F'(m)$, which vanishes at the fold; \cref{eq:dmdt} therefore
+diverges there, quantifying the remark following \cref{thm:bifurcation}. Both
+terms in the numerator are positive. The denominator is positive on the light
+branch and negative on the heavy branch (\cref{lem:concave}), so the light root
+increases with endurance and the heavy root decreases: as $t_f$ grows the two
+branches approach each other and merge at the fold.
+
+\subsection{Rotor speed at maximum thrust}
+
+For a fixed-pitch rotor at fixed collective, $T=k_T\Omega^2$, so the speed
+required for the sizing thrust $T_{\max}=\lambda mg/N$ relative to hover
+$T_h = mg/N$ is
+\begin{equation}
+  \frac{\Omega_{\max}}{\Omega_h} = \sqrt{\frac{T_{\max}}{T_h}} = \sqrt{\lambda} .
+  \label{eq:omegaratio}
+\end{equation}
+Hence hover occurs at $1/\sqrt\lambda$ of full rotor speed: at $\lambda=1.8$
+this is $74.5\%$, which is the figure quoted in \cref{sec:results} and which
+also fixes the voltage headroom the pack must provide.
+
+\subsection{Torque authority of the symmetric quadrotor}
+
+Holding total thrust at $mg$ and the other two moments at zero, the largest
+moment about body axis $j$ is the value of the linear program
+\begin{equation}
+  \max\ \tau_j
+  \quad\text{s.t.}\quad
+  \mat M\vect u = (mg,\ \tau_j\vect e_j),
+  \qquad
+  0\le u_i\le\Omega_{\max}^2 ,
+  \label{eq:authlp}
+\end{equation}
+and its counterpart for $-\tau_j$; the authority is the smaller of the two.
+The engine solves \cref{eq:authlp} directly for every layout. For the $\times$
+quadrotor with alternating spins it has a closed form.
+
+Let $a_i = \mat M_{j+1,i}$. For each of the three moment rows $|a_i|=a$ is the
+same for every rotor ($k_TL/\sqrt2$ for roll and pitch, $k_Q$ for yaw), and the
+sign vector $s_i=\operatorname{sign}a_i$ is orthogonal to the thrust row and to
+the other two moment rows. Write $\vect u = \Omega_h^2\vect 1 + \vect d$. The
+thrust constraint is $\sum_i d_i=0$, and $\tau_j = a\sum_i s_i d_i = 2aD$ with
+$D=\sum_{s_i=+1}d_i=-\sum_{s_i=-1}d_i$. Each of the two increments is at most
+$\Omega_{\max}^2-\Omega_h^2$ and each of the two decrements at most $\Omega_h^2$,
+so $D\le2\Delta$ with
+\begin{equation}
+  \Delta = \min\{\Omega_h^2,\ \Omega_{\max}^2-\Omega_h^2\} .
+\end{equation}
+The bound is attained by $\vect d=\Delta\vect s$, which satisfies every
+constraint by the orthogonality, hence
+\begin{equation}
+  \tau_j^{\max} = 4a\Delta = \Delta\sum_{i=1}^{4}\big|\mat M_{j+1,i}\big| ,
+  \label{eq:authderiv}
+\end{equation}
+which is \cref{eq:authority}. There is no factor $1/N$: the thrust sum is held by
+pairing increments with decrements, not by dividing the moment. For
+$\lambda\le2$, $\Delta=(\lambda-1)\Omega_h^2$.
+
+The closed form uses the equal-magnitude and orthogonality properties of this
+layout and should not be extended blindly. For the hexacopter with
+$\psi_0=\pi/6$ the roll row has $\sum_i|\sin\psi_i| = 4$ and the pitch row
+$\sum_i|\cos\psi_i|=2\sqrt3$, because two rotors sit on the pitch axis and
+contribute nothing to pitch; the magnitudes are unequal and the LP must be
+solved. The same holds for any layout with a failed rotor.
+
+\subsection{Sound power to pressure with the reference constants}
+
+The reference intensity implied by $p_0=\SI{20}{\micro\pascal}$ is
+$I_0 = p_0^2/(\rho_0 c_0)$. At $\rho_0=\SI{1.225}{\kilo\gram\per\metre\cubed}$
+and $c_0=\SI{343}{\metre\per\second}$,
+$\rho_0 c_0 = \SI{420}{\pascal\second\per\metre}$ and
+$I_0 = (2\times10^{-5})^2/420 = \SI{9.52e-13}{\watt\per\metre\squared}$, against
+the nominal $W_0/\SI{1}{\metre\squared} = \SI{1e-12}{\watt\per\metre\squared}$.
+The discrepancy is $10\log_{10}(1/0.952)=\SI{0.21}{\decibel}$, which is why
+\cref{eq:lwlp} is stated as an equality: the reference constants are chosen to
+make it one to within a fifth of a decibel at standard conditions.

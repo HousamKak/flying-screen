@@ -1,0 +1,198 @@
+﻿\section{Momentum theory over an actuator disk}
+\label{sec:momentum}
+
+Everything downstream rests on one result: the power required to hold a mass in
+the air, as a function of how much air the machine can reach. We derive it from
+a control volume rather than quote it, because the exponents that appear are
+the entire argument of \cref{sec:fold} and it matters that they are earned.
+
+\subsection{The model}
+
+\begin{model}[Rankine-Froude actuator disk]
+\label{mod:disk}
+The rotor is replaced by a permeable disk of area $A$ across which the static
+pressure jumps by $\Delta p$ while the velocity is continuous. The flow is
+axisymmetric, the fluid is at rest far upstream, and the slipstream is a
+well-defined streamtube. Rotation imparted to the wake, viscous losses and the
+finite number of blades are all excluded; they return in \cref{sec:blade}.
+\end{model}
+
+This is the classical model of Rankine and W.~Froude, given in the form used
+here by Glauert~\cite{glauert1935} and, in the rotorcraft setting, by
+Leishman~\cite[Ch.~2]{leishman2006} and Johnson~\cite[Ch.~2]{johnson1980}.
+
+Let $\vind$ denote the axial velocity induced \emph{at the disk} and $w$ the
+axial velocity in the far wake, both measured relative to the undisturbed
+fluid. Let $A_\infty$ be the cross-sectional area of the far wake.
+
+\subsection{The three conservation laws}
+
+\paragraph{Mass.} The streamtube carries a constant mass flow. Evaluating at
+the disk,
+\begin{equation}
+  \dot m_{\mathrm{air}} = \rho A \vind = \rho A_\infty w .
+  \label{eq:continuity}
+\end{equation}
+
+\paragraph{Momentum.} Applying the momentum theorem to a control volume
+enclosing the streamtube between a station far upstream, where the fluid is at
+rest and the pressure is $p_\infty$, and a station far downstream, where the
+pressure has returned to $p_\infty$ and the velocity is $w$, the only external
+axial force is that exerted by the disk on the fluid, equal and opposite to the
+thrust:
+\begin{equation}
+  T = \dot m_{\mathrm{air}}\,(w - 0) = \rho A \vind w .
+  \label{eq:momentum}
+\end{equation}
+
+\paragraph{Energy.} Bernoulli's equation holds along streamlines on each side
+of the disk separately, but not across it, because the disk does work on the
+fluid. Upstream, from the far field to the disk face,
+\begin{equation}
+  p_\infty = p_1 + \tfrac12 \rho \vind^2 ,
+  \label{eq:bern1}
+\end{equation}
+and downstream, from the disk face to the far wake,
+\begin{equation}
+  p_2 + \tfrac12 \rho \vind^2 = p_\infty + \tfrac12 \rho w^2 .
+  \label{eq:bern2}
+\end{equation}
+Subtracting \cref{eq:bern1} from \cref{eq:bern2} eliminates $p_\infty$ and
+$\vind$:
+\begin{equation}
+  \Delta p \coloneqq p_2 - p_1 = \tfrac12 \rho w^2 ,
+  \qquad\text{whence}\qquad
+  T = A\,\Delta p = \tfrac12 \rho A w^2 .
+  \label{eq:pressurejump}
+\end{equation}
+
+\subsection{The central result}
+
+\begin{theorem}[Froude's theorem and the hover power law]
+\label{thm:momentum}
+Under \cref{mod:disk} the far-wake velocity is exactly twice the velocity
+induced at the disk,
+\begin{equation}
+  w = 2\vind ,
+  \label{eq:froude}
+\end{equation}
+the thrust is
+\begin{equation}
+  T = 2\rho A \vind^2 ,
+  \qquad\text{equivalently}\qquad
+  \vind = \sqrt{\frac{T}{2\rho A}} ,
+  \label{eq:vi}
+\end{equation}
+the far wake contracts to half the disk area, $A_\infty = A/2$, and the power
+delivered to the fluid is
+\begin{equation}
+  \Pideal = T\vind = \frac{T^{3/2}}{\sqrt{2\rho A}} .
+  \label{eq:pideal}
+\end{equation}
+\end{theorem}
+
+\begin{proof}
+Equate the two expressions for thrust, \cref{eq:momentum,eq:pressurejump}:
+\[
+  \rho A \vind w = \tfrac12 \rho A w^2 .
+\]
+Since $T>0$ forces $w>0$ and $A>0$, division by $\rho A w$ is legitimate and
+gives $\vind = w/2$, which is \cref{eq:froude}. Substituting $w = 2\vind$ into
+\cref{eq:momentum} yields $T = 2\rho A \vind^2$, and solving for $\vind$ gives
+\cref{eq:vi}; the positive root is selected because the wake is directed
+downward for positive thrust. Wake contraction follows from
+\cref{eq:continuity}: $A_\infty = A\vind/w = A/2$.
+
+For the power, the rate of work done by the disk on the fluid equals the flux
+of kinetic energy out of the control volume, the fluid entering at rest:
+\[
+  P = \tfrac12 \dot m_{\mathrm{air}} w^2
+    = \tfrac12 (\rho A \vind)(2\vind)^2
+    = 2\rho A \vind^3
+    = (2\rho A \vind^2)\,\vind = T\vind ,
+\]
+so $P = T\vind$, which is also what one obtains directly as force times the
+velocity of the disk relative to the fluid it acts on. Substituting
+\cref{eq:vi} gives $\Pideal = T\sqrt{T/(2\rho A)} = T^{3/2}(2\rho A)^{-1/2}$.
+\end{proof}
+
+\begin{remark}
+The factor of two in \cref{eq:froude} is the reason the disk sees only half the
+dynamic pressure of the wake, and is the origin of the $3/2$ exponent that
+drives the entire feasibility analysis. Half the velocity increment happens
+upstream of the disk and half downstream.
+\end{remark}
+
+\begin{corollary}[Hover]
+\label{cor:hover}
+In hover, $T = mg$, so
+\begin{equation}
+  \vind = \sqrt{\frac{mg}{2\rho A}},
+  \qquad
+  \Pideal = \frac{(mg)^{3/2}}{\sqrt{2\rho A}} .
+  \label{eq:hoverpower}
+\end{equation}
+At fixed disk area, $\Pideal \propto m^{3/2}$.
+\end{corollary}
+
+\subsection{Disk loading}
+
+\begin{definition}[Disk loading]
+$\mathrm{DL} \coloneqq T/A$, with units of pressure.
+\end{definition}
+
+Rewriting \cref{eq:vi,eq:pideal} in terms of disk loading isolates the
+physically meaningful group:
+\begin{equation}
+  \vind = \sqrt{\frac{\mathrm{DL}}{2\rho}},
+  \qquad
+  \frac{\Pideal}{T} = \sqrt{\frac{\mathrm{DL}}{2\rho}} ,
+  \qquad
+  \frac{\Pideal}{m} = g\sqrt{\frac{\mathrm{DL}}{2\rho}} .
+  \label{eq:dl}
+\end{equation}
+
+\begin{observation}
+\label{obs:dl}
+Power per unit mass in hover depends on the disk loading alone, not on mass and
+area separately. A hovering machine is therefore not primarily asking for
+powerful motors; it is asking for low disk loading. The quantity
+$T/\Pideal = \sqrt{2\rho/\mathrm{DL}}$, the power loading, is the correct
+figure of merit for a hovering vehicle and improves as disk loading falls.
+\end{observation}
+
+This single observation determines the shape of every machine in
+\cref{sec:results}: large, slowly turning rotors, because
+\cref{eq:dl} says that is the only lever with any authority, and
+\cref{sec:acoustics} will show that the same choice is what makes the machine
+quiet.
+
+\subsection{Axial flight and the validity of \texorpdfstring{\cref{thm:momentum}}{Theorem 3.2}}
+
+For axial motion at climb velocity $V_c$ relative to the air, the same control
+volume argument with a non-zero inflow gives
+\begin{equation}
+  T = 2\rho A (V_c + \vind)\vind
+  \quad\Longrightarrow\quad
+  \vind = -\frac{V_c}{2} + \sqrt{\left(\frac{V_c}{2}\right)^2
+          + \frac{T}{2\rho A}} ,
+  \label{eq:axial}
+\end{equation}
+which reduces to \cref{eq:vi} at $V_c=0$ and is implemented in that form. The
+power is then $P = T(V_c + \vind)$.
+
+\Cref{eq:axial} is valid in climb and in the windmill-brake state, but fails in
+descent for $-2 \lesssim V_c/v_{i,h} \lesssim 0$, where $v_{i,h}$ is the hover
+induced velocity. This is the vortex ring state, where
+the streamtube assumption breaks down and the flow is unsteady and
+recirculating~\cite[\S2.13]{leishman2006}. The machines considered here descend
+slowly and the engine does not enter that regime, but it is a real limitation
+of the model rather than a technicality: a fast descent to land is precisely
+the manoeuvre it cannot predict.
+
+Two further caveats are worth recording. Momentum theory gives a lower bound on
+the power: it is the power required to produce the thrust by the most efficient
+possible redistribution of momentum, and any real rotor does worse.
+\Cref{sec:blade} quantifies by how much. Second, the theory says nothing about
+how the loading is produced, so it cannot predict stall, compressibility or
+Reynolds effects; those enter through the blade element layer.

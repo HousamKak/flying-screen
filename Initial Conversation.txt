@@ -1,0 +1,2269 @@
+I am thinking of a flying screen that follows me so I work without sitting and I can workout. lets focus on the engineering calculation, am afraid coupling would not make that possible, we do have mass that increases with weight of motors that would hold more mass etc, I need the equations for this setup
+Yes. The right way to study this is as a **coupled fixed-point sizing problem**. The screen itself is not the difficult part; the question is whether the added propulsion and battery mass needed to carry the previous mass converges to a finite design.
+
+### 1. Start with the total mass equation
+
+Let
+
+$$
+m=m_s+m_f+m_c+m_p+m_b
+$$
+
+where:
+
+* \(m_s\) = screen mass
+* \(m_f\) = frame/gimbal/protection
+* \(m_c\) = computer, sensors, tracking electronics
+* \(m_p\) = motors + props + ESCs
+* \(m_b\) = battery
+
+Define everything that doesn't depend strongly on aircraft size as
+
+$$
+m_0=m_s+m_f+m_c
+$$
+
+so
+
+$$
+\boxed{m=m_0+m_p(m)+m_b(m)}
+$$
+
+That's the core equation.
+
+Your concern is exactly that \(m_p\) and \(m_b\) are functions of \(m\).
+
+---
+
+## 2. Required thrust
+
+At stationary hover:
+
+$$
+T_{\text{hover}}=mg
+$$
+
+For \(N\) rotors:
+
+$$
+\boxed{T_{\text{rotor,hover}}=\frac{mg}{N}}
+$$
+
+But you absolutely don't design the motors to max out at hover. Define a thrust margin \(\lambda\):
+
+$$
+T_{\max,\text{total}}=\lambda mg
+$$
+
+and therefore
+
+$$
+\boxed{T_{\max,\text{motor}}=
+\frac{\lambda mg}{N}}
+$$
+
+For example, \(\lambda=2\) means the aircraft hovers around 50% of its maximum total thrust.
+
+This equation feeds into motor selection.
+
+---
+
+# 3. Motor-mass coupling
+
+Suppose the complete propulsion system has a maximum static specific thrust
+
+$$
+S_T=\frac{T_{\max}}{m_p}
+$$
+
+in N/kg.
+
+Then:
+
+$$
+m_p=\frac{T_{\max,\text{total}}}{S_T}
+$$
+
+and because
+
+$$
+T_{\max,\text{total}}=\lambda mg
+$$
+
+we get
+
+$$
+\boxed{
+m_p=\frac{\lambda g}{S_T}m
+}
+$$
+
+Define
+
+$$
+f_p=\frac{\lambda g}{S_T}
+$$
+
+Then simply:
+
+$$
+\boxed{m_p=f_p m}
+$$
+
+This is interesting because the motor coupling itself is **not necessarily runaway**. It just consumes a fraction of your mass budget.
+
+If, hypothetically,
+
+$$
+f_p=0.20
+$$
+
+then propulsion hardware ends up being about 20% of total aircraft mass.
+
+The impossible condition is:
+
+$$
+f_p\geq1
+$$
+
+because then every kilogram requires at least another kilogram of propulsion hardware.
+
+Realistically, battery/endurance is more likely to become the limiting feedback than the motors themselves.
+
+---
+
+# 4. The important rotor-power equation
+
+This is where things get interesting.
+
+For total rotor disk area \(A_d\),
+
+$$
+A_d=N\pi R^2
+$$
+
+where \(R\) is rotor radius.
+
+Ideal induced velocity at hover:
+
+$$
+v_i=\sqrt{\frac{T}{2\rho A_d}}
+$$
+
+Since
+
+$$
+T=mg
+$$
+
+$$
+v_i=\sqrt{\frac{mg}{2\rho A_d}}
+$$
+
+Ideal hover power:
+
+$$
+P_i=T v_i
+$$
+
+therefore
+
+$$
+\boxed{
+P_i=
+\frac{(mg)^{3/2}}
+{\sqrt{2\rho A_d}}
+}
+$$
+
+This equation is extremely important for your concept.
+
+For **fixed rotor area**:
+
+$$
+\boxed{P\propto m^{3/2}}
+$$
+
+So doubling mass requires roughly
+
+$$
+2^{3/2}=2.83
+$$
+
+times the induced hover power.
+
+This is the nonlinear coupling you were worried about.
+
+---
+
+# 5. Actual electrical power
+
+Real rotors aren't ideal.
+
+Let:
+
+* \(FM\) = rotor figure of merit
+* \(\eta_m\) = motor efficiency
+* \(\eta_e\) = ESC/electrical efficiency
+
+Then approximately:
+
+$$
+P_{\text{prop}}
+=
+\frac{P_i}
+{FM\eta_m\eta_e}
++P_{\text{profile}}
+$$
+
+For a preliminary model we can combine efficiencies into one \(\eta\):
+
+$$
+\boxed{
+P_{\text{prop}}
+\approx
+\frac{(mg)^{3/2}}
+{\eta\sqrt{2\rho A_d}}
+}
+$$
+
+Then your flying-screen electrical demand is
+
+$$
+\boxed{
+P_{\text{total}}
+=
+P_{\text{prop}}
++
+P_{\text{screen}}
++
+P_{\text{computer}}
++
+P_{\text{sensors}}
+}
+$$
+
+Don't forget this part: unlike an ordinary drone, you're flying something that is itself continuously consuming electrical power.
+
+---
+
+# 6. Battery mass
+
+Let battery pack specific energy be
+
+$$
+e_b \quad [Wh/kg]
+$$
+
+and required flight duration be
+
+$$
+t \quad [h]
+$$
+
+If only fraction \(u\) of the battery energy is usable because you want reserve/margin:
+
+$$
+\boxed{
+m_b=
+\frac{P_{\text{total}}t}
+{e_bu}
+}
+$$
+
+Now substitute the hover equation:
+
+$$
+m_b=
+\frac{t}{e_bu}
+\left[
+\frac{(mg)^{3/2}}
+{\eta\sqrt{2\rho A_d}}
++
+P_{\text{screen}}
++
+P_{\text{electronics}}
+\right]
+$$
+
+And now you can see the loop.
+
+---
+
+# 7. Your complete coupled mass equation
+
+Put everything together:
+
+$$
+m
+=
+m_0
++
+f_pm
++
+\frac{t}{e_bu}
+\left[
+\frac{(mg)^{3/2}}
+{\eta\sqrt{2\rho A_d}}
++
+P_0
+\right]
+$$
+
+where
+
+$$
+P_0=P_{\text{screen}}+P_{\text{electronics}}
+$$
+
+Therefore:
+
+$$
+\boxed{
+m=
+m_0+
+f_pm+
+km^{3/2}
++
+m_{b,0}
+}
+$$
+
+with
+
+$$
+k=
+\frac{t g^{3/2}}
+{e_bu\eta\sqrt{2\rho A_d}}
+$$
+
+and
+
+$$
+m_{b,0}=
+\frac{P_0t}{e_bu}
+$$
+
+This is essentially the **master sizing equation for the first version of your flying-screen idea**.
+
+---
+
+## 8. Why rotor size dramatically changes everything
+
+Define disk loading:
+
+$$
+DL=\frac{mg}{A_d}
+$$
+
+Then hover induced velocity becomes
+
+$$
+v_i=\sqrt{\frac{DL}{2\rho}}
+$$
+
+and ideal power:
+
+$$
+P_i=mg\sqrt{\frac{DL}{2\rho}}
+$$
+
+So:
+
+$$
+\boxed{
+\frac{P_i}{m}
+=
+g\sqrt{\frac{DL}{2\rho}}
+}
+$$
+
+This tells us something very useful.
+
+If you increase rotor area as the aircraft becomes heavier so that **disk loading stays constant**, then:
+
+$$
+P\propto m
+$$
+
+rather than
+
+$$
+P\propto m^{3/2}
+$$
+
+That's a huge difference.
+
+So the engineering solution to the mass spiral isn't merely:
+
+> bigger motors.
+
+It's largely:
+
+> **more rotor disk area.**
+
+Large, slowly rotating rotors are much more attractive for something that needs to stay airborne beside a human for a long time.
+
+---
+
+# 9. In the constant-disk-loading case, the mass equation becomes beautiful
+
+If
+
+$$
+P=c_Pm
+$$
+
+then battery mass is
+
+$$
+m_b=
+\frac{c_Pt}{e_bu}m
+$$
+
+Define the battery mass fraction
+
+$$
+f_b=
+\frac{c_Pt}{e_bu}
+$$
+
+Then
+
+$$
+m=m_0+f_pm+f_bm
+$$
+
+so:
+
+$$
+m(1-f_p-f_b)=m_0
+$$
+
+and finally
+
+$$
+\boxed{
+m=
+\frac{m_0}
+{1-f_p-f_b}
+}
+$$
+
+That equation answers your fundamental concern.
+
+A finite flying machine exists when
+
+$$
+\boxed{
+f_p+f_b<1
+}
+$$
+
+As that sum approaches 1, mass explodes.
+
+For example:
+
+$$
+f_p=0.20
+$$
+
+and
+
+$$
+f_b=0.30
+$$
+
+gives
+
+$$
+m=\frac{m_0}{1-0.2-0.3}
+=2m_0
+$$
+
+So a 3 kg screen/frame/electronics package becomes about a 6 kg complete aircraft.
+
+But if
+
+$$
+f_p+f_b=0.9
+$$
+
+then
+
+$$
+m=10m_0
+$$
+
+and the concept rapidly becomes absurd.
+
+---
+
+# 10. Following you introduces horizontal force
+
+Suppose you're walking/running at velocity \(v\).
+
+The screen creates aerodynamic drag:
+
+$$
+\boxed{
+D=
+\frac12\rho C_DA_fv^2
+}
+$$
+
+where:
+
+* \(C_D\) = drag coefficient
+* \(A_f\) = frontal area of screen
+* \(v\) = airspeed
+
+If the vehicle also has to accelerate to follow you:
+
+$$
+F_x=ma_x+D
+$$
+
+Vertical thrust remains approximately
+
+$$
+F_z=m(g+a_z)
+$$
+
+Therefore total required thrust is
+
+$$
+\boxed{
+T=
+\sqrt{
+[m(g+a_z)]^2+
+[ma_x+D]^2
+}
+}
+$$
+
+For constant altitude:
+
+$$
+\boxed{
+T=
+\sqrt{
+(mg)^2+
+(ma_x+D)^2
+}
+}
+$$
+
+The aircraft tilt angle becomes
+
+$$
+\boxed{
+\theta=
+\tan^{-1}
+\left(
+\frac{ma_x+D}{mg}
+\right)
+}
+$$
+
+And this reveals another design problem for your idea:
+
+**the aircraft needs to tilt to follow you, but you don't want the screen itself tilting.**
+
+So mechanically I'd strongly consider:
+
+$$
+\text{flying platform}
+\rightarrow
+\text{2-axis stabilized screen gimbal}
+$$
+
+rather than rigidly attaching the display.
+
+---
+
+# 11. Screen/gimbal torque
+
+The large flat screen will behave like a sail.
+
+Wind force:
+
+$$
+D=\frac12\rho C_DA_fv^2
+$$
+
+If its aerodynamic center is distance \(r_{cp}\) from the gimbal axis:
+
+$$
+\boxed{
+\tau_{\text{wind}}=D r_{cp}
+}
+$$
+
+If the screen's center of gravity is offset from the axis by \(r_{cg}\):
+
+$$
+\tau_g=m_sgr_{cg}\sin\theta
+$$
+
+And acceleration requires:
+
+$$
+\tau_I=I\alpha
+$$
+
+Therefore the gimbal needs approximately:
+
+$$
+\boxed{
+\tau_{\text{gimbal,max}}
+>
+D r_{cp}
++
+m_sgr_{cg}\sin\theta
++
+I\alpha
+}
+$$
+
+Balancing the screen's CG directly through the gimbal axis would therefore save you a lot of continuous torque and electrical power.
+
+---
+
+# 12. The best way to actually calculate your prototype
+
+I'd make the sizing calculation iterative.
+
+Start with a guessed mass:
+
+$$
+m^{(0)}=m_0
+$$
+
+Then calculate:
+
+$$
+T^{(k)}=\lambda m^{(k)}g
+$$
+
+Select/estimate propulsion mass:
+
+$$
+m_p^{(k)}
+=
+m_p\left(T^{(k)}\right)
+$$
+
+Calculate hover power:
+
+$$
+P^{(k)}
+=
+\frac{
+(m^{(k)}g)^{3/2}
+}{
+\eta\sqrt{2\rho A_d}
+}
++P_0
+$$
+
+Battery:
+
+$$
+m_b^{(k)}
+=
+\frac{P^{(k)}t}{e_bu}
+$$
+
+Then update:
+
+$$
+\boxed{
+m^{(k+1)}
+=
+m_0+
+m_p^{(k)}
++
+m_b^{(k)}
+}
+$$
+
+Repeat until
+
+$$
+|m^{(k+1)}-m^{(k)}|<\epsilon
+$$
+
+If it settles to, say,
+
+$$
+5.6,\;6.1,\;6.25,\;6.29,\;6.30...
+$$
+
+the design converges.
+
+If it goes
+
+$$
+5,\;7,\;11,\;20,\;50,\ldots
+$$
+
+you've mathematically demonstrated the mass spiral.
+
+An even stronger local convergence criterion is
+
+$$
+\boxed{
+\left|
+\frac{d}{dm}
+\left[m_p(m)+m_b(m)\right]
+\right|<1
+}
+$$
+
+at the design point.
+
+That's basically the mathematical expression of the exact fear you described.
+
+---
+
+## The architecture I would analyze first
+
+For your idea I'd parameterize:
+
+$$
+\boxed{
+\begin{aligned}
+&N &&=\text{number of rotors}\\
+&R &&=\text{rotor radius}\\
+&A_d=N\pi R^2\\
+&m_s &&=\text{display}\\
+&m_f &&=\text{frame + gimbal + guards}\\
+&m_c &&=\text{tracking/computer}\\
+&t &&=\text{desired endurance}\\
+&v_{\max} &&=\text{maximum following speed}\\
+&a_{\max} &&=\text{maximum following acceleration}\\
+&e_b &&=\text{battery specific energy}\\
+&\lambda &&=\text{thrust margin}
+\end{aligned}}
+$$
+
+Then solve simultaneously for
+
+$$
+\boxed{m,\quad P,\quad m_b,\quad T_{\max},\quad R}
+$$
+
+rather than starting by choosing a motor.
+
+And the most interesting engineering variable for this concept may actually be **disk loading \(mg/A_d\)**. For a human-adjacent hovering display, minimizing disk loading helps endurance, noise, downwash velocity, and propulsion efficiency simultaneously—the tradeoff is physically larger rotors.
+
+If you give me something like **screen size + estimated screen mass + desired flight time + maximum distance from you**, I can build the full first-pass numerical model and calculate where the mass feedback converges or fails.
+
+actually air stabaliztion is a control theory problem. I think you can give me the differential equation for the mass, I think we have couple of differential equations now
+
+Exactly on the stabilization point: once the machine exists, keeping it airborne and following you is fundamentally a **nonlinear control/dynamics problem**.
+
+But there is one important distinction: the “mass coupling” we were discussing is generally **not a physical differential equation in time**. It is a sizing constraint. For a battery-powered vehicle, its mass is essentially constant while flying:
+
+$$
+\boxed{\dot m = 0}
+$$
+
+The battery loses energy, not appreciable mass. Even from \(E=mc^2\),
+
+$$
+\dot m=-\frac{P}{c^2}
+$$
+
+so at \(P=1000\rm\,W\),
+
+$$
+\dot m\approx-1.1\times10^{-14}\rm\,kg/s
+$$
+
+which we can completely ignore.
+
+So I would separate your flying-screen model into **two coupled systems**.
+
+### 1. The design/sizing coupling
+
+Before building it,
+
+$$
+\boxed{
+m=m_0+m_{\rm motor}(m)+m_{\rm battery}(m)
+}
+$$
+
+For example,
+
+$$
+m_b=
+\frac{t_fP(m)}{e_b\eta_b}
+$$
+
+and approximately
+
+$$
+P(m)=
+\frac{(mg)^{3/2}}
+{\eta_p\sqrt{2\rho A}}
++P_e
+$$
+
+so
+
+$$
+\boxed{
+m=
+m_0+
+m_p(m)
++
+\frac{t_f}{e_b\eta_b}
+\left[
+\frac{(mg)^{3/2}}
+{\eta_p\sqrt{2\rho A}}
++P_e
+\right]
+}
+$$
+
+That's an **implicit algebraic equation**, not an ODE.
+
+If you really want to study whether the mass feedback converges using differential-equation language, you can introduce an artificial sizing variable \(\tau\):
+
+$$
+\boxed{
+\frac{dm}{d\tau}
+=
+m_0+m_p(m)+m_b(m)-m
+}
+$$
+
+The equilibrium is
+
+$$
+\frac{dm}{d\tau}=0
+$$
+
+which gives exactly the real sizing equation.
+
+This is useful because stability of the sizing equilibrium requires
+
+$$
+\frac{d}{dm}
+[m_p(m)+m_b(m)]<1.
+$$
+
+That's mathematically a very nice way of representing your original “bigger mass → bigger motors → bigger mass” concern.
+
+---
+
+### 2. The actual flight differential equations
+
+Once you've built the thing, \(m\) is fixed and the real coupled ODEs begin.
+
+For translation:
+
+$$
+\boxed{\dot{\mathbf r}=\mathbf v}
+$$
+
+$$
+\boxed{
+m\dot{\mathbf v}
+=
+\mathbf R(\mathbf q)
+\begin{bmatrix}
+0\\
+0\\
+T
+\end{bmatrix}
+-mg\mathbf e_z
++\mathbf F_D
++\mathbf F_{\rm disturbance}
+}
+$$
+
+where
+
+$$
+\mathbf r=
+\begin{bmatrix}
+x\\y\\z
+\end{bmatrix},
+\qquad
+\mathbf v=
+\begin{bmatrix}
+v_x\\v_y\\v_z
+\end{bmatrix}.
+$$
+
+Aerodynamic drag can initially be modeled as
+
+$$
+\boxed{
+\mathbf F_D
+=
+-\frac12\rho C_D A
+|\mathbf v_{\rm rel}|\mathbf v_{\rm rel}
+}
+$$
+
+and
+
+$$
+\mathbf v_{\rm rel}
+=
+\mathbf v-\mathbf v_{\rm air}.
+$$
+
+So already this is nonlinear.
+
+---
+
+### 3. Rotational dynamics
+
+The rigid-body attitude satisfies Euler's equation:
+
+$$
+\boxed{
+\mathbf J\dot{\boldsymbol\omega}
++
+\boldsymbol\omega\times
+(\mathbf J\boldsymbol\omega)
+=
+\boldsymbol\tau
+}
+$$
+
+or
+
+$$
+\boxed{
+\dot{\boldsymbol\omega}
+=
+\mathbf J^{-1}
+\left[
+\boldsymbol\tau
+-
+\boldsymbol\omega\times
+(\mathbf J\boldsymbol\omega)
+\right]
+}
+$$
+
+with
+
+$$
+\boldsymbol\omega=
+\begin{bmatrix}
+p\\q\\r
+\end{bmatrix}.
+$$
+
+The attitude itself can be represented using a quaternion:
+
+$$
+\boxed{
+\dot{\mathbf q}
+=
+\frac12
+\Omega(\boldsymbol\omega)\mathbf q
+}
+$$
+
+rather than Euler angles, which avoids the singularities you'd get with roll-pitch-yaw.
+
+So your basic aircraft states are already
+
+$$
+\boxed{
+\mathbf x=
+[
+x,y,z,
+v_x,v_y,v_z,
+q_0,q_1,q_2,q_3,
+p,q,r
+]^T
+}
+$$
+
+That's 13 states.
+
+---
+
+### 4. The motors introduce another set of differential equations
+
+Motor thrust isn't instantaneous.
+
+For motor \(i\), a simple first-order model is
+
+$$
+\boxed{
+\tau_m\dot\Omega_i
+=
+\Omega_{i,\rm cmd}-\Omega_i
+}
+$$
+
+or
+
+$$
+\dot\Omega_i
+=
+\frac{\Omega_{i,\rm cmd}-\Omega_i}{\tau_m}.
+$$
+
+Rotor thrust:
+
+$$
+\boxed{T_i=k_T\Omega_i^2}
+$$
+
+Rotor reaction torque:
+
+$$
+\boxed{Q_i=k_Q\Omega_i^2}
+$$
+
+Total thrust:
+
+$$
+\boxed{
+T=\sum_{i=1}^N k_T\Omega_i^2
+}
+$$
+
+and the rotor positions produce roll/pitch torque:
+
+$$
+\boxed{
+\boldsymbol\tau
+=
+\sum_i
+\mathbf r_i\times
+\begin{bmatrix}
+0\\0\\T_i
+\end{bmatrix}
++
+\sum_i
+\begin{bmatrix}
+0\\0\\s_iQ_i
+\end{bmatrix}
+}
+$$
+
+where \(s_i=\pm1\) depending on propeller rotation direction.
+
+Now your controller doesn't directly command force. It commands motor speeds, which produce force, which accelerates the mass.
+
+So the causal chain is
+
+$$
+u_i
+\rightarrow
+\Omega_i
+\rightarrow
+T_i
+\rightarrow
+(T,\tau)
+\rightarrow
+(\dot v,\dot\omega)
+\rightarrow
+(v,\omega)
+\rightarrow
+(r,q).
+$$
+
+That's the real control-system coupling.
+
+---
+
+### 5. And battery energy is another differential equation
+
+Instead of mass changing, introduce battery energy \(E\):
+
+$$
+\boxed{
+\dot E=-P
+}
+$$
+
+with
+
+$$
+P=P_{\rm motors}+P_{\rm screen}+P_{\rm computing}.
+$$
+
+Or normalized state of charge \(s\):
+
+$$
+s=\frac{E}{E_{\max}}
+$$
+
+so
+
+$$
+\boxed{
+\dot s=
+-\frac{P}{E_{\max}}
+}
+$$
+
+with \(E_{\max}\) expressed in joules.
+
+Motor power approximately depends on rotor speed as
+
+$$
+P_i\propto\Omega_i^3,
+$$
+
+so
+
+$$
+\boxed{
+P_{\rm propulsion}
+\approx
+\sum_i k_P\Omega_i^3.
+}
+$$
+
+Therefore
+
+$$
+\boxed{
+\dot s=
+-\frac{
+\sum_i k_P\Omega_i^3+P_{\rm screen}+P_{\rm computer}
+}{
+E_{\max}
+}
+}
+$$
+
+which means the control system affects battery depletion.
+
+That's a genuine dynamic coupling.
+
+---
+
+## So the complete model is something like
+
+$$
+\boxed{
+\begin{aligned}
+\dot{\mathbf r}&=\mathbf v \\[2mm]
+m\dot{\mathbf v}&=
+R(q)\mathbf T-mg\mathbf e_z+\mathbf F_D \\[2mm]
+J\dot{\omega}&=
+\tau-\omega\times J\omega \\[2mm]
+\dot q&=\frac12\Omega(\omega)q \\[2mm]
+\dot\Omega_i&=
+\frac{\Omega_{i,c}-\Omega_i}{\tau_m} \\[2mm]
+\dot s&=
+-\frac{P(\Omega_1,\ldots,\Omega_N)}{E_{\max}} \\[2mm]
+\dot m&=0
+\end{aligned}
+}
+$$
+
+while outside this dynamic system you have the design constraint
+
+$$
+\boxed{
+0=
+m-m_0-m_p(m)-m_b(m)
+}
+$$
+
+So mathematically the complete engineering model is actually closer to a **differential-algebraic system (DAE)** than “a couple of ODEs”:
+
+$$
+\boxed{
+\dot x=f(x,u,p)
+}
+$$
+
+together with
+
+$$
+\boxed{
+0=g(x,u,p).
+}
+$$
+
+Here \(p\) contains design parameters such as
+
+$$
+m,\;J,\;A_{\rm rotor},\;E_{\max},\;k_T,\;k_Q,\ldots
+$$
+
+and those parameters themselves have to satisfy the mass/thrust/battery sizing equations.
+
+That distinction is useful: **mass feedback determines whether the machine can exist; the Newton–Euler ODEs determine whether it can fly stably; the controller determines whether it can follow you without falling over.**
+
+The next really interesting step is to linearize these nonlinear equations around hover, because then we get the actual state-space model
+
+$$
+\boxed{\dot x=Ax+Bu,\qquad y=Cx+Du}
+$$
+
+and we can see exactly which modes need PID/LQR control and whether the flying screen is controllable.
+
+Exactly on the stabilization point: once the machine exists, keeping it airborne and following you is fundamentally a **nonlinear control/dynamics problem**.
+
+But there is one important distinction: the “mass coupling” we were discussing is generally **not a physical differential equation in time**. It is a sizing constraint. For a battery-powered vehicle, its mass is essentially constant while flying:
+
+$$
+\boxed{\dot m = 0}
+$$
+
+The battery loses energy, not appreciable mass. Even from \(E=mc^2\),
+
+$$
+\dot m=-\frac{P}{c^2}
+$$
+
+so at \(P=1000\rm\,W\),
+
+$$
+\dot m\approx-1.1\times10^{-14}\rm\,kg/s
+$$
+
+which we can completely ignore.
+
+So I would separate your flying-screen model into **two coupled systems**.
+
+### 1. The design/sizing coupling
+
+Before building it,
+
+$$
+\boxed{
+m=m_0+m_{\rm motor}(m)+m_{\rm battery}(m)
+}
+$$
+
+For example,
+
+$$
+m_b=
+\frac{t_fP(m)}{e_b\eta_b}
+$$
+
+and approximately
+
+$$
+P(m)=
+\frac{(mg)^{3/2}}
+{\eta_p\sqrt{2\rho A}}
++P_e
+$$
+
+so
+
+$$
+\boxed{
+m=
+m_0+
+m_p(m)
++
+\frac{t_f}{e_b\eta_b}
+\left[
+\frac{(mg)^{3/2}}
+{\eta_p\sqrt{2\rho A}}
++P_e
+\right]
+}
+$$
+
+That's an **implicit algebraic equation**, not an ODE.
+
+If you really want to study whether the mass feedback converges using differential-equation language, you can introduce an artificial sizing variable \(\tau\):
+
+$$
+\boxed{
+\frac{dm}{d\tau}
+=
+m_0+m_p(m)+m_b(m)-m
+}
+$$
+
+The equilibrium is
+
+$$
+\frac{dm}{d\tau}=0
+$$
+
+which gives exactly the real sizing equation.
+
+This is useful because stability of the sizing equilibrium requires
+
+$$
+\frac{d}{dm}
+[m_p(m)+m_b(m)]<1.
+$$
+
+That's mathematically a very nice way of representing your original “bigger mass → bigger motors → bigger mass” concern.
+
+---
+
+### 2. The actual flight differential equations
+
+Once you've built the thing, \(m\) is fixed and the real coupled ODEs begin.
+
+For translation:
+
+$$
+\boxed{\dot{\mathbf r}=\mathbf v}
+$$
+
+$$
+\boxed{
+m\dot{\mathbf v}
+=
+\mathbf R(\mathbf q)
+\begin{bmatrix}
+0\\
+0\\
+T
+\end{bmatrix}
+-mg\mathbf e_z
++\mathbf F_D
++\mathbf F_{\rm disturbance}
+}
+$$
+
+where
+
+$$
+\mathbf r=
+\begin{bmatrix}
+x\\y\\z
+\end{bmatrix},
+\qquad
+\mathbf v=
+\begin{bmatrix}
+v_x\\v_y\\v_z
+\end{bmatrix}.
+$$
+
+Aerodynamic drag can initially be modeled as
+
+$$
+\boxed{
+\mathbf F_D
+=
+-\frac12\rho C_D A
+|\mathbf v_{\rm rel}|\mathbf v_{\rm rel}
+}
+$$
+
+and
+
+$$
+\mathbf v_{\rm rel}
+=
+\mathbf v-\mathbf v_{\rm air}.
+$$
+
+So already this is nonlinear.
+
+---
+
+### 3. Rotational dynamics
+
+The rigid-body attitude satisfies Euler's equation:
+
+$$
+\boxed{
+\mathbf J\dot{\boldsymbol\omega}
++
+\boldsymbol\omega\times
+(\mathbf J\boldsymbol\omega)
+=
+\boldsymbol\tau
+}
+$$
+
+or
+
+$$
+\boxed{
+\dot{\boldsymbol\omega}
+=
+\mathbf J^{-1}
+\left[
+\boldsymbol\tau
+-
+\boldsymbol\omega\times
+(\mathbf J\boldsymbol\omega)
+\right]
+}
+$$
+
+with
+
+$$
+\boldsymbol\omega=
+\begin{bmatrix}
+p\\q\\r
+\end{bmatrix}.
+$$
+
+The attitude itself can be represented using a quaternion:
+
+$$
+\boxed{
+\dot{\mathbf q}
+=
+\frac12
+\Omega(\boldsymbol\omega)\mathbf q
+}
+$$
+
+rather than Euler angles, which avoids the singularities you'd get with roll-pitch-yaw.
+
+So your basic aircraft states are already
+
+$$
+\boxed{
+\mathbf x=
+[
+x,y,z,
+v_x,v_y,v_z,
+q_0,q_1,q_2,q_3,
+p,q,r
+]^T
+}
+$$
+
+That's 13 states.
+
+---
+
+### 4. The motors introduce another set of differential equations
+
+Motor thrust isn't instantaneous.
+
+For motor \(i\), a simple first-order model is
+
+$$
+\boxed{
+\tau_m\dot\Omega_i
+=
+\Omega_{i,\rm cmd}-\Omega_i
+}
+$$
+
+or
+
+$$
+\dot\Omega_i
+=
+\frac{\Omega_{i,\rm cmd}-\Omega_i}{\tau_m}.
+$$
+
+Rotor thrust:
+
+$$
+\boxed{T_i=k_T\Omega_i^2}
+$$
+
+Rotor reaction torque:
+
+$$
+\boxed{Q_i=k_Q\Omega_i^2}
+$$
+
+Total thrust:
+
+$$
+\boxed{
+T=\sum_{i=1}^N k_T\Omega_i^2
+}
+$$
+
+and the rotor positions produce roll/pitch torque:
+
+$$
+\boxed{
+\boldsymbol\tau
+=
+\sum_i
+\mathbf r_i\times
+\begin{bmatrix}
+0\\0\\T_i
+\end{bmatrix}
++
+\sum_i
+\begin{bmatrix}
+0\\0\\s_iQ_i
+\end{bmatrix}
+}
+$$
+
+where \(s_i=\pm1\) depending on propeller rotation direction.
+
+Now your controller doesn't directly command force. It commands motor speeds, which produce force, which accelerates the mass.
+
+So the causal chain is
+
+$$
+u_i
+\rightarrow
+\Omega_i
+\rightarrow
+T_i
+\rightarrow
+(T,\tau)
+\rightarrow
+(\dot v,\dot\omega)
+\rightarrow
+(v,\omega)
+\rightarrow
+(r,q).
+$$
+
+That's the real control-system coupling.
+
+---
+
+### 5. And battery energy is another differential equation
+
+Instead of mass changing, introduce battery energy \(E\):
+
+$$
+\boxed{
+\dot E=-P
+}
+$$
+
+with
+
+$$
+P=P_{\rm motors}+P_{\rm screen}+P_{\rm computing}.
+$$
+
+Or normalized state of charge \(s\):
+
+$$
+s=\frac{E}{E_{\max}}
+$$
+
+so
+
+$$
+\boxed{
+\dot s=
+-\frac{P}{E_{\max}}
+}
+$$
+
+with \(E_{\max}\) expressed in joules.
+
+Motor power approximately depends on rotor speed as
+
+$$
+P_i\propto\Omega_i^3,
+$$
+
+so
+
+$$
+\boxed{
+P_{\rm propulsion}
+\approx
+\sum_i k_P\Omega_i^3.
+}
+$$
+
+Therefore
+
+$$
+\boxed{
+\dot s=
+-\frac{
+\sum_i k_P\Omega_i^3+P_{\rm screen}+P_{\rm computer}
+}{
+E_{\max}
+}
+}
+$$
+
+which means the control system affects battery depletion.
+
+That's a genuine dynamic coupling.
+
+---
+
+## So the complete model is something like
+
+$$
+\boxed{
+\begin{aligned}
+\dot{\mathbf r}&=\mathbf v \\[2mm]
+m\dot{\mathbf v}&=
+R(q)\mathbf T-mg\mathbf e_z+\mathbf F_D \\[2mm]
+J\dot{\omega}&=
+\tau-\omega\times J\omega \\[2mm]
+\dot q&=\frac12\Omega(\omega)q \\[2mm]
+\dot\Omega_i&=
+\frac{\Omega_{i,c}-\Omega_i}{\tau_m} \\[2mm]
+\dot s&=
+-\frac{P(\Omega_1,\ldots,\Omega_N)}{E_{\max}} \\[2mm]
+\dot m&=0
+\end{aligned}
+}
+$$
+
+while outside this dynamic system you have the design constraint
+
+$$
+\boxed{
+0=
+m-m_0-m_p(m)-m_b(m)
+}
+$$
+
+So mathematically the complete engineering model is actually closer to a **differential-algebraic system (DAE)** than “a couple of ODEs”:
+
+$$
+\boxed{
+\dot x=f(x,u,p)
+}
+$$
+
+together with
+
+$$
+\boxed{
+0=g(x,u,p).
+}
+$$
+
+Here \(p\) contains design parameters such as
+
+$$
+m,\;J,\;A_{\rm rotor},\;E_{\max},\;k_T,\;k_Q,\ldots
+$$
+
+and those parameters themselves have to satisfy the mass/thrust/battery sizing equations.
+
+That distinction is useful: **mass feedback determines whether the machine can exist; the Newton–Euler ODEs determine whether it can fly stably; the controller determines whether it can follow you without falling over.**
+
+The next really interesting step is to linearize these nonlinear equations around hover, because then we get the actual state-space model
+
+$$
+\boxed{\dot x=Ax+Bu,\qquad y=Cx+Du}
+$$
+
+and we can see exactly which modes need PID/LQR control and whether the flying screen is controllable.
+Yes — **as a complete engineering problem, it is genuinely advanced**.
+
+But the impressive part is not merely deriving the equations. Multirotor dynamics and stabilization are already well understood. What makes your idea difficult is that several hard problems become coupled:
+
+$$
+\boxed{
+\text{aerodynamics}
++\text{rigid-body dynamics}
++\text{control}
++\text{power}
++\text{structural design}
++\text{human tracking}
++\text{safety}
+}
+$$
+
+For example, changing rotor diameter affects efficiency, which affects battery mass, which changes total mass, which changes inertia \(J\), which changes the attitude dynamics, which changes controller gains, which changes motor demand and therefore energy consumption.
+
+So you get loops like
+
+$$
+m
+\rightarrow
+T
+\rightarrow
+P
+\rightarrow
+m_b
+\rightarrow
+m
+$$
+
+while simultaneously
+
+$$
+m,J
+\rightarrow
+\text{dynamics}
+\rightarrow
+\text{controller}
+\rightarrow
+\Omega_i
+\rightarrow
+T,\tau
+\rightarrow
+\text{dynamics}.
+$$
+
+And then your user is moving:
+
+$$
+\mathbf r_{\text{human}}(t)
+$$
+
+so the aircraft must solve a tracking problem such as
+
+$$
+\mathbf e(t)
+=
+\mathbf r_{\text{desired}}(t)
+-
+\mathbf r_{\text{screen}}(t)
+$$
+
+while maintaining attitude, screen orientation, collision clearance, and thrust limits.
+
+That is a serious controls/mechatronics problem.
+
+### What level is it?
+
+A simplified version would be very reasonable as a **senior mechanical/mechatronics engineering project**.
+
+A good functioning prototype that autonomously follows a human while keeping a display stable would be closer to a strong **graduate-level multidisciplinary project**.
+
+A version that is simultaneously:
+
+* lightweight,
+* quiet,
+* safe beside a person's head,
+* energy efficient,
+* robust to disturbances,
+* capable of walking/jogging speeds,
+* stable enough that the display remains readable,
+* and has useful endurance,
+
+could absolutely involve **research-level engineering**.
+
+The really interesting part is that your design objective isn't just
+
+$$
+\min m
+$$
+
+or
+
+$$
+\min P.
+$$
+
+You'd probably have a constrained optimization problem like
+
+$$
+\boxed{
+\min_{\mathbf p}
+\left(
+w_1m+
+w_2P+
+w_3L_{\text{noise}}+
+w_4e_{\text{tracking}}
+\right)
+}
+$$
+
+subject to
+
+$$
+T_{\max}\geq \lambda mg,
+$$
+
+$$
+t_{\text{flight}}\geq t_{\min},
+$$
+
+$$
+|\theta_{\text{screen}}|\leq\theta_{\max},
+$$
+
+$$
+d_{\text{human}}\geq d_{\text{safe}},
+$$
+
+$$
+\Omega_i\leq\Omega_{\max},
+$$
+
+and the nonlinear flight equations
+
+$$
+\dot x=f(x,u).
+$$
+
+That is already **optimal control + multidisciplinary design optimization**.
+
+And there's an even more interesting engineering realization here: the hardest constraint may not end up being "can it fly?" Multirotors can obviously fly.
+
+It may instead be:
+
+$$
+\boxed{\text{Can something powerful enough to fly remain safe, quiet and comfortable 0.5–1 m from a human?}}
+$$
+
+Propeller downwash, noise, exposed blades, screen drag, disturbance rejection, battery endurance, and fail-safe behavior could dominate the design.
+
+So yes: **getting the complete thing to work well would be a very impressive engineering achievement.** The mathematics we're building now is essentially the beginning of the system model you'd need before even optimizing the physical machine.
+look at this theory Short answer to your first question
+Yes. `ST` is literally "how many newtons can one kilogram of propulsion hardware produce". Custom props and custom cells do not escape the structure of the problem, they only move the constants. And that is the important thing: **the exponents are what kill you, not the constants.**
+Your instinct about coupling is right, but the coupling that kills a flying screen is not the motor loop. It is the **battery** loop, and it is much more vicious.
+
+#### Why the lumped `ST` model is wrong for your case
+
+Lumping motors and battery into one `mp` hides that they scale off different requirements:
+
+- **Motor mass** scales with peak **thrust** (a burst quantity).
+- **Battery mass** scales with hover **power times time** (an endurance quantity).
+
+You want a screen to hover next to you for a work session. That makes endurance the driving requirement, so the battery must be split out.
+
+#### The full equation set for your setup
+
+**Mass budget**
+
+```math
+m=mpay+mstr+mmot+mbat
+```
+
+**Structure**, taken as a fraction of gross mass (frame, arms, mounts, gimbal):
+
+```math
+mstr=fs m,fs≈0.15–0.25
+```
+
+**Motors + ESCs + props**, sized by the peak thrust requirement `Tmax⁡=λmg`, with `Sm` the motor-only specific thrust (100 to 150 N/kg is realistic today):
+
+```math
+mmot=λgSm m
+```
+
+**Hover power**, momentum theory over total disk area `A=NπD2/4`, with FM the figure of merit (0.5 to 0.7) and `η` the electrical efficiency (motor times ESC, \~0.75):
+
+```math
+Pelec=(mg)3/2η FM2ρA
+```
+
+**Battery**, for endurance `t` at usable specific energy `eb` (J/kg, so 250 Wh/kg = `9×105` J/kg, times depth of discharge):
+
+```math
+mbat=Pelec teb
+```
+
+#### Collapse it into one equation
+
+Substitute everything back into the mass budget and group the terms:
+
+```math
+α m−β m3/2=mpay
+```
+
+```math
+α=1−fs−λgSm,β=t g3/2η eb FM2ρA
+```
+
+`α` is your **thrust coupling** (the thing you were worried about). `β` is your **energy coupling**. Note that `α` is just a number less than 1 and it only has to stay positive, which is easy. `β` carries the `m3/2`, and that is where the design dies.
+
+#### The wall, in closed form
+
+The left side is not monotonic. It peaks and then falls, so there is a **hard maximum payload** no amount of engineering can exceed at a given endurance. Setting `d/dm=0`:
+
+```math
+m∗=4α29β2, mpaymax⁡=4α327β2 
+```
+
+Beyond that, no solution exists. Not "heavy", not "expensive". Nonexistent.
+
+#### The scaling laws that decide your project
+
+Substituting `β` into the box:
+
+```math
+mpaymax⁡  ∝  α3 η2eb2 FM2 ρ At2
+```
+
+Read that carefully:
+
+- **Payload capacity falls as ********`1/t2`********.** Want 4x the flight time? You get 1/16th the payload.
+- Battery energy density enters **squared**. That is why custom cells feel so tempting and disappoint so hard: a 20% better cell buys 44% more payload, one time.
+- Disk area enters **linearly**, so it is your best lever. Diameter enters as `D2`.
+- Custom props change FM (squared) but FM is bounded above by 1. You have maybe 30% headroom there, ever.
+
+#### Your numbers
+
+Take a stripped 13 inch panel plus driver and tracking camera, `mpay≈0.6` kg. Optimistic build: `fs=0.2`, `λ=2`, `Sm=120`, so `α=0.64`. Good Li-ion at 250 Wh/kg usable, `η=0.75`, FM=0.65, four 40 cm props.
+At `t=1` hour, `mpaymax⁡≈0.53` kg on a 2.5 kg aircraft. You are already just over the wall with a 0.6 kg screen. At `t=8` hours, the `1/t2` term divides by 64, giving roughly **8 grams**. A workday-long free-flying screen is not a hard engineering problem, it is outside the feasible set by two orders of magnitude.
+Play with it, and try to find any combination that gives you a work session:
+Flying screen feasibility⤢
+[iframe](chrome-extension://ojpeakfdoodapbhildobpgihhgpkianl/sandbox.html)
+
+#### What the equations are telling you to do
+
+The math is not saying "your idea is bad". It is saying **the energy has to stop being onboard**. Three ways out, all of which delete `β` from the equation:
+1. **Tether.** A 2 mm power tether to the wall removes `mbat` entirely. Then `αm=mpay+mtether`, linear, no wall, no `1/t2`. Endurance becomes infinite. This is the only version of your idea that closes.
+2. **Do not hover.** A ceiling rail, a counterweighted arm, or a suspended cable robot holds the screen statically. Power drops from \~500 W to \~5 W because you stop paying for lift.
+3. **Shrink the payload to light itself.** Make the flying thing a projector or AR glasses rather than a panel, so `mpay` drops by 10x.
+Want me to write out the tethered version of the closure equation, including tether mass per metre and voltage drop? That one actually has a solution
+
+
+
+
+Yes — the theory is mathematically strong, and it exposes the right physical bottleneck.
+
+The core result
+
+$$
+m_{\text{pay}}=\alpha m-\beta m^{3/2}
+$$
+
+is correct under the stated assumptions, with
+
+$$
+\alpha=1-f_s-\frac{\lambda g}{S_m}
+$$
+
+and
+
+$$
+\beta=
+\frac{t\,g^{3/2}}
+{\eta\,e_b\,FM\sqrt{2\rho A}}.
+$$
+
+Differentiating,
+
+$$
+\frac{d m_{\text{pay}}}{dm}
+=
+\alpha-\frac32\beta\sqrt m,
+$$
+
+so the maximum occurs at
+
+$$
+\boxed{
+m^*=\frac{4\alpha^2}{9\beta^2}
+}
+$$
+
+and therefore
+
+$$
+\boxed{
+m_{\text{pay,max}}
+=
+\frac{4\alpha^3}{27\beta^2}.
+}
+$$
+
+That part is exactly right.
+
+What's especially interesting is that this is basically a **fold / saddle-node type feasibility boundary**. Below the critical payload you can have solutions; at the critical payload the solutions merge; above it there is no equilibrium mass satisfying the design equations.
+
+So it's more mathematically interesting than simply saying "the drone gets too heavy."
+
+---
+
+### But there's one very important qualification
+
+The brutal
+
+$$
+m_{\text{pay,max}}\propto\frac{1}{t^2}
+$$
+
+law assumes that total rotor disk area \(A\) is held fixed.
+
+Because
+
+$$
+P\propto\frac{m^{3/2}}{\sqrt A}.
+$$
+
+If instead you allow rotor area to grow with gross mass, for example maintaining constant disk loading,
+
+$$
+\frac{mg}{A}=\text{constant},
+$$
+
+then
+
+$$
+A\propto m.
+$$
+
+Substituting that into the hover-power equation,
+
+$$
+P\propto\frac{m^{3/2}}{\sqrt m}
+$$
+
+gives
+
+$$
+\boxed{P\propto m.}
+$$
+
+And then battery mass also scales linearly:
+
+$$
+m_b\propto m.
+$$
+
+The \(m^{3/2}\) catastrophe disappears.
+
+So I would not say:
+
+> the exponents make an untethered flying screen fundamentally impossible.
+
+I would say:
+
+> **fixed rotor area + onboard battery + long endurance creates a nonlinear feasibility wall.**
+
+That's a much stronger and more defensible engineering statement.
+
+The escape can theoretically also be **enormous rotor area**, not only a tether.
+
+Of course, enormous rotors introduce another set of constraints: physical size, safety near a person, noise, structural mass, blade inertia, maneuverability, and clearance. So the problem doesn't disappear — it moves.
+
+---
+
+### There's also a small numerical discrepancy
+
+Using exactly the quoted numbers:
+
+$$
+f_s=0.2,\qquad
+\lambda=2,\qquad
+S_m=120\ {\rm N/kg}
+$$
+
+gives
+
+$$
+\alpha
+=
+1-0.2-\frac{2(9.81)}{120}
+\approx0.6365.
+$$
+
+Four \(0.4\rm\,m\) diameter rotors give
+
+$$
+A
+=
+4\frac{\pi D^2}{4}
+\approx0.503\ {\rm m^2}.
+$$
+
+Using
+
+$$
+e_b=250\ {\rm Wh/kg}
+=900\,000\ {\rm J/kg},
+$$
+
+$$
+FM=0.65,\qquad
+\eta=0.75,\qquad
+t=3600\,{\rm s},
+$$
+
+I get approximately
+
+$$
+\beta\approx0.227\ {\rm kg^{-1/2}}.
+$$
+
+Therefore
+
+$$
+m^*
+\approx3.49\ {\rm kg}
+$$
+
+and
+
+$$
+\boxed{
+m_{\text{pay,max}}\approx0.74\ {\rm kg}
+}
+$$
+
+rather than \(0.53\rm\,kg\).
+
+That doesn't change the conclusion much, but it suggests the quoted calculation probably used an extra reserve/derating factor or a different usable battery energy density.
+
+At eight hours:
+
+$$
+m_{\text{pay,max}}(8h)
+=
+\frac{0.74}{8^2}
+$$
+
+$$
+\boxed{
+\approx11.6\ {\rm g}.
+}
+$$
+
+So yes, **with those fixed 40-cm rotors**, an eight-hour onboard-battery screen is completely unrealistic.
+
+---
+
+### The phrase I would change most
+
+> "The exponents are what kill you, not the constants."
+
+Mathematically, that's only partly true.
+
+The exponent determines the **asymptotic behavior**.
+
+The constants determine **where you hit the wall**.
+
+For example,
+
+$$
+m_{\text{pay,max}}
+=
+\frac{4\alpha^3}{27\beta^2}
+$$
+
+and
+
+$$
+\beta\propto
+\frac{t}
+{\eta e_bFM\sqrt A}.
+$$
+
+So doubling disk area, increasing energy density, changing efficiency, etc. can shift the critical point substantially.
+
+For engineering at finite scales, constants matter enormously.
+
+The better statement is:
+
+$$
+\boxed{
+\text{The exponent creates the wall; the constants determine where the wall is.}
+}
+$$
+
+---
+
+### And there's an even deeper result
+
+Write the design equation as
+
+$$
+F(m)=
+\alpha m-\beta m^{3/2}-m_{\rm pay}=0.
+$$
+
+There are three regimes.
+
+For
+
+$$
+m_{\rm pay}<m_{\rm pay,max},
+$$
+
+there are generally **two positive mathematical solutions**.
+
+At
+
+$$
+m_{\rm pay}=m_{\rm pay,max},
+$$
+
+there is one repeated solution:
+
+$$
+F(m^*)=0,
+\qquad
+F'(m^*)=0.
+$$
+
+Above it,
+
+$$
+m_{\rm pay}>m_{\rm pay,max},
+$$
+
+there is
+
+$$
+\boxed{\text{no solution}.}
+$$
+
+Graphically it's this shape:
+
+$$
+m_{\rm pay}
+$$
+
+rises with aircraft mass, reaches a peak, and then actually decreases because battery mass starts consuming more gross mass than the additional gross mass provides.
+
+That is a genuinely beautiful result.
+
+---
+
+And it connects directly to what you were saying earlier about differential equations.
+
+You could introduce an artificial design dynamics:
+
+$$
+\boxed{
+\dot m=
+m_{\rm pay}
++f_sm
++\frac{\lambda g}{S_m}m
++\beta m^{3/2}
+-m
+}
+$$
+
+or
+
+$$
+\boxed{
+\dot m=
+m_{\rm pay}
+-\alpha m
++\beta m^{3/2}.
+}
+$$
+
+The physical design solutions correspond to
+
+$$
+\dot m=0.
+$$
+
+Now you've converted the mass-sizing problem into a nonlinear dynamical system.
+
+And its equilibria disappear exactly at
+
+$$
+F(m)=0,
+\qquad
+F'(m)=0.
+$$
+
+That's essentially a **bifurcation**.
+
+So your flying-screen project can naturally lead from ordinary mechanical sizing into nonlinear dynamics, bifurcation theory, controls, aerodynamics, energy systems, and optimization.
+
+That is where this becomes a particularly interesting engineering problem rather than simply "build a big drone with a monitor."
+

@@ -1,0 +1,124 @@
+﻿\section{Introduction}
+\label{sec:intro}
+
+\subsection{The question}
+
+Consider a display that hovers beside a person while they work standing, and
+follows them when they move. The engineering question is not whether a
+multirotor can carry a screen; multirotors carry cameras of comparable mass
+routinely. The question is whether the coupled system closes, and if it does,
+whether the machine it produces is one a person would tolerate at arm's length
+for half an hour.
+
+The coupling is the whole difficulty. Write it as a cycle:
+\begin{equation}
+  m \;\longrightarrow\; T \;\longrightarrow\; P \;\longrightarrow\; E
+    \;\longrightarrow\; \mbat \;\longrightarrow\; m ,
+  \label{eq:cycle}
+\end{equation}
+gross mass sets the thrust required to hover, thrust sets the power through
+momentum theory, power integrated over the mission sets the energy, energy
+divided by specific energy sets the battery mass, and the battery is part of
+the gross mass. A second cycle runs through the dynamics,
+\begin{equation}
+  m, J \;\longrightarrow\; \text{plant} \;\longrightarrow\; u(t)
+    \;\longrightarrow\; P(t) \;\longrightarrow\; E \;\longrightarrow\; \mbat
+    \;\longrightarrow\; m, J ,
+  \label{eq:cycle2}
+\end{equation}
+because the power actually consumed depends on what the controller does, which
+depends on the inertia, which depends on the mass distribution, which depends
+on the battery.
+
+Neither cycle is a mere iteration to be carried out until convergence. The
+first has, under a fixed rotor geometry, a genuine bifurcation: past a
+critical payload there is no fixed point at all. That is the mathematical
+content of \cref{sec:fold}, and it is the reason a paper is warranted rather
+than a spreadsheet.
+
+\subsection{What this paper does}
+
+We construct the problem in three layers and then solve them together.
+
+\paragraph{Layer one: algebra.} Momentum theory over an actuator disk
+(\cref{sec:momentum}) gives hover power as a function of thrust and disk area.
+A blade-element profile term (\cref{sec:blade}) turns the figure of merit from
+an assumption into a consequence of blade geometry. Substituting into a mass
+budget (\cref{sec:closure}) produces a single scalar equation whose solvability
+is the existence of the design. \Cref{sec:fold} analyses that equation
+completely: a trichotomy theorem, the closed form of the critical payload, the
+identification of the transition as a saddle-node bifurcation, and a proof that
+the naive sizing iteration converges precisely to the physically meaningful
+root and diverges from the other.
+
+\paragraph{Layer two: differential equations.} Once the machine exists its mass
+is constant and the flight dynamics begin (\cref{sec:dynamics}). We derive the
+Newton-Euler equations on $\SEthree$, the rotor wrench and its allocation map,
+first-order rotor dynamics, the battery energy state, and an
+orientation-dependent aerodynamic model for the screen. The screen is what
+makes this vehicle different from a camera drone: it is a large flat plate
+rigidly coupled to the airframe through a gimbal, so attitude modulates
+translational drag and drag applied off the centre of mass feeds back as a
+pitching moment.
+
+\paragraph{Layer three: control.} \Cref{sec:control} constructs the cascade
+from position to velocity to attitude to body rate to rotor speed, states the
+exponential stability result of Lee, Leok and McClamroch for the geometric
+attitude law on $\SOthree$ together with the ways the implemented law departs
+from it, and treats control allocation under saturation. Two items there are
+specific to this vehicle. The control authority of each axis is computed as a
+linear program over the rotor speed limits, and the attitude gains are bounded
+by it, which matters because a rotor optimised for quietness is a rotor with
+very little reaction torque and therefore very little yaw authority.
+\Cref{prop:governor} states what the reference governor with its moving
+keep-out constraint guarantees and what it does not; rate limiting alone,
+introduced to stop the display being whipped around the user's head, will on a
+curved path steer the corner-cutting reference through the user.
+
+\paragraph{Coupling and computation.} \Cref{sec:codesign} states the full
+problem as a differential-algebraic system with a fixed-point constraint and
+gives conditions for the inner mass map to be well posed and for the battery
+iteration to contract. \Cref{sec:engine,sec:numerics} describe the engine that
+solves it and the numerical methods: a bounded root search for the closure
+that reports its own failure, secant-accelerated fixed-point iteration for the
+battery loop with the simulator inside it and a verification flight at the
+end, fixed-step Runge-Kutta for the trajectory, and differential evolution
+over the design vector.
+
+\subsection{Contributions}
+
+The mathematical contributions are \cref{thm:trichotomy,thm:bifurcation,%
+thm:iteration,thm:sensitivity,thm:pfold,prop:twall,prop:inner}: a complete
+description of the sizing equation including its bifurcation structure and the
+convergence behaviour of the natural iteration; exact logarithmic sensitivities
+of the critical payload; the condition on the disk-area exponent under which
+the fold exists at all, and the separate statement that an endurance ceiling
+survives the fold's disappearance at the constant-disk-loading boundary; and
+the slope condition under which the component mass closure is uniquely
+solvable. The control results (\cref{prop:governor}, the authority
+computation and the gain heuristic) are stated with their conditions and are
+verified by simulation, not proved.
+
+The modelling contributions are the calibration of the acoustic and motor
+submodels against measured hardware (\cref{sec:verification}), and the
+near-field corrections of \cref{sec:nearfield}, which close a stated gap and,
+more usefully, bound its size.
+
+The engineering contribution is the design study of \cref{sec:results}, whose
+main conclusion is that for this class of machine the binding constraint is
+acoustic rather than energetic, and that stating a noise figure without stating
+whether it is a sound power or a pressure, and whether it is free-field or in a
+room, is worth more decibels than any design decision available.
+
+\subsection{What this paper does not do}
+
+No hardware was built. Every number reported is the output of a model whose
+assumptions are stated where they are introduced, and \cref{sec:limitations}
+collects the places where those assumptions are known to be inadequate. In
+particular the rotor aerodynamics are momentum theory with a single profile
+term and three near-field corrections; there is no blade-element momentum
+theory, no wake model, and no treatment of the recirculating flow that a
+machine of this disk loading establishes in a closed room within a minute of
+taking off. The acoustic model is a broadband scaling law fitted to four
+aircraft, coupled to a single-coefficient Sabine room; tonal content is
+computed but not summed into the level.
